@@ -111,7 +111,7 @@ mod_dataInput <- function(id, nfidb) {
         ),
 
         # buttons module
-        mod_buttonsInput(ns('mod_buttonsInput'), nfidb)
+        mod_buttonsInput(ns('mod_buttonsInput'))
       ),
 
       # 2. data aggregation level (div and id is for shinyjs later application)
@@ -152,7 +152,11 @@ mod_dataInput <- function(id, nfidb) {
           mod_filtersUI(ns('mod_filtersUI'), nfidb)
 
         )
-      )
+      ),
+
+      # apply button
+      shiny::hr(),
+      mod_applyButtonInput(ns('mod_applyButtonInput_data_panel'))
     )#, # absolute panel end
 
     ## vizControls ####
@@ -193,9 +197,19 @@ mod_data <- function(
     mod_buttons, 'mod_buttonsInput'
   )
 
+  apply_data <- shiny::callModule(
+    mod_applyButton, 'mod_applyButtonInput_data_panel'
+  )
+
+  # apply_viz <- shiny::callModule(
+  #   mod_applyButton, 'mod_applyButtonInput_viz_panel'
+  # )
+  apply_viz <- apply_data
+  ## TODO change this when mod viz is done
+
   filters_reactives <- shiny::callModule(
     mod_filters, 'mod_filtersUI',
-    nfidb, data_reactives
+    nfidb, data_reactives, apply_data, apply_viz
   )
 
   # show/hide the panels
@@ -219,6 +233,10 @@ mod_data <- function(
 
     }
   )
+
+  shiny::observe({
+    data_reactives$filter_expressions <- filters_reactives
+  })
 
 
 }

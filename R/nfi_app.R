@@ -39,17 +39,17 @@ nfi_app <- function() {
           ),
 
           ########################################################### debug ####
-          # shiny::absolutePanel(
-          #   id = 'debug', class = 'panel panel-default', fixed = TRUE,
-          #   draggable = TRUE, width = 640, height = 'auto',
-          #   # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
-          #   # top = 'auto', left = 'auto', right = 100, bottom = 100,
-          #   top = 60, left = 'auto', right = 50, bottom = 'auto',
-          #
-          #   shiny::textOutput('debug1'),
-          #   shiny::textOutput('debug2'),
-          #   shiny::textOutput('debug3')
-          # ),
+          shiny::absolutePanel(
+            id = 'debug', class = 'panel panel-default', fixed = TRUE,
+            draggable = TRUE, width = 640, height = 'auto',
+            # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
+            # top = 'auto', left = 'auto', right = 100, bottom = 100,
+            top = 60, left = 'auto', right = 50, bottom = 'auto',
+
+            shiny::textOutput('debug1'),
+            shiny::textOutput('debug2'),
+            shiny::textOutput('debug3')
+          ),
           ####################################################### end debug ####
 
           ## mod_data ####
@@ -122,9 +122,9 @@ nfi_app <- function() {
     # )
 
     ## debug #####
-    # output$debug1 <- shiny::renderPrint({
-    #   map_reactives$map_draw_edited_features
-    # })
+    output$debug1 <- shiny::renderPrint({
+      data_reactives$filter_expressions
+    })
     # output$debug2 <- shiny::renderPrint({
     #   map_reactives$map_draw_all_features
     # })

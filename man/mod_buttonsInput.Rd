@@ -12,8 +12,6 @@ mod_buttons(input, output, session)
 \arguments{
 \item{id}{shiny id}
 
-\item{nfidb}{pool object to access the nfi db}
-
 \item{input}{internal}
 
 \item{output}{internal}

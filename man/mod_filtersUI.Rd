@@ -7,7 +7,7 @@
 \usage{
 mod_filtersUI(id, nfidb)
 
-mod_filters(input, output, session, nfidb, mod_data)
+mod_filters(input, output, session, nfidb, mod_data, apply_data, apply_viz)
 }
 \arguments{
 \item{id}{shiny id}
@@ -22,6 +22,10 @@ mod_filters(input, output, session, nfidb, mod_data)
 
 \item{mod_data}{reactives from the mod_dataInput module, to know about which scenario
 we are}
+
+\item{apply_data}{reactive from the applyButton module located in the data}
+
+\item{apply_viz}{reactive from the applyButton module located in the viz}
 
 \item{nfidb}{pool object to access the nfi db}
 }

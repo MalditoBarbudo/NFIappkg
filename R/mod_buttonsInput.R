@@ -3,7 +3,6 @@
 #' @description A shiny module to create and populate the buttons inputs
 #'
 #' @param id shiny id
-#' @param nfidb pool object to access the nfi db
 #'
 #' @export
 mod_buttonsInput <- function(id, nfidb) {
