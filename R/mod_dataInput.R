@@ -39,22 +39,14 @@ mod_dataInput <- function(id, nfidb) {
     'Natura Network 2000' = 'natura_network_2000'
   )
 
-  agg_level_choices <- c(
-    'Total by plot' = 'plot',
-    'Breakdown by Species' = 'species',
-    'Breakdown by Simplified Species' = 'simpspecies',
-    'Breakdown by Genus' = 'genus',
-    'Breakdown by Decidious/Esclerophyl/Conifer' = 'dec',
-    'Breakdown by Broadleaf/Conifer' = 'bc'
+  functional_group_choices <- c(
+    'Total by plot' = 'PLOT',
+    'Breakdown by Species' = 'SPECIES',
+    'Breakdown by Simplified Species' = 'SIMPSPECIES',
+    'Breakdown by Genus' = 'GENUS',
+    'Breakdown by Decidious/Esclerophyl/Conifer' = 'DEC',
+    'Breakdown by Broadleaf/Conifer' = 'BC'
   )
-
-  admin_div_fil_choices <- dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL') %>%
-    dplyr::filter(var_id == 'admin_region') %>%
-    dplyr::pull(var_values)
-
-  protected_areas_fil_choices <- dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL') %>%
-    dplyr::filter(var_id == 'admin_natural_interest_area') %>%
-    dplyr::pull(var_values)
 
   # UI ####
   shiny::tagList(
@@ -125,7 +117,7 @@ mod_dataInput <- function(id, nfidb) {
       # 2. data aggregation level (div and id is for shinyjs later application)
       shinyjs::hidden(
         shiny::div(
-          id = ns('dataAgg'),
+          id = ns('data_aggregation'),
 
           # horizontal rule to separate
           shiny::hr(),
@@ -136,9 +128,9 @@ mod_dataInput <- function(id, nfidb) {
             shiny::column(
               9,
               shinyWidgets::pickerInput(
-                ns('agg_level'), 'Select the breakdown level',
-                choices = agg_level_choices,
-                selected = 'plot', width = '100%'
+                ns('functional_group'), 'Select the breakdown level',
+                choices = functional_group_choices,
+                selected = 'none', width = '100%'
               ),
               shinyWidgets::awesomeCheckbox(
                 ns('diameter_classes'),
@@ -148,79 +140,19 @@ mod_dataInput <- function(id, nfidb) {
             )
           )
         )
-      )#,
+      ),
 
       # 3. data filtering (div and id is for shinyjs later application)
-      #   (this inputs are created empty and filled later on in the server based
-      #   on the section 1. inputs)
-      # shinyjs::hidden(
-      #   shiny::div(
-      #     id = ns('dataFil'),
-      #
-      #     # horizontal rule to separate
-      #     shiny::hr(),
-      #
-      #     shiny::h4(label_getter(nfidb, 'esp', 'dataFil_h4_label')),
-      #
-      #     shiny::fluidRow(
-      #       shiny::column(
-      #         6,
-      #         shinyWidgets::pickerInput(
-      #           ns('admin_div_fil'),
-      #           label_getter(nfidb, 'esp', 'admin_div_fil_label', 'comarca'),
-      #           choices = admin_div_fil_choices,
-      #           selected = '', multiple = TRUE, width = '100%',
-      #           options = list(
-      #             `actions-box` = TRUE,
-      #             `deselect-all-text` = 'None selected...',
-      #             `select-all-text` = 'All selected',
-      #             `selected-text-format` = 'count',
-      #             `count-selected-text` = "{0} divisions selected (of {1})"
-      #           )
-      #         )
-      #       ),
-      #       shiny::column(
-      #         6,
-      #         shinyWidgets::pickerInput(
-      #           ns('protected_areas_fil'),
-      #           label_getter(nfidb, 'esp', 'protected_areas_fil_label', 'proteccio'),
-      #           choices = protected_areas_fil_choices,
-      #           selected = '', multiple = TRUE, width = '100%',
-      #           options = list(
-      #             `actions-box` = TRUE,
-      #             `deselect-all-text` = 'None selected...',
-      #             `select-all-text` = 'All selected',
-      #             `selected-text-format` = 'count',
-      #             `count-selected-text` = "{0} divisions selected (of {1})"
-      #           )
-      #         )
-      #       )
-      #     ),
-      #
-      #     # hidden div for advanced filters
-      #     mod_advancedFiltersUI(ns('mod_advancedFiltersUI'), nfidb),
-      #     # shinyjs::hidden(
-      #     #   shiny::div(
-      #     #     id = ns('advancedFiltersControls'),
-      #     #     mod_advancedFiltersUI(ns('mod_advancedFiltersUI'))
-      #     #   )
-      #     # ),
-      #
-      #     shiny::fluidRow(
-      #       shiny::column(
-      #         6, offset = 3,
-      #         shinyWidgets::actionBttn(
-      #           ns('apply_filters'),
-      #           label_getter(nfidb, 'esp', 'apply_filters_label'),
-      #           icon = shiny::icon('check'),
-      #           style = "stretch",
-      #           block = TRUE,
-      #           size = 'sm'
-      #         )
-      #       )
-      #     )
-      #   )
-      # )
+      #   (this inputs are located in the mod_filter module
+      shinyjs::hidden(
+        shiny::div(
+          id = ns('data_filters'),
+          shiny::hr(),
+          shiny::h4('Filter data'),
+          mod_filtersUI(ns('mod_filtersUI'), nfidb)
+
+        )
+      )
     )#, # absolute panel end
 
     ## vizControls ####
@@ -229,4 +161,64 @@ mod_dataInput <- function(id, nfidb) {
     #   mod_vizInput(ns('mod_vizInput'), nfidb)
     # )
   ) # end of tagList
+}
+
+#' mod_data server function
+#' @param input internal
+#' @param output internal
+#' @param session internal
+#'
+#' @param nfidb pool object to access the nfi db
+#'
+#' @export
+mod_data <- function(
+  input, output, session,
+  nfidb
+) {
+
+  # reactive values to return and use in other modules
+  data_reactives <- shiny::reactiveValues()
+
+  shiny::observe({
+    data_reactives$nfi <- input$nfi
+    data_reactives$viz_shape <- input$viz_shape
+    data_reactives$admin_div <- input$admin_div
+    data_reactives$protected_areas <- input$protected_areas
+    data_reactives$functional_group <- input$functional_group
+    data_reactives$diameter_classes <- input$diameter_classes
+  })
+
+  # calling the modules used
+  buttons_reactives <- shiny::callModule(
+    mod_buttons, 'mod_buttonsInput'
+  )
+
+  filters_reactives <- shiny::callModule(
+    mod_filters, 'mod_filtersUI',
+    nfidb, data_reactives
+  )
+
+  # show/hide the panels
+  shiny::observeEvent(
+    eventExpr = buttons_reactives$show_filter_def,
+    handlerExpr = {
+      shinyjs::toggleElement(id = 'data_filters')
+    }
+  )
+
+  shiny::observeEvent(
+    eventExpr = buttons_reactives$show_agg,
+    handlerExpr = {
+      shinyjs::toggleElement(id = 'data_aggregation')
+    }
+  )
+
+  shiny::observeEvent(
+    eventExpr = buttons_reactives$show_viz,
+    handlerExpr = {
+
+    }
+  )
+
+
 }

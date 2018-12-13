@@ -98,10 +98,10 @@ nfi_app <- function() {
     ## module calling ####
 
     # data
-    # data_reactives <- shiny::callModule(
-    #   mod_data, 'mod_dataInput',
-    #   nfidb
-    # )
+    data_reactives <- shiny::callModule(
+      mod_data, 'mod_dataInput',
+      nfidb
+    )
 
     # map
     # map_reactives <- shiny::callModule(

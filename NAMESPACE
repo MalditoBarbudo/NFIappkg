@@ -2,6 +2,9 @@
 
 export(mod_buttons)
 export(mod_buttonsInput)
+export(mod_data)
 export(mod_dataInput)
+export(mod_filters)
+export(mod_filtersUI)
 export(nfi_app)
 importFrom(magrittr,"%>%")
