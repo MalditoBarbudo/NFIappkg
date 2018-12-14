@@ -133,7 +133,7 @@ nfi_app <- function() {
     ## debug #####
     output$debug1 <- shiny::renderTable({
       foo <- returned_data_reactives$main_data
-      foo[['selected']] %>% dplyr::collect()
+      foo[['selected']] %>% dplyr::collect() %>% head(4)
     })
     # output$debug2 <- shiny::renderPrint({
     #   map_reactives$map_draw_all_features
