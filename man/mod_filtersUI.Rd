@@ -7,7 +7,7 @@
 \usage{
 mod_filtersUI(id, nfidb)
 
-mod_filters(input, output, session, nfidb, mod_data, apply_data, apply_viz)
+mod_filters(input, output, session, nfidb, data_inputs, apply_data, apply_viz)
 }
 \arguments{
 \item{id}{shiny id}
@@ -20,7 +20,7 @@ mod_filters(input, output, session, nfidb, mod_data, apply_data, apply_viz)
 
 \item{session}{internal}
 
-\item{mod_data}{reactives from the mod_dataInput module, to know about which scenario
+\item{data_inputs}{reactives from the data_inputsInput module, to know about which scenario
 we are}
 
 \item{apply_data}{reactive from the applyButton module located in the data}

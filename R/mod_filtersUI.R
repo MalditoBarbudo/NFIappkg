@@ -14,18 +14,21 @@ mod_filtersUI <- function(id, nfidb) {
   # ui
   shiny::tagList(
     shiny::fluidRow(
-      shinyWidgets::pickerInput(
-        ns('filter_vars'),
-        'Select the variable/s to filter data by:',
-        choices = '',
-        multiple = TRUE,
-        options = list(
-          `actions-box` = TRUE,
-          `deselect-all-text` = 'None selected...',
-          `select-all-text` = 'All selected',
-          `selected-text-format` = 'count > 3',
-          `count-selected-text` = "{0} variables selected (of {1})",
-          `size` = 10
+      shiny::column(
+        9,
+        shinyWidgets::pickerInput(
+          ns('filter_vars'),
+          'Select the variable/s to filter data by:',
+          choices = '',
+          multiple = TRUE,
+          options = list(
+            `actions-box` = TRUE,
+            `deselect-all-text` = 'None selected...',
+            `select-all-text` = 'All selected',
+            `selected-text-format` = 'count > 3',
+            `count-selected-text` = "{0} variables selected (of {1})",
+            `size` = 10
+          )
         )
       )
     ),
@@ -39,7 +42,7 @@ mod_filtersUI <- function(id, nfidb) {
 #' @param session internal
 #'
 #' @param nfidb pool object to access the nfi db
-#' @param mod_data reactives from the mod_dataInput module, to know about which scenario
+#' @param data_inputs reactives from the data_inputsInput module, to know about which scenario
 #'   we are
 #' @param apply_data reactive from the applyButton module located in the data
 #' @param apply_viz reactive from the applyButton module located in the viz
@@ -51,14 +54,25 @@ mod_filtersUI <- function(id, nfidb) {
 #' @rdname mod_filtersUI
 mod_filters <- function(
   input, output, session,
-  nfidb, mod_data, apply_data, apply_viz
+  nfidb, data_inputs, apply_data, apply_viz
 ) {
 
   #### Filter vars and update picker ####
   tables_to_look_at <- shiny::reactive({
-    nfi <- mod_data$nfi
-    functional_group <- mod_data$functional_group
-    diameter_classes <- mod_data$diameter_classes
+    nfi <- data_inputs$nfi
+
+    if (nfi == 'nfi_2_nfi_3') {
+      nfi <- 'COMP_NFI2_NFI3'
+    } else {
+      if (nfi == 'nfi_3_nfi_4') {
+        nfi <- 'COMP_NFI3_NFI4'
+      } else {
+        nfi <- toupper(nfi)
+      }
+    }
+
+    functional_group <- data_inputs$functional_group %>% toupper()
+    diameter_classes <- data_inputs$diameter_classes
 
     if (isTRUE(diameter_classes)) {
       dc <- 'DIAMCLASS_'
@@ -126,7 +140,8 @@ mod_filters <- function(
                 `deselect-all-text` = 'None selected...',
                 `select-all-text` = 'All selected',
                 `selected-text-format` = 'count',
-                `count-selected-text` = "{0} values selected (of {1})"
+                `count-selected-text` = "{0} values selected (of {1})",
+                `size` = 10
               )
             )
           } else {
@@ -158,10 +173,8 @@ mod_filters <- function(
 
                 # TODO que hacemos con las lógicas???
               }
-
             }
           }
-
         }
       )
     })
@@ -173,56 +186,56 @@ mod_filters <- function(
   })
 
   ## Filter exprs generators ####
-  data_filter_expressions <- shiny::eventReactive(
-    ignoreInit = FALSE, ignoreNULL = FALSE,
-    eventExpr = apply_data$apply,
-    valueExpr = {
+  data_filter_expressions <- shiny::reactive({
 
-      # check the case of empty filter vars
-      if (is.null(input$filter_vars) || input$filter_vars == '') {
-        return(rlang::quos())
-      }
+    # browser()
 
-      lapply(
-        input$filter_vars, function(var) {
-          table_names <- tables_to_look_at()
+    # check the case of empty filter vars
+    if (is.null(input$filter_vars) || input$filter_vars == '') {
+      return(rlang::quos())
+    }
 
-          var_info <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
-            dplyr::filter(var_id == var, var_table %in% table_names) %>%
-            dplyr::select(var_id, var_type)
+    lapply(
+      input$filter_vars, function(var) {
+        table_names <- tables_to_look_at()
 
-          if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
+        var_info <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+          dplyr::filter(var_id == var, var_table %in% table_names) %>%
+          dplyr::select(var_id, var_type)
+
+        if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
+          rlang::quo(
+            !!rlang::sym(var) %in% c(!!input[[var]])
+          )
+        } else {
+          if (var_info %>% dplyr::pull(var_type) %>% unique() %in% c('numeric', 'integer')) {
             rlang::quo(
-              !!rlang::sym(var) %in% c(!!input[[var]])
+              between(!!rlang::sym(var), !!input[[var]][1], !!input[[var]][2])
             )
           } else {
-            if (var_info %>% dplyr::pull(var_type) %>% unique() %in% c('numeric', 'integer')) {
+
+            if (var_info %>% dplyr::pull(var_type) %>% unique() == 'logical') {
               rlang::quo(
-                between(!!rlang::sym(var), !!input[[var]][1], !!input[[var]][2])
+
               )
+              # TODO que hacemos con las lógicas???
             } else {
+              rlang::quo(
 
-              if (var_info %>% dplyr::pull(var_type) %>% unique() == 'logical') {
-                rlang::quo(
-
-                )
-                # TODO que hacemos con las lógicas???
-              } else {
-                rlang::quo(
-
-                )
-                # TODO que hacemos con las lógicas???
-              }
+              )
+              # TODO que hacemos con las lógicas???
             }
           }
         }
-      )
-    }
-  )
+      }
+    )
+  })
 
   filter_reactives <- shiny::reactiveValues()
   shiny::observe({
-    filter_reactives$filter_expressions <- data_filter_expressions
+    # browser()
+    filter_reactives$filter_expressions <- data_filter_expressions()
+    filter_reactives$filter_vars <- input$filter_vars
   })
 
   return(filter_reactives)

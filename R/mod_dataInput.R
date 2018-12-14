@@ -13,11 +13,11 @@ mod_dataInput <- function(id, nfidb) {
 
   ## preacalculated choices ####
   nfi_choices <- c(
-    'NFI v2' = 'NFI_2',
-    'NFI v3' = 'NFI_3',
-    'NFI v4' = 'NFI_4',
-    'NFI comp v2 - v3' = 'COMP_NFI2_NFI3',
-    'NFI comp v3 - v4' = 'COMP_NFI3_NFI4'
+    'NFI v2' = 'nfi_2',
+    'NFI v3' = 'nfi_3',
+    'NFI v4' = 'nfi_4',
+    'NFI comp v2 - v3' = 'nfi_2_nfi_3',
+    'NFI comp v3 - v4' = 'nfi_3_nfi_4'
   )
 
   viz_shape_choices <- c(
@@ -40,12 +40,12 @@ mod_dataInput <- function(id, nfidb) {
   )
 
   functional_group_choices <- c(
-    'Total by plot' = 'PLOT',
-    'Breakdown by Species' = 'SPECIES',
-    'Breakdown by Simplified Species' = 'SIMPSPECIES',
-    'Breakdown by Genus' = 'GENUS',
-    'Breakdown by Decidious/Esclerophyl/Conifer' = 'DEC',
-    'Breakdown by Broadleaf/Conifer' = 'BC'
+    'Total by plot' = 'plot',
+    'Breakdown by Species' = 'species',
+    'Breakdown by Simplified Species' = 'simpspecies',
+    'Breakdown by Genus' = 'genus',
+    'Breakdown by Decidious/Esclerophyl/Conifer' = 'dec',
+    'Breakdown by Broadleaf/Conifer' = 'bc'
   )
 
   # UI ####
@@ -181,15 +181,15 @@ mod_data <- function(
 ) {
 
   # reactive values to return and use in other modules
-  data_reactives <- shiny::reactiveValues()
+  data_inputs <- shiny::reactiveValues()
 
   shiny::observe({
-    data_reactives$nfi <- input$nfi
-    data_reactives$viz_shape <- input$viz_shape
-    data_reactives$admin_div <- input$admin_div
-    data_reactives$protected_areas <- input$protected_areas
-    data_reactives$functional_group <- input$functional_group
-    data_reactives$diameter_classes <- input$diameter_classes
+    data_inputs$nfi <- input$nfi
+    data_inputs$viz_shape <- input$viz_shape
+    data_inputs$admin_div <- input$admin_div
+    data_inputs$protected_areas <- input$protected_areas
+    data_inputs$functional_group <- input$functional_group
+    data_inputs$diameter_classes <- input$diameter_classes
   })
 
   # calling the modules used
@@ -209,7 +209,7 @@ mod_data <- function(
 
   filters_reactives <- shiny::callModule(
     mod_filters, 'mod_filtersUI',
-    nfidb, data_reactives, apply_data, apply_viz
+    nfidb, data_inputs, apply_data, apply_viz
   )
 
   # show/hide the panels
@@ -234,9 +234,14 @@ mod_data <- function(
     }
   )
 
+  # observer to get the filter expressions and the buttons actions
   shiny::observe({
-    data_reactives$filter_expressions <- filters_reactives
+    # browser()
+    data_inputs$filter_expressions <- filters_reactives$filter_expressions
+    data_inputs$filter_vars <- filters_reactives$filter_vars
+    data_inputs$apply_data <- apply_data$apply
+    data_inputs$apply_viz <- apply_viz$apply
   })
 
-
+  return(data_inputs)
 }

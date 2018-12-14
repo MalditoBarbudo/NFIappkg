@@ -46,7 +46,7 @@ nfi_app <- function() {
             # top = 'auto', left = 'auto', right = 100, bottom = 100,
             top = 60, left = 'auto', right = 50, bottom = 'auto',
 
-            shiny::textOutput('debug1'),
+            shiny::tableOutput('debug1'),
             shiny::textOutput('debug2'),
             shiny::textOutput('debug3')
           ),
@@ -55,6 +55,9 @@ nfi_app <- function() {
           ## mod_data ####
           # mod_data module, it includes the dataSel, dataFil and dataAgg inputs
           mod_dataInput('mod_dataInput', nfidb),
+
+          # just a call to the returned_data module
+          mod_returnedDataOutput('mod_returnedDataOutput'),
 
           ## mod_map ####
           # mod_map, it includes the map
@@ -97,10 +100,16 @@ nfi_app <- function() {
 
     ## module calling ####
 
-    # data
+    # data inputs
     data_reactives <- shiny::callModule(
       mod_data, 'mod_dataInput',
       nfidb
+    )
+
+    # returned data (NON COLLECTED!!!)
+    returned_data_reactives <- shiny::callModule(
+      mod_returnedData, 'mod_returnedDataOutput',
+      data_reactives, nfidb
     )
 
     # map
@@ -122,8 +131,9 @@ nfi_app <- function() {
     # )
 
     ## debug #####
-    output$debug1 <- shiny::renderPrint({
-      data_reactives$filter_expressions
+    output$debug1 <- shiny::renderTable({
+      foo <- returned_data_reactives$main_data
+      foo[['selected']] %>% dplyr::collect()
     })
     # output$debug2 <- shiny::renderPrint({
     #   map_reactives$map_draw_all_features
