@@ -15,4 +15,8 @@ Imports: shiny,
     magrittr,
     tidyNFI,
     pool,
-    glue
+    glue,
+    sf,
+    leaflet,
+    leaflet.extras,
+    htmlwidgets
