@@ -17,10 +17,15 @@ mod_returnedDataOutput <- function(id) {
 #' @param session internal
 #'
 #' @param data_inputs reactives from dataInput module
+#' @param custom_polygon custom_polygon sf object, if any
 #' @param nfidb pool object to access the nfi db
+#'
+#' @export
+#'
+#' @rdname mod_returnedDataOuput
 mod_returnedData <- function(
   input, output, session,
-  data_inputs, nfidb
+  data_inputs, custom_polygon = NULL, nfidb
 ) {
 
   # main data generator
@@ -37,6 +42,7 @@ mod_returnedData <- function(
       diameter_classes <- data_inputs$diameter_classes
       filter_vars <- data_inputs$filter_vars
       filter_expressions <- data_inputs$filter_expressions
+      custom_polygon_fil_expr <- tidyNFI:::custom_polygon_filter_expr(custom_polygon, nfidb)
 
       selected_data <- tidyNFI::nfi_results_data(
         conn = nfidb,
@@ -49,6 +55,7 @@ mod_returnedData <- function(
           variables = filter_vars,
           conn = nfidb,
           !!! filter_expressions,
+          !!! custom_polygon_fil_expr,
           .collect = FALSE
         )
 

@@ -57,11 +57,11 @@ nfi_app <- function() {
           mod_dataInput('mod_dataInput', nfidb),
 
           # just a call to the returned_data module
-          mod_returnedDataOutput('mod_returnedDataOutput'),
+          # mod_returnedDataOutput('mod_returnedDataOutput'), ## NOT HERE
 
           ## mod_map ####
           # mod_map, it includes the map
-          # mod_mapUI('mod_mapUI'),
+          mod_mapUI('mod_mapUI'),
 
           ## mod_infoPanel ####
           # mod_infoPanel, it includes the map events info panel
@@ -106,17 +106,17 @@ nfi_app <- function() {
       nfidb
     )
 
-    # returned data (NON COLLECTED!!!)
-    returned_data_reactives <- shiny::callModule(
-      mod_returnedData, 'mod_returnedDataOutput',
-      data_reactives, nfidb
-    )
+    # returned data (NON COLLECTED!!!) ## NOT HERE
+    # returned_data_reactives <- shiny::callModule(
+    #   mod_returnedData, 'mod_returnedDataOutput',
+    #   data_reactives, nfidb
+    # )
 
     # map
-    # map_reactives <- shiny::callModule(
-    #   mod_map, 'mod_mapUI',
-    #   data_reactives, data_reactives$advancedFilters_reactives, nfidb
-    # )
+    map_reactives <- shiny::callModule(
+      mod_map, 'mod_mapUI',
+      data_reactives, nfidb
+    )
 
     # info panel
     # shiny::callModule(

@@ -4,7 +4,8 @@
 \alias{mod_returnedData}
 \title{mod_returnedData server function}
 \usage{
-mod_returnedData(input, output, session, data_inputs, nfidb)
+mod_returnedData(input, output, session, data_inputs, custom_polygon = NULL,
+  nfidb)
 }
 \arguments{
 \item{input}{internal}
@@ -14,6 +15,8 @@ mod_returnedData(input, output, session, data_inputs, nfidb)
 \item{session}{internal}
 
 \item{data_inputs}{reactives from dataInput module}
+
+\item{custom_polygon}{custom_polygon sf object, if any}
 
 \item{nfidb}{pool object to access the nfi db}
 }

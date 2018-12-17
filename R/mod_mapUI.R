@@ -11,8 +11,15 @@ mod_mapUI <- function(id, nfidb) {
   # ns
   ns <- shiny::NS(id)
 
-  # leaflet output
-  leaflet::leafletOutput(ns('map'), height = '100%')
+  shiny::tagList(
+    # leaflet output
+    leaflet::leafletOutput(ns('map'), height = '100%'),
+
+    # mod returned data
+    mod_returnedDataOutput('mod_returnedDataOutput')
+  )
+
+
 
 }
 
@@ -22,7 +29,6 @@ mod_mapUI <- function(id, nfidb) {
 #' @param session internal
 #'
 #' @param data_reactives reactive with the reactive data and the data inputs
-#' @param returned_data_reactives reactive with the returned data to map
 #' @param nfidb pool with database connection object
 #'
 #' @export
@@ -30,7 +36,7 @@ mod_mapUI <- function(id, nfidb) {
 #' @rdname mod_mapUI
 mod_map <- function(
   input, output, session,
-  data_reactives, returned_data_reactives, nfidb
+  data_reactives, nfidb
 ) {
 
   # basic map,setting the view, zoom and panes to manage the zIndex
@@ -82,6 +88,7 @@ mod_map <- function(
   shiny::observeEvent(
     eventExpr = data_reactives$admin_div,
     handlerExpr = {
+
       polygon_object <- switch(
         data_reactives$admin_div,
         'aut_community' = 'catalonia_polygons',
@@ -109,36 +116,28 @@ mod_map <- function(
         'municipality' = '~admin_municipality'
       )
 
-      if (admin_div == '') {
-        leaflet::leafletProxy('map') %>%
-          leaflet::clearGroup('veguerias') %>%
-          leaflet::clearGroup('regions') %>%
-          leaflet::clearGroup('municipalities') %>%
-          leaflet::clearGroup('provinces')
-      } else {
-        leaflet::leafletProxy('map') %>%
-          leaflet::clearGroup('veguerias') %>%
-          leaflet::clearGroup('regions') %>%
-          leaflet::clearGroup('municipalities') %>%
-          leaflet::clearGroup('provinces') %>%
-          leaflet::addPolygons(
-            data = rlang::eval_tidy(rlang::sym(!!polygon_object)),
-            group = polygon_group,
-            label = rlang::sym(!!polygon_labels),
-            layerId = rlang::sym(!!polygon_labels),
-            weight = 1, smoothFactor = 1,
-            opacity = 1.0, fill = TRUE,
-            color = '#6C7A89FF', fillColor = "#CF000F00",
-            highlightOptions = leaflet::highlightOptions(
-              color = "#CF000F", weight = 2,
-              bringToFront = FALSE,
-              fill = TRUE, fillColor = "#CF000F00"
-            ),
-            options = leaflet::pathOptions(
-              pane = 'admin_divs'
-            )
+      leaflet::leafletProxy('map') %>%
+        leaflet::clearGroup('veguerias') %>%
+        leaflet::clearGroup('regions') %>%
+        leaflet::clearGroup('municipalities') %>%
+        leaflet::clearGroup('provinces') %>%
+        leaflet::addPolygons(
+          data = rlang::eval_tidy(rlang::sym(polygon_object)),
+          group = polygon_group,
+          label = as.formula(polygon_labels),
+          layerId = as.formula(polygon_labels),
+          weight = 1, smoothFactor = 1,
+          opacity = 1.0, fill = TRUE,
+          color = '#6C7A89FF', fillColor = "#CF000F00",
+          highlightOptions = leaflet::highlightOptions(
+            color = "#CF000F", weight = 2,
+            bringToFront = FALSE,
+            fill = TRUE, fillColor = "#CF000F00"
+          ),
+          options = leaflet::pathOptions(
+            pane = 'admin_divs'
           )
-      }
+        )
     }
   )
 
@@ -160,6 +159,30 @@ mod_map <- function(
       return(polygon_res)
     }
   })
+
+  # returned data (NON COLLECTED!!!) ## NOT HERE
+  returned_data_reactives <- shiny::callModule(
+    mod_returnedData, 'mod_returnedDataOutput',
+    data_reactives, custom_polygon(), nfidb
+  )
+
+  # map_modificated <- shiny::eventReactive(
+  #   eventExpr = returned_data_reactives,
+  #   valueExpr = {
+  #
+  #     viz_shape <- data_reactives$viz_shape
+  #     admin_div <- glue::glue('admin_{data_reactives$admin_div}')
+  #
+  #     if (viz_shape == 'polygon') {
+  #
+  #       map_data <- returned_data_reactives[['summarised']] %>%
+  #
+  #
+  #     }
+  #
+  #
+  #   }
+  # )
 
 
 }
