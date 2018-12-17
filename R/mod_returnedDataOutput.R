@@ -58,7 +58,17 @@ mod_returnedData <- function(
           !!! filter_expressions,
           !!! custom_polygon_fil_expr,
           .collect = FALSE
-        )
+        ) %>%
+        dplyr::left_join(dplyr::tbl(nfidb, 'PLOTS'), by = 'plot_id')
+
+      if (nfi %in% c('nfi_2', 'nfi_3', 'nfi_4')) {
+        selected_data <- selected_data %>%
+          dplyr::left_join(
+            dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi)}_DYNAMIC_INFO")),
+            by = 'plot_id'
+          )
+      }
+
 
       if (viz_shape == 'polygon') {
         summarised_data <- selected_data %>%
