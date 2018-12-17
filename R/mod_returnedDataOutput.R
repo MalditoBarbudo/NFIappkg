@@ -30,6 +30,7 @@ mod_returnedData <- function(
 
   # main data generator
   main_data <- shiny::eventReactive(
+    ignoreNULL = FALSE, ignoreInit = FALSE,
     eventExpr = data_inputs$apply_data,
     valueExpr = {
 

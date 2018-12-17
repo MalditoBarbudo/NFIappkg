@@ -44,8 +44,6 @@ mod_filtersUI <- function(id, nfidb) {
 #' @param nfidb pool object to access the nfi db
 #' @param data_inputs reactives from the data_inputsInput module, to know about which scenario
 #'   we are
-#' @param apply_data reactive from the applyButton module located in the data
-#' @param apply_viz reactive from the applyButton module located in the viz
 #'
 #' @importFrom dplyr between
 #'
@@ -54,7 +52,7 @@ mod_filtersUI <- function(id, nfidb) {
 #' @rdname mod_filtersUI
 mod_filters <- function(
   input, output, session,
-  nfidb, data_inputs, apply_data, apply_viz
+  nfidb, data_inputs
 ) {
 
   #### Filter vars and update picker ####

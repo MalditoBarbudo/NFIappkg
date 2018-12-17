@@ -157,13 +157,21 @@ mod_dataInput <- function(id, nfidb) {
       # apply button
       shiny::hr(),
       mod_applyButtonInput(ns('mod_applyButtonInput_data_panel'))
-    )#, # absolute panel end
+    ), # absolute panel end
 
     ## vizControls ####
-    # shiny::div(
-    #   id = ns('vizInputs'),
-    #   mod_vizInput(ns('mod_vizInput'), nfidb)
-    # )
+    shiny::div(
+      id = ns('vizInputs'),
+      shiny::absolutePanel(
+        id = 'vizControls', class = 'panel panel-default', fixed = TRUE,
+        draggable = TRUE, width = 380, height = 'auto',
+        top = 400, right = 60, left = 'auto', bottom = 'auto',
+
+        mod_vizInput(ns('mod_vizInput'), nfidb),
+
+        mod_applyButtonInput(ns('mod_applyButtonInput_viz_panel'))
+      )
+    )
   ) # end of tagList
 }
 
@@ -201,15 +209,18 @@ mod_data <- function(
     mod_applyButton, 'mod_applyButtonInput_data_panel'
   )
 
-  # apply_viz <- shiny::callModule(
-  #   mod_applyButton, 'mod_applyButtonInput_viz_panel'
-  # )
-  apply_viz <- apply_data
-  ## TODO change this when mod viz is done
+  viz_reactives <- shiny::callModule(
+    mod_viz, 'mod_vizInput',
+    data_inputs, nfidb
+  )
+
+  apply_viz <- shiny::callModule(
+    mod_applyButton, 'mod_applyButtonInput_viz_panel'
+  )
 
   filters_reactives <- shiny::callModule(
     mod_filters, 'mod_filtersUI',
-    nfidb, data_inputs, apply_data, apply_viz
+    nfidb, data_inputs
   )
 
   # show/hide the panels
@@ -237,10 +248,19 @@ mod_data <- function(
   # observer to get the filter expressions and the buttons actions
   shiny::observe({
     # browser()
+    # filters
     data_inputs$filter_expressions <- filters_reactives$filter_expressions
     data_inputs$filter_vars <- filters_reactives$filter_vars
+    # apply buttons
     data_inputs$apply_data <- apply_data$apply
     data_inputs$apply_viz <- apply_viz$apply
+    # viz
+    data_inputs$color <- viz_reactives$color
+    data_inputs$reverse_pal <- viz_reactives$reverse_pal
+    data_inputs$size <- viz_reactives$size
+    data_inputs$statistic <- viz_reactives$statistic
+    data_inputs$viz_functional_group_value <- viz_reactives$viz_functional_group_value
+    data_inputs$viz_diamclass <- viz_reactives$viz_diamclass
   })
 
   return(data_inputs)

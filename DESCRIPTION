@@ -1,11 +1,11 @@
 Package: NFIappkg
 Type: Package
-Title: Shiny modules and helpers for IFNapp
+Title: Shiny modules and helpers for NFIapp
 Version: 0.0.0.9000
 Authors@R: person("Granda", "Víctor", email = "victorgrandagarcia@gmail.com",
                   role = c("aut", "cre"))
 Description: Package to maintain and improve the shiny modules and helper
-    functions for the IFNapp from the "Laboratori Forestal Catalá"
+    functions for the NFIapp from the "Laboratori Forestal Catalá"
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

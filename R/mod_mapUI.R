@@ -28,7 +28,7 @@ mod_mapUI <- function(id, nfidb) {
 #' @param output internal
 #' @param session internal
 #'
-#' @param data_reactives reactive with the reactive data and the data inputs
+#' @param data_inputs reactive with the reactive data and the data inputs
 #' @param nfidb pool with database connection object
 #'
 #' @export
@@ -36,7 +36,7 @@ mod_mapUI <- function(id, nfidb) {
 #' @rdname mod_mapUI
 mod_map <- function(
   input, output, session,
-  data_reactives, nfidb
+  data_inputs, nfidb
 ) {
 
   # basic map,setting the view, zoom and panes to manage the zIndex
@@ -65,7 +65,7 @@ mod_map <- function(
         L.easyPrint({
         title: '',
         sizeModes: ['A4Landscape', 'A4Portrait'],
-        filename: 'IFNmap',
+        filename: 'NFImap',
         exportOnly: true,
         hideControlContainer: false
         }).addTo(this);
@@ -86,11 +86,11 @@ mod_map <- function(
   # slower, though. So we control the polygons drawing with a classic
   # input-observer pair, as we do with the parceles circles.
   shiny::observeEvent(
-    eventExpr = data_reactives$admin_div,
+    eventExpr = data_inputs$admin_div,
     handlerExpr = {
 
       polygon_object <- switch(
-        data_reactives$admin_div,
+        data_inputs$admin_div,
         'aut_community' = 'catalonia_polygons',
         'province' = 'provinces_polygons',
         'vegueria' = 'veguerias_polygons',
@@ -99,7 +99,7 @@ mod_map <- function(
       )
 
       polygon_group <- switch(
-        data_reactives$admin_div,
+        data_inputs$admin_div,
         'aut_community' = 'aut_communities',
         'province' = 'provinces',
         'vegueria' = 'veguerias',
@@ -108,7 +108,7 @@ mod_map <- function(
       )
 
       polygon_labels <- switch(
-        data_reactives$admin_div,
+        data_inputs$admin_div,
         'aut_community' = '~admin_aut_community',
         'province' = '~admin_province',
         'vegueria' = '~admin_vegueria',
@@ -161,21 +161,21 @@ mod_map <- function(
   })
 
   # returned data (NON COLLECTED!!!) ## NOT HERE
-  returned_data_reactives <- shiny::callModule(
+  returned_data_inputs <- shiny::callModule(
     mod_returnedData, 'mod_returnedDataOutput',
-    data_reactives, custom_polygon(), nfidb
+    data_inputs, custom_polygon(), nfidb
   )
 
   # map_modificated <- shiny::eventReactive(
-  #   eventExpr = returned_data_reactives,
+  #   eventExpr = returned_data_inputs,
   #   valueExpr = {
   #
-  #     viz_shape <- data_reactives$viz_shape
-  #     admin_div <- glue::glue('admin_{data_reactives$admin_div}')
+  #     viz_shape <- data_inputs$viz_shape
+  #     admin_div <- glue::glue('admin_{data_inputs$admin_div}')
   #
   #     if (viz_shape == 'polygon') {
   #
-  #       map_data <- returned_data_reactives[['summarised']] %>%
+  #       map_data <- returned_data_inputs[['summarised']] %>%
   #
   #
   #     }
