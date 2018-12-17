@@ -255,10 +255,10 @@ mod_data <- function(
     data_inputs$apply_data <- apply_data$apply
     data_inputs$apply_viz <- apply_viz$apply
     # viz
-    data_inputs$color <- viz_reactives$color
-    data_inputs$reverse_pal <- viz_reactives$reverse_pal
-    data_inputs$size <- viz_reactives$size
-    data_inputs$statistic <- viz_reactives$statistic
+    data_inputs$viz_color <- viz_reactives$viz_color
+    data_inputs$viz_reverse_pal <- viz_reactives$viz_reverse_pal
+    data_inputs$viz_size <- viz_reactives$viz_size
+    data_inputs$viz_statistic <- viz_reactives$viz_statistic
     data_inputs$viz_functional_group_value <- viz_reactives$viz_functional_group_value
     data_inputs$viz_diamclass <- viz_reactives$viz_diamclass
   })

@@ -208,10 +208,10 @@ mod_viz <- function(
   viz_reactives <- shiny::reactiveValues()
 
   shiny::observe({
-    viz_reactives$color <- input$color
-    viz_reactives$reverse_pal <- input$reverse_pal
-    viz_reactives$size <- input$size
-    viz_reactives$statistic <- input$statistic
+    viz_reactives$viz_color <- input$viz_color
+    viz_reactives$viz_reverse_pal <- input$viz_reverse_pal
+    viz_reactives$viz_size <- input$viz_size
+    viz_reactives$viz_statistic <- input$viz_statistic
     viz_reactives$viz_functional_group_value <- input$viz_functional_group_value
     viz_reactives$viz_diamclass <- input$viz_diamclass
   })

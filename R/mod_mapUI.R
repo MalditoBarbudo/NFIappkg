@@ -166,6 +166,132 @@ mod_map <- function(
     data_inputs, custom_polygon(), nfidb
   )
 
+  apply_reactives <- shiny::reactiveValues()
+  shiny::observe({
+    apply_reactives$apply_data <- data_inputs$apply_data
+    apply_reactives$apply_viz <- data_inputs$apply_viz
+  })
+
+  shiny::observeEvent(
+    eventExpr = apply_reactives,
+    handlerExpr = {
+
+      # browser()
+
+      # polygons
+      if (data_inputs$viz_shape == 'polygon') {
+
+        polygon_object <- switch(
+          data_inputs$admin_div,
+          'aut_community' = 'catalonia_polygons',
+          'province' = 'provinces_polygons',
+          'vegueria' = 'veguerias_polygons',
+          'region' = 'regions_polygons',
+          'municipality' = 'municipalities_polygons'
+        )
+
+        join_var <- switch(
+          data_inputs$admin_div,
+          'aut_community' = 'admin_aut_community',
+          'province' = 'admin_province',
+          'vegueria' = 'admin_vegueria',
+          'region' = 'admin_region',
+          'municipality' = 'admin_municipality'
+        )
+
+        polygon_group <- switch(
+          data_inputs$admin_div,
+          'aut_community' = 'aut_communities',
+          'province' = 'provinces',
+          'vegueria' = 'veguerias',
+          'region' = 'regions',
+          'municipality' = 'municipalities'
+        )
+
+        polygon_labels <- switch(
+          data_inputs$admin_div,
+          'aut_community' = '~admin_aut_community',
+          'province' = '~admin_province',
+          'vegueria' = '~admin_vegueria',
+          'region' = '~admin_region',
+          'municipality' = '~admin_municipality'
+        )
+
+        viz_color <- glue::glue("{data_inputs$viz_color}_{data_inputs$viz_statistic}")
+        # viz_size <- glue::glue("{data_inputs$viz_size}_{data_inputs$viz_statistic}")
+
+        # filter by functional group value
+        if (data_inputs$functional_group != 'plot') {
+
+          fil_var <- glue::glue("{data_inputs$functional_group}_id")
+          fil_val <- data_inputs$viz_functional_group_value
+
+          gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == !!! fil_val)
+        } else {
+          gf_filter_expr <- rlang::quo()
+        }
+
+        # filter by diam class value
+        if (isTRUE(data_inputs$diameter_classes)) {
+          dc_filter_expr <- rlang::quo(diamclass_id == !!! data_inputs$viz_diamclass)
+        } else {
+          dc_filter_expr <- rlang::quo()
+        }
+
+        map_data <- returned_data_inputs$main_data[['summarised']] %>%
+          dplyr::filter(
+            !!! gf_filter_expr,
+            !!! dc_filter_expr
+          ) %>%
+          dplyr::select(dplyr::one_of(
+            join_var, viz_color, viz_size
+          )) %>%
+          dplyr::collect() %>%
+          dplyr::left_join(
+            !! rlang::sym(polygon_object), by = join_var
+          )
+
+        color_vector <- map_data %>% dplyr::pull(!!! viz_color)
+        if (is.numeric(color_vector)) {
+          pal <- leaflet::colorBin(
+            'viridis', color_vector, 9, reverse = data_inputs$viz_reverse_pal
+          )
+        } else {
+          pal <- leaflet::colorFactor(
+            'viridis', color_vector, reverse = data_inputs$viz_reverse_pal
+          )
+        }
+
+        leaflet::leafletProxy('map') %>%
+          leaflet::clearGroup('veguerias') %>%
+          leaflet::clearGroup('regions') %>%
+          leaflet::clearGroup('municipalities') %>%
+          leaflet::clearGroup('provinces') %>%
+          leaflet::clearGroup('plots') %>%
+          leaflet::addPolygons(
+            data = map_data,
+            group = polygon_group,
+            label = as.formula(polygon_labels),
+            layerId = as.formula(polygon_labels),
+            weight = 1, smoothFactor = 1,
+            opacity = 1.0, fill = TRUE,
+            color = '#6C7A89FF', fillColor = pal(color_vector),
+            highlightOptions = leaflet::highlightOptions(
+              color = "#CF000F", weight = 2,
+              bringToFront = FALSE
+            ),
+            options = leaflet::pathOptions(
+              pane = 'admin_divs'
+            )
+          ) %>%
+          leaflet::addLegend(
+            position = 'topright', pal = pal, values = color_vector, title = viz_color,
+            layerId = 'color_legend', opacity = 1
+          )
+      }
+    }
+  )
+
   # map_modificated <- shiny::eventReactive(
   #   eventExpr = returned_data_inputs,
   #   valueExpr = {
