@@ -39,8 +39,8 @@ mod_map <- function(
   data_inputs, nfidb
 ) {
 
-  # basic map,setting the view, zoom and panes to manage the zIndex
-  base_map <- shiny::reactive({
+  # output map
+  output$map <- leaflet::renderLeaflet({
     leaflet::leaflet() %>%
       leaflet::setView(0.8, 41.67, zoom = 8) %>%
       leaflet::addMapPane('admin_divs', zIndex = 410) %>%
@@ -71,11 +71,6 @@ mod_map <- function(
         }).addTo(this);
         }"
       )
-  })
-
-  # output map
-  output$map <- leaflet::renderLeaflet({
-    base_map()
   })
 
   # observer for admin divs polygons. We use this instead of add polygons
@@ -160,23 +155,24 @@ mod_map <- function(
     }
   })
 
-  # returned data (NON COLLECTED!!!) ## NOT HERE
+  # returned data (NON COLLECTED!!!)
   returned_data_inputs <- shiny::callModule(
     mod_returnedData, 'mod_returnedDataOutput',
     data_inputs, custom_polygon(), nfidb
   )
 
-  apply_reactives <- shiny::reactiveValues()
-  shiny::observe({
+  apply_reactives <- shiny::reactive({
+    apply_reactives <- list()
     apply_reactives$apply_data <- data_inputs$apply_data
     apply_reactives$apply_viz <- data_inputs$apply_viz
   })
 
   shiny::observeEvent(
-    eventExpr = apply_reactives,
+    ignoreNULL = FALSE, ignoreInit = TRUE,
+    eventExpr = apply_reactives(),
     handlerExpr = {
 
-      # browser()
+      browser()
 
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
@@ -217,7 +213,7 @@ mod_map <- function(
           'municipality' = '~admin_municipality'
         )
 
-        viz_color <- glue::glue("{data_inputs$viz_color}_{data_inputs$viz_statistic}")
+        viz_color <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
         # viz_size <- glue::glue("{data_inputs$viz_size}_{data_inputs$viz_statistic}")
 
         # filter by functional group value
@@ -226,32 +222,48 @@ mod_map <- function(
           fil_var <- glue::glue("{data_inputs$functional_group}_id")
           fil_val <- data_inputs$viz_functional_group_value
 
-          gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == !!! fil_val)
+          # when changing to another functional group from plot there is one run without
+          # viz_functional_group_value, so we have to skip it
+          if (fil_val == '') {
+            return()
+          } else {
+            gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == fil_val)
+          }
         } else {
           gf_filter_expr <- rlang::quo()
         }
 
         # filter by diam class value
         if (isTRUE(data_inputs$diameter_classes)) {
-          dc_filter_expr <- rlang::quo(diamclass_id == !!! data_inputs$viz_diamclass)
+          dc_filter_expr <- rlang::quo(diamclass_id == data_inputs$viz_diamclass)
         } else {
           dc_filter_expr <- rlang::quo()
         }
 
+        filter_exprs <- rlang::quos(!!!gf_filter_expr, !!!dc_filter_expr) %>%
+          magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
+
         map_data <- returned_data_inputs$main_data[['summarised']] %>%
           dplyr::filter(
-            !!! gf_filter_expr,
-            !!! dc_filter_expr
+            !!! filter_exprs
           ) %>%
           dplyr::select(dplyr::one_of(
-            join_var, viz_color, viz_size
+            join_var, viz_color
           )) %>%
           dplyr::collect() %>%
-          dplyr::left_join(
-            !! rlang::sym(polygon_object), by = join_var
-          )
+          dplyr::full_join(
+            rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
+          ) %>%
+          sf::st_as_sf()
 
-        color_vector <- map_data %>% dplyr::pull(!!! viz_color)
+        # check if there is color variable
+        if (is.null(viz_color) || rlang::is_empty(viz_color)) {
+          color_vector <- rep('no_color', nrow(map_data))
+        } else {
+          color_vector <- map_data %>%
+            dplyr::pull(rlang::eval_tidy(rlang::sym(viz_color)))
+        }
+
         if (is.numeric(color_vector)) {
           pal <- leaflet::colorBin(
             'viridis', color_vector, 9, reverse = data_inputs$viz_reverse_pal
@@ -276,6 +288,7 @@ mod_map <- function(
             weight = 1, smoothFactor = 1,
             opacity = 1.0, fill = TRUE,
             color = '#6C7A89FF', fillColor = pal(color_vector),
+            fillOpacity = 1,
             highlightOptions = leaflet::highlightOptions(
               color = "#CF000F", weight = 2,
               bringToFront = FALSE

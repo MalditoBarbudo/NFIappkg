@@ -91,118 +91,235 @@ mod_viz <- function(
   data_inputs, nfidb
 ) {
 
-  returned_data_for_viz <-  shiny::callModule(
-    mod_returnedData, 'ret_data_viz',
-    data_inputs, NULL, nfidb
-  )
+  tables_to_look_at <- shiny::reactive({
+    nfi <- data_inputs$nfi
+
+    if (nfi == 'nfi_2_nfi_3') {
+      nfi <- 'COMP_NFI2_NFI3'
+    } else {
+      if (nfi == 'nfi_3_nfi_4') {
+        nfi <- 'COMP_NFI3_NFI4'
+      } else {
+        nfi <- toupper(nfi)
+      }
+    }
+
+    functional_group <- data_inputs$functional_group %>% toupper()
+    diameter_classes <- data_inputs$diameter_classes
+
+    if (isTRUE(diameter_classes)) {
+      dc <- 'DIAMCLASS_'
+    } else {
+      dc <- ''
+    }
+
+    table_names <- c(
+      glue::glue("{functional_group}_{nfi}_{dc}RESULTS"),
+      'PLOTS',
+      glue::glue("PLOTS_{nfi}_DYNAMIC_INFO")
+    )
+    return(table_names)
+  })
 
   # we need the vars in the data to be able to show the names in the color and size inputs
-  vars_to_viz_by <- shiny::eventReactive(
-    ignoreNULL = FALSE, ignoreInit = FALSE,
-    eventExpr = data_inputs$apply_data,
-    valueExpr = {
-      if (data_inputs$viz_shape == 'plot') {
-        data_vars <- returned_data_for_viz$main_data[['selected']] %>%
-          head(1) %>% dplyr::collect() %>% names()
-      } else {
-        data_vars <- returned_data_for_viz$main_data[['summarised']] %>%
-          head(1) %>% dplyr::collect() %>% names() %>%
-          stringr::str_remove('_[a-z]+$') %>% unique()
-      }
+  vars_to_viz_by <- shiny::reactive({
+    table_names <- tables_to_look_at()
 
-      ## TODO when the theasurus is completed here we build the real list of variables
+    all_variables <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+      dplyr::filter(var_table %in% table_names) %>%
+      dplyr::pull(var_id)
 
-      return(data_vars)
+    numeric_variables <- dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL') %>%
+      dplyr::filter(var_id %in% all_variables) %>%
+      dplyr::pull(var_id)
+
+    ## TODO when the theasurus is completed here we build the real list of variables
+
+    if (data_inputs$viz_shape == 'plot') {
+      return(all_variables)
+    } else {
+      return(numeric_variables)
     }
-  )
+  })
+
+  # vars_to_viz_by <- shiny::eventReactive(
+  #   ignoreNULL = FALSE, ignoreInit = FALSE,
+  #   eventExpr = data_inputs$apply_data,
+  #   valueExpr = {
+  #
+  #     if (data_inputs$viz_shape == 'plot') {
+  #       data_vars <- returned_data_for_viz$main_data[['selected']] %>%
+  #         head(1) %>% dplyr::collect() %>% names()
+  #     } else {
+  #       data_vars <- returned_data_for_viz$main_data[['summarised']] %>%
+  #         head(1) %>% dplyr::collect() %>% names() %>%
+  #         stringr::str_remove('_[mean|sd|min|max]+$') %>% unique()
+  #     }
+  #
+  #     ## TODO when the theasurus is completed here we build the real list of variables
+  #
+  #     return(data_vars)
+  #   }
+  # )
 
   # color input updater
-  shiny::observeEvent(
-    eventExpr = data_inputs$apply_data,
-    handlerExpr = {
-      color_choices <- vars_to_viz_by()
+  shiny::observe({
+    color_choices <- vars_to_viz_by()
+    # update the pickerInput
+    shinyWidgets::updatePickerInput(
+      session, 'viz_color',
+      choices = color_choices,
+      label = 'Color:'
+    )
+  })
+
+  # shiny::observeEvent(
+  #   ignoreNULL = FALSE, ignoreInit = FALSE,
+  #   eventExpr = data_inputs$apply_data,
+  #   handlerExpr = {
+  #     color_choices <- vars_to_viz_by()
+  #
+  #     # update the pickerInput
+  #     shinyWidgets::updatePickerInput(
+  #       session, 'viz_color',
+  #       choices = color_choices,
+  #       label = 'Color:'
+  #     )
+  #   }
+  # )
+
+  # size input updater
+  shiny::observe({
+    if (data_inputs$viz_shape == 'plot') {
+      size_choices <- vars_to_viz_by()
 
       # update the pickerInput
       shinyWidgets::updatePickerInput(
-        session, 'viz_color',
-        choices = color_choices,
-        label = 'Color:'
+        session, 'viz_size',
+        choices = size_choices,
+        label = 'Size:'
       )
+
+      # show and enable
+      shinyjs::show('viz_size')
+    } else {
+      shinyjs::hide('viz_size')
     }
-  )
+  })
 
-  # size input updater
-  shiny::observeEvent(
-    eventExpr = data_inputs$apply_data,
-    handlerExpr = {
+  # shiny::observeEvent(
+  #   ignoreNULL = FALSE, ignoreInit = FALSE,
+  #   eventExpr = data_inputs$apply_data,
+  #   handlerExpr = {
+  #
+  #     if (data_inputs$viz_shape == 'plot') {
+  #       size_choices <- vars_to_viz_by()
+  #
+  #       # update the pickerInput
+  #       shinyWidgets::updatePickerInput(
+  #         session, 'viz_size',
+  #         choices = size_choices,
+  #         label = 'Size:'
+  #       )
+  #
+  #       # show and enable
+  #       shinyjs::show('viz_size')
+  #     } else {
+  #       shinyjs::hide('viz_size')
+  #     }
+  #   }
+  # )
 
-      if (data_inputs$viz_shape == 'plot') {
-        size_choices <- vars_to_viz_by()
-
-        # update the pickerInput
-        shinyWidgets::updatePickerInput(
-          session, 'viz_size',
-          choices = size_choices,
-          label = 'Size:'
-        )
-
-        # show and enable
-        shinyjs::show('viz_size')
-      } else {
-        shinyjs::hide('viz_size')
-      }
+  # statistic input updater
+  shiny::observe({
+    if (data_inputs$viz_shape != 'plot') {
+      shinyjs::show('viz_statistic')
+    } else {
+      shinyjs::hide('viz_statistic')
     }
-  )
+  })
 
-  shiny::observeEvent(
-    eventExpr = data_inputs$apply_data,
-    handlerExpr = {
-
-      if (data_inputs$viz_shape != 'plot') {
-        shinyjs::show('viz_statistic')
-      } else {
-        shinyjs::hide('viz_statistic')
-      }
-
-    }
-  )
+  # shiny::observeEvent(
+  #   ignoreNULL = FALSE, ignoreInit = FALSE,
+  #   eventExpr = data_inputs$apply_data,
+  #   handlerExpr = {
+  #
+  #     if (data_inputs$viz_shape != 'plot') {
+  #       shinyjs::show('viz_statistic')
+  #     } else {
+  #       shinyjs::hide('viz_statistic')
+  #     }
+  #   }
+  # )
 
   # functional group value updater
-  shiny::observeEvent(
-    eventExpr = data_inputs$apply_data,
-    handlerExpr = {
-      if (data_inputs$functional_group != 'plot') {
+  shiny::observe({
+    if (data_inputs$functional_group != 'plot') {
 
-        functional_group <- data_inputs$functional_group
-        funct_group_var <- glue::glue('{functional_group}_id')
+      functional_group <- data_inputs$functional_group
+      funct_group_var <- glue::glue('{functional_group}_id')
+      table_names <- tables_to_look_at()
 
-        viz_functional_group_value_choices <- returned_data_for_viz$main_data[['selected']] %>%
-          dplyr::pull(!! rlang::sym(funct_group_var)) %>%
-          unique()
+      viz_functional_group_value_choices <- dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL') %>%
+        dplyr::filter(var_id == funct_group_var, var_table %in% table_names) %>%
+        dplyr::pull(var_values)
 
-        shinyWidgets::updatePickerInput(
-          session, 'viz_functional_group_value',
-          choices = viz_functional_group_value_choices,
-          label = glue::glue("{functional_group} to visualize:")
-        )
-
-        shinyjs::show('viz_functional_group_value')
-      } else {
-        shinyjs::hide('viz_functional_group_value')
-      }
+      shinyWidgets::updatePickerInput(
+        session, 'viz_functional_group_value',
+        choices = viz_functional_group_value_choices,
+        label = glue::glue("{functional_group} to visualize:")
+      )
+      shinyjs::show('viz_functional_group_value')
+    } else {
+      shinyjs::hide('viz_functional_group_value')
     }
-  )
+  })
 
-  shiny::observeEvent(
-    eventExpr = data_inputs$apply_data,
-    handlerExpr = {
-      if (isTRUE(data_inputs$diameter_classes)) {
-        shinyjs::show('viz_diamclass')
-      } else {
-        shinyjs::hide('viz_diamclass')
-      }
+  # shiny::observeEvent(
+  #   eventExpr = data_inputs$apply_data,
+  #   handlerExpr = {
+  #     if (data_inputs$functional_group != 'plot') {
+  #
+  #       functional_group <- data_inputs$functional_group
+  #       funct_group_var <- glue::glue('{functional_group}_id')
+  #
+  #       viz_functional_group_value_choices <- returned_data_for_viz$main_data[['selected']] %>%
+  #         dplyr::pull(!! rlang::sym(funct_group_var)) %>%
+  #         unique()
+  #
+  #       shinyWidgets::updatePickerInput(
+  #         session, 'viz_functional_group_value',
+  #         choices = viz_functional_group_value_choices,
+  #         label = glue::glue("{functional_group} to visualize:")
+  #       )
+  #
+  #       shinyjs::show('viz_functional_group_value')
+  #     } else {
+  #       shinyjs::hide('viz_functional_group_value')
+  #     }
+  #   }
+  # )
+
+  # diameter_classes
+  shiny::observe({
+    if (isTRUE(data_inputs$diameter_classes)) {
+      shinyjs::show('viz_diamclass')
+    } else {
+      shinyjs::hide('viz_diamclass')
     }
-  )
+  })
+
+  # shiny::observeEvent(
+  #   ignoreNULL = FALSE, ignoreInit = FALSE,
+  #   eventExpr = data_inputs$apply_data,
+  #   handlerExpr = {
+  #     if (isTRUE(data_inputs$diameter_classes)) {
+  #       shinyjs::show('viz_diamclass')
+  #     } else {
+  #       shinyjs::hide('viz_diamclass')
+  #     }
+  #   }
+  # )
 
   # return the viz inputs
   viz_reactives <- shiny::reactiveValues()
@@ -215,5 +332,7 @@ mod_viz <- function(
     viz_reactives$viz_functional_group_value <- input$viz_functional_group_value
     viz_reactives$viz_diamclass <- input$viz_diamclass
   })
+
+  return(viz_reactives)
 
 }

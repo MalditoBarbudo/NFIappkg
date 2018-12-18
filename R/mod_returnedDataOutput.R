@@ -34,7 +34,7 @@ mod_returnedData <- function(
     eventExpr = data_inputs$apply_data,
     valueExpr = {
 
-      browser()
+      # browser()
 
       nfi <- data_inputs$nfi
       viz_shape <- data_inputs$viz_shape
