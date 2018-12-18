@@ -123,6 +123,7 @@ mod_viz <- function(
 
   # we need the vars in the data to be able to show the names in the color and size inputs
   vars_to_viz_by <- shiny::reactive({
+
     table_names <- tables_to_look_at()
 
     all_variables <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
@@ -130,7 +131,7 @@ mod_viz <- function(
       dplyr::pull(var_id)
 
     numeric_variables <- dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL') %>%
-      dplyr::filter(var_id %in% all_variables) %>%
+      dplyr::filter(var_id %in% all_variables, var_table %in% table_names) %>%
       dplyr::pull(var_id)
 
     ## TODO when the theasurus is completed here we build the real list of variables

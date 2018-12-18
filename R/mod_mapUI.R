@@ -172,7 +172,7 @@ mod_map <- function(
     eventExpr = apply_reactives(),
     handlerExpr = {
 
-      browser()
+      # browser()
 
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
@@ -243,14 +243,21 @@ mod_map <- function(
         filter_exprs <- rlang::quos(!!!gf_filter_expr, !!!dc_filter_expr) %>%
           magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
 
-        map_data <- returned_data_inputs$main_data[['summarised']] %>%
+        map_data_pre <- returned_data_inputs$main_data[['summarised']] %>%
           dplyr::filter(
             !!! filter_exprs
           ) %>%
           dplyr::select(dplyr::one_of(
             join_var, viz_color
           )) %>%
-          dplyr::collect() %>%
+          dplyr::collect()
+
+        if (nrow(map_data_pre) == 0) {
+          ## TODO a warning
+          return()
+        }
+
+        map_data <- map_data_pre %>%
           dplyr::full_join(
             rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
           ) %>%
