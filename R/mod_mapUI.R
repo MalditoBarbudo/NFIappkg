@@ -18,9 +18,6 @@ mod_mapUI <- function(id, nfidb) {
     # mod returned data
     mod_returnedDataOutput('mod_returnedDataOutput')
   )
-
-
-
 }
 
 #' mod_map server function
@@ -174,6 +171,36 @@ mod_map <- function(
 
       # browser()
 
+      # common things to both, polygons and plots
+
+      # filter by functional group value
+      if (data_inputs$functional_group != 'plot') {
+
+        fil_var <- glue::glue("{data_inputs$functional_group}_id")
+        fil_val <- data_inputs$viz_functional_group_value
+
+        # when changing to another functional group from plot there is one run without
+        # viz_functional_group_value, so we have to skip it
+        if (fil_val == '') {
+          return()
+        } else {
+          gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == fil_val)
+        }
+      } else {
+        gf_filter_expr <- rlang::quo()
+      }
+
+      # filter by diam class value
+      if (isTRUE(data_inputs$diameter_classes)) {
+        dc_filter_expr <- rlang::quo(diamclass_id == data_inputs$viz_diamclass)
+      } else {
+        dc_filter_expr <- rlang::quo()
+      }
+
+      # all the filter expressions
+      filter_exprs <- rlang::quos(!!!gf_filter_expr, !!!dc_filter_expr) %>%
+        magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
+
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
 
@@ -216,32 +243,32 @@ mod_map <- function(
         viz_color <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
         # viz_size <- glue::glue("{data_inputs$viz_size}_{data_inputs$viz_statistic}")
 
-        # filter by functional group value
-        if (data_inputs$functional_group != 'plot') {
+        # # filter by functional group value
+        # if (data_inputs$functional_group != 'plot') {
+        #
+        #   fil_var <- glue::glue("{data_inputs$functional_group}_id")
+        #   fil_val <- data_inputs$viz_functional_group_value
+        #
+        #   # when changing to another functional group from plot there is one run without
+        #   # viz_functional_group_value, so we have to skip it
+        #   if (fil_val == '') {
+        #     return()
+        #   } else {
+        #     gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == fil_val)
+        #   }
+        # } else {
+        #   gf_filter_expr <- rlang::quo()
+        # }
 
-          fil_var <- glue::glue("{data_inputs$functional_group}_id")
-          fil_val <- data_inputs$viz_functional_group_value
+        # # filter by diam class value
+        # if (isTRUE(data_inputs$diameter_classes)) {
+        #   dc_filter_expr <- rlang::quo(diamclass_id == data_inputs$viz_diamclass)
+        # } else {
+        #   dc_filter_expr <- rlang::quo()
+        # }
 
-          # when changing to another functional group from plot there is one run without
-          # viz_functional_group_value, so we have to skip it
-          if (fil_val == '') {
-            return()
-          } else {
-            gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == fil_val)
-          }
-        } else {
-          gf_filter_expr <- rlang::quo()
-        }
-
-        # filter by diam class value
-        if (isTRUE(data_inputs$diameter_classes)) {
-          dc_filter_expr <- rlang::quo(diamclass_id == data_inputs$viz_diamclass)
-        } else {
-          dc_filter_expr <- rlang::quo()
-        }
-
-        filter_exprs <- rlang::quos(!!!gf_filter_expr, !!!dc_filter_expr) %>%
-          magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
+        # filter_exprs <- rlang::quos(!!!gf_filter_expr, !!!dc_filter_expr) %>%
+        #   magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
 
         map_data_pre <- returned_data_inputs$main_data[['summarised']] %>%
           dplyr::filter(
@@ -273,11 +300,11 @@ mod_map <- function(
 
         if (is.numeric(color_vector)) {
           pal <- leaflet::colorBin(
-            'viridis', color_vector, 9, reverse = data_inputs$viz_reverse_pal
+            'plasma', color_vector, 9, reverse = data_inputs$viz_reverse_pal
           )
         } else {
           pal <- leaflet::colorFactor(
-            'viridis', color_vector, reverse = data_inputs$viz_reverse_pal
+            'plasma', color_vector, reverse = data_inputs$viz_reverse_pal
           )
         }
 
@@ -308,6 +335,131 @@ mod_map <- function(
             position = 'topright', pal = pal, values = color_vector, title = viz_color,
             layerId = 'color_legend', opacity = 1
           )
+      } else {
+        # plots
+
+        # switches
+        polygon_object <- switch(
+          data_inputs$admin_div,
+          'aut_community' = 'catalonia_polygons',
+          'province' = 'provinces_polygons',
+          'vegueria' = 'veguerias_polygons',
+          'region' = 'regions_polygons',
+          'municipality' = 'municipalities_polygons'
+        )
+
+        polygon_group <- switch(
+          data_inputs$admin_div,
+          'aut_community' = 'aut_communities',
+          'province' = 'provinces',
+          'vegueria' = 'veguerias',
+          'region' = 'regions',
+          'municipality' = 'municipalities'
+        )
+
+        polygon_labels <- switch(
+          data_inputs$admin_div,
+          'aut_community' = '~admin_aut_community',
+          'province' = '~admin_province',
+          'vegueria' = '~admin_vegueria',
+          'region' = '~admin_region',
+          'municipality' = '~admin_municipality'
+        )
+
+        # color and size vars
+        viz_color <- glue::glue("{data_inputs$viz_color}")
+        viz_size <- glue::glue("{data_inputs$viz_size}")
+
+        map_data_pre <- returned_data_inputs$main_data[['selected']] %>%
+          dplyr::filter(
+            !!! filter_exprs
+          ) %>%
+          dplyr::select(dplyr::one_of(
+            c('plot_id', 'coords_longitude', 'coords_latitude'), viz_color, viz_size
+          )) %>%
+          dplyr::collect()
+
+        if (nrow(map_data_pre) == 0) {
+          ## TODO a warning
+          return()
+        }
+
+        map_data <- map_data_pre %>%
+          sf::st_as_sf(
+            coords = c('coords_longitude', 'coords_latitude'),
+            crs = '+proj=longlat +datum=WGS84'
+          )
+
+        # check if there is color variable
+        if (is.null(viz_color) || rlang::is_empty(viz_color)) {
+          color_vector <- rep('no_color', nrow(map_data))
+        } else {
+          color_vector <- map_data %>%
+            dplyr::pull(rlang::eval_tidy(rlang::sym(viz_color)))
+        }
+
+        # build the color palette
+        if (is.numeric(color_vector)) {
+          pal <- leaflet::colorBin(
+            'plasma', color_vector, 9, reverse = data_inputs$viz_reverse_pal
+          )
+        } else {
+          pal <- leaflet::colorFactor(
+            'plasma', color_vector, reverse = data_inputs$viz_reverse_pal
+          )
+        }
+
+        # check if there is size variable
+        if (is.null(viz_size) || rlang::is_empty(viz_size) || viz_size == '') {
+          size_vector <- rep(750, nrow(map_data))
+        } else {
+          if (is.numeric(map_data[[viz_size]])) {
+            size_vector <- (map_data[[viz_size]] / max(map_data[[viz_size]], na.rm = TRUE)) * 3000
+          } else {
+            size_vector <- (as.numeric(as.factor(map_data[[viz_size]])) /
+              max(as.numeric(as.factor(map_data[[viz_size]])), na.rm = TRUE)) * 3000
+          }
+        }
+
+        # reduce the size of the nas
+        size_vector[is.na(color_vector)] <- 250
+
+        # build the map
+        leaflet::leafletProxy('map') %>%
+          leaflet::clearGroup('veguerias') %>%
+          leaflet::clearGroup('regions') %>%
+          leaflet::clearGroup('municipalities') %>%
+          leaflet::clearGroup('provinces') %>%
+          leaflet::clearGroup('plots') %>%
+          leaflet::addPolygons(
+            data = rlang::eval_tidy(rlang::sym(polygon_object)),
+            group = polygon_group,
+            label = as.formula(polygon_labels),
+            layerId = as.formula(polygon_labels),
+            weight = 1, smoothFactor = 1,
+            opacity = 1.0, fill = TRUE,
+            color = '#6C7A89FF', fillColor = "#CF000F00",
+            highlightOptions = leaflet::highlightOptions(
+              color = "#CF000F", weight = 2,
+              bringToFront = FALSE,
+              fill = TRUE, fillColor = "#CF000F00"
+            ),
+            options = leaflet::pathOptions(
+              pane = 'admin_divs'
+            )
+          ) %>%
+          leaflet::addCircles(
+            data = map_data,
+            group = 'plots', label = ~plot_id, layerId = ~plot_id,
+            stroke = FALSE, fillOpacity = 0.4, fillColor = pal(color_vector),
+            radius = size_vector,
+            options = leaflet::pathOptions(pane = 'plots')
+          ) %>%
+          leaflet::addLegend(
+            position = 'topright', pal = pal, values = color_vector, title = viz_color,
+            layerId = 'color_legend', opacity = 1
+          )
+
       }
     }
   )

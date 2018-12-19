@@ -29,7 +29,10 @@ mod_vizInput <- function(id, nfidb) {
     shinyWidgets::pickerInput(
       ns('viz_color'),
       'Color:',
-      choices = ''
+      choices = '',
+      options = list(
+        `size` = 10
+      )
     ),
 
     # reverse palette
@@ -43,7 +46,10 @@ mod_vizInput <- function(id, nfidb) {
     shinyjs::hidden(
       shinyWidgets::pickerInput(
         ns('viz_size'), 'Size:',
-        choices = ''
+        choices = '',
+        options = list(
+          `size` = 10
+        )
       )
     ),
 
@@ -59,7 +65,10 @@ mod_vizInput <- function(id, nfidb) {
     shinyjs::hidden(
       shinyWidgets::pickerInput(
         ns('viz_functional_group_value'), '',
-        choices = ''
+        choices = '',
+        options = list(
+          `size` = 10
+        )
       )
     ),
 
@@ -197,7 +206,7 @@ mod_viz <- function(
       # update the pickerInput
       shinyWidgets::updatePickerInput(
         session, 'viz_size',
-        choices = size_choices,
+        choices = c('', size_choices),
         label = 'Size:'
       )
 
