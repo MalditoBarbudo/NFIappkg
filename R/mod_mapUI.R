@@ -136,7 +136,7 @@ mod_map <- function(
   # capture the custom polygon (if any) to use it later
   custom_polygon <- shiny::reactive({
 
-    # browser()
+    browser()
     # When removing the features (custom polygon) the input$map_draw_new_feature
     # is not cleared, so is always filtering the sites, even after removing. For
     # that we need to control when the removed feature equals the new, that's it,
@@ -299,8 +299,10 @@ mod_map <- function(
         }
 
         if (is.numeric(color_vector)) {
-          pal <- leaflet::colorBin(
-            'plasma', color_vector, 9, reverse = data_inputs$viz_reverse_pal
+          pal <- leaflet::colorNumeric(
+            scales::gradient_n_pal(
+              viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
+              ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
           )
         } else {
           pal <- leaflet::colorFactor(
@@ -400,8 +402,10 @@ mod_map <- function(
 
         # build the color palette
         if (is.numeric(color_vector)) {
-          pal <- leaflet::colorBin(
-            'plasma', color_vector, 9, reverse = data_inputs$viz_reverse_pal
+          pal <- leaflet::colorNumeric(
+            scales::gradient_n_pal(
+              viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
+              ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
           )
         } else {
           pal <- leaflet::colorFactor(
@@ -414,15 +418,15 @@ mod_map <- function(
           size_vector <- rep(750, nrow(map_data))
         } else {
           if (is.numeric(map_data[[viz_size]])) {
-            size_vector <- (map_data[[viz_size]] / max(map_data[[viz_size]], na.rm = TRUE)) * 3000
+            size_vector <- ((map_data[[viz_size]] / max(map_data[[viz_size]], na.rm = TRUE)) * 1500) + 750
           } else {
-            size_vector <- (as.numeric(as.factor(map_data[[viz_size]])) /
-              max(as.numeric(as.factor(map_data[[viz_size]])), na.rm = TRUE)) * 3000
+            size_vector <- ((as.numeric(as.factor(map_data[[viz_size]])) /
+              max(as.numeric(as.factor(map_data[[viz_size]])), na.rm = TRUE)) * 1500) + 750
           }
         }
 
         # reduce the size of the nas
-        size_vector[is.na(color_vector)] <- 250
+        size_vector[is.na(color_vector)] <- 500
 
         # build the map
         leaflet::leafletProxy('map') %>%
