@@ -241,7 +241,7 @@ mod_data <- function(
   shiny::observeEvent(
     eventExpr = buttons_reactives$show_viz,
     handlerExpr = {
-
+      shinyjs::toggleElement(id = 'vizInputs')
     }
   )
 
