@@ -122,11 +122,13 @@ mod_filters <- function(
 
           var_info <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
             dplyr::filter(var_id == var, var_table %in% table_names) %>%
-            dplyr::select(var_id, var_type)
+            dplyr::select(var_id, var_table, var_type)
 
           if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
             var_values <- var_info %>%
-              dplyr::left_join(dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL'), by = 'var_id') %>%
+              dplyr::left_join(
+                dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL'), by = c('var_id', 'var_table')
+              ) %>%
               dplyr::pull(var_values)
 
             shinyWidgets::pickerInput(
@@ -145,7 +147,9 @@ mod_filters <- function(
           } else {
             if (var_info %>% dplyr::pull(var_type) %>% unique() %in% c('numeric', 'integer')) {
               var_values <- var_info %>%
-                dplyr::left_join(dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL'), by = 'var_id') %>%
+                dplyr::left_join(
+                  dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL'), by = c('var_id', 'var_table')
+                ) %>%
                 dplyr::select(var_min, var_max) %>%
                 dplyr::collect()
 
