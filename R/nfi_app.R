@@ -12,7 +12,7 @@ nfi_app <- function() {
   ui <- shiny::tagList(
 
     shinyjs::useShinyjs(),
-    shinyWidgets::chooseSliderSkin(skin = "Flat", color = '#0DB3D4'),
+    shinyWidgets::chooseSliderSkin(skin = "Shiny", color = '#0DB3D4'),
 
     shiny::navbarPage(
       # opts

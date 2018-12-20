@@ -136,7 +136,7 @@ mod_map <- function(
   # capture the custom polygon (if any) to use it later
   custom_polygon <- shiny::reactive({
 
-    browser()
+    # browser()
     # When removing the features (custom polygon) the input$map_draw_new_feature
     # is not cleared, so is always filtering the sites, even after removing. For
     # that we need to control when the removed feature equals the new, that's it,

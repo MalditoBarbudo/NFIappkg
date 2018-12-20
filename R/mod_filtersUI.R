@@ -163,9 +163,22 @@ mod_filters <- function(
             } else {
 
               if (var_info %>% dplyr::pull(var_type) %>% unique() == 'logical') {
-                var_values <- var_info %>%
-                  dplyr::left_join(dplyr::tbl(nfidb, 'VARIABLES_LOGICAL'), by = 'var_id') %>%
-                  dplyr::collect()
+                # var_values <- var_info %>%
+                #   dplyr::left_join(dplyr::tbl(nfidb, 'VARIABLES_LOGICAL'), by = 'var_id') %>%
+                #   dplyr::collect()
+                # shinyWidgets::pickerInput(
+                #   ns(var), label = var,
+                #   choices = c('TRUE', 'FALSE'),
+                #   multiple = FALSE,
+                #   options = list(
+                #     `actions-box` = TRUE,
+                #     `deselect-all-text` = 'None selected...',
+                #     `select-all-text` = 'All selected',
+                #     `selected-text-format` = 'count',
+                #     `count-selected-text` = "{0} values selected (of {1})",
+                #     `size` = 10
+                #   )
+                # )
 
                 # TODO que hacemos con las lógicas???
               } else {
