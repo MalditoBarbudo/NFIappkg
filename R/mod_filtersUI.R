@@ -124,6 +124,14 @@ mod_filters <- function(
             dplyr::filter(var_id == var, var_table %in% table_names) %>%
             dplyr::select(var_id, var_table, var_type)
 
+          # check for special case, plot_id which is present in all the tables,
+          # in that case, we choose the results table, that is the one more
+          # restrictive (less options)
+          if (length(dplyr::pull(var_info, var_table)) > 1){
+            var_info <- var_info %>%
+              dplyr::filter(var_table == table_names[1])
+          }
+
           if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
             var_values <- var_info %>%
               dplyr::left_join(
