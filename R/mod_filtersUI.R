@@ -57,6 +57,7 @@ mod_filters <- function(
 
   #### Filter vars and update picker ####
   tables_to_look_at <- shiny::reactive({
+
     nfi <- data_inputs$nfi
 
     if (nfi == 'nfi_2_nfi_3') {
@@ -114,6 +115,8 @@ mod_filters <- function(
 
     # create the inputs for each varible selected
     filters_inputs <- shiny::reactive({
+
+      browser()
 
       lapply(
         input$filter_vars, function(var) {
