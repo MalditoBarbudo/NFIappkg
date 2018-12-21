@@ -220,7 +220,7 @@ mod_filters <- function(
 
         if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
           rlang::quo(
-            !!rlang::sym(var) %in% c(!!input[[var]])
+            !!rlang::sym(var) %in% !!input[[var]]
           )
         } else {
           if (var_info %>% dplyr::pull(var_type) %>% unique() %in% c('numeric', 'integer')) {

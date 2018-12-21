@@ -17,7 +17,7 @@ mod_returnedDataOutput <- function(id) {
 #' @param session internal
 #'
 #' @param data_inputs reactives from dataInput module
-#' @param custom_polygon custom_polygon sf object, if any
+#' @param map_inputs map input with custom_polygon sf object, if any
 #' @param nfidb pool object to access the nfi db
 #'
 #' @export
@@ -25,7 +25,7 @@ mod_returnedDataOutput <- function(id) {
 #' @rdname mod_returnedDataOuput
 mod_returnedData <- function(
   input, output, session,
-  data_inputs, custom_polygon = NULL, nfidb
+  data_inputs, map_inputs = NULL, nfidb
 ) {
 
   # main data generator
@@ -43,7 +43,36 @@ mod_returnedData <- function(
       diameter_classes <- data_inputs$diameter_classes
       filter_vars <- data_inputs$filter_vars
       filter_expressions <- data_inputs$filter_expressions
-      custom_polygon_fil_expr <- tidyNFI:::custom_polygon_filter_expr(custom_polygon, nfidb)
+      # custom_polygon_fil_expr needs some extra checking:
+      if (is.null(map_inputs$custom_polygon)) {
+        custom_polygon_fil_expr <- rlang::quos()
+      } else {
+        # check if plot_id is already in the filter_vars
+        if ('plot_id' %in% filter_vars) {
+          # then we need to replace the filter expression adding the one created
+          # by the custom_polygon_filter_expr function
+          orig_expr <- rlang::quo_text(
+            filter_expressions[[which(filter_vars == 'plot_id')]]
+          )
+          expr_to_add <- rlang::quo_text(
+            tidyNFI:::custom_polygon_filter_expr(
+              map_inputs$custom_polygon, nfidb
+            )
+          )
+          filter_expressions[[which(filter_vars == 'plot_id')]] <- rlang::quo_set_expr(
+            filter_expressions[[which(filter_vars == 'plot_id')]],
+            rlang::expr(!!rlang::parse_expr(glue::glue(
+              "{orig_expr} || {expr_to_add}"
+            )))
+          )
+          custom_polygon_fil_expr <- rlang::quos()
+        } else {
+          filter_vars <- c('plot_id', filter_vars)
+          custom_polygon_fil_expr <- tidyNFI:::custom_polygon_filter_expr(
+            map_inputs$custom_polygon, nfidb
+          )
+        }
+      }
 
       selected_data <- tidyNFI::nfi_results_data(
         conn = nfidb,
@@ -55,8 +84,8 @@ mod_returnedData <- function(
         tidyNFI::nfi_results_filter(
           variables = filter_vars,
           conn = nfidb,
-          !!! filter_expressions,
           !!! custom_polygon_fil_expr,
+          !!! filter_expressions,
           .collect = FALSE
         ) %>%
         dplyr::left_join(dplyr::tbl(nfidb, 'PLOTS'), by = 'plot_id')

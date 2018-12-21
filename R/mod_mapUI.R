@@ -133,29 +133,42 @@ mod_map <- function(
     }
   )
 
-  # capture the custom polygon (if any) to use it later
-  custom_polygon <- shiny::reactive({
+  map_inputs <- shiny::reactiveValues()
+  shiny::observe({
+    map_inputs$map_draw_all_features <- input$map_draw_all_features
+    map_inputs$map_center <- input$map_center
+  })
 
-    # browser()
-    # When removing the features (custom polygon) the input$map_draw_new_feature
-    # is not cleared, so is always filtering the sites, even after removing. For
-    # that we need to control when the removed feature equals the new, that's it,
-    # when we removed the last one
-    res <- input$map_draw_all_features
-    if (is.null(res) || length(res[['features']]) == 0) {
-      return(NULL)
-    } else {
-      polygon_res <- tidyNFI:::custom_poly_to_sf(
-        res[['features']][[1]]
-      )
-      return(polygon_res)
+  # capture the custom polygon (if any) to use it later
+  custom_polygon <- shiny::eventReactive(
+    # ignoreNULL = FALSE, ignoreInit = FALSE,
+    eventExpr = map_inputs$map_draw_all_features,
+    valueExpr = {
+
+      # When removing the features (custom polygon) the input$map_draw_new_feature
+      # is not cleared, so is always filtering the sites, even after removing. For
+      # that we need to control when the removed feature equals the new, that's it,
+      # when we removed the last one
+      res <- input$map_draw_all_features
+      if (is.null(res) || length(res[['features']]) == 0) {
+        return(NULL)
+      } else {
+        polygon_res <- tidyNFI:::custom_poly_to_sf(
+          res[['features']][[1]]
+        )
+        return(polygon_res)
+      }
     }
+  )
+
+  shiny::observe({
+    map_inputs$custom_polygon <- custom_polygon()
   })
 
   # returned data (NON COLLECTED!!!)
   returned_data_inputs <- shiny::callModule(
     mod_returnedData, 'mod_returnedDataOutput',
-    data_inputs, custom_polygon(), nfidb
+    data_inputs, map_inputs, nfidb
   )
 
   apply_reactives <- shiny::reactive({
@@ -164,6 +177,7 @@ mod_map <- function(
     apply_reactives$apply_viz <- data_inputs$apply_viz
   })
 
+  # draw the new map
   shiny::observeEvent(
     ignoreNULL = FALSE, ignoreInit = TRUE,
     eventExpr = apply_reactives(),
@@ -201,44 +215,47 @@ mod_map <- function(
       filter_exprs <- rlang::quos(!!!gf_filter_expr, !!!dc_filter_expr) %>%
         magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
 
+      # switches (polygons objects, labels and groups)
+      polygon_object <- switch(
+        data_inputs$admin_div,
+        'aut_community' = 'catalonia_polygons',
+        'province' = 'provinces_polygons',
+        'vegueria' = 'veguerias_polygons',
+        'region' = 'regions_polygons',
+        'municipality' = 'municipalities_polygons'
+      )
+
+      join_var <- switch(
+        data_inputs$admin_div,
+        'aut_community' = 'admin_aut_community',
+        'province' = 'admin_province',
+        'vegueria' = 'admin_vegueria',
+        'region' = 'admin_region',
+        'municipality' = 'admin_municipality'
+      )
+
+      polygon_group <- switch(
+        data_inputs$admin_div,
+        'aut_community' = 'aut_communities',
+        'province' = 'provinces',
+        'vegueria' = 'veguerias',
+        'region' = 'regions',
+        'municipality' = 'municipalities'
+      )
+
+      polygon_labels <- switch(
+        data_inputs$admin_div,
+        'aut_community' = '~admin_aut_community',
+        'province' = '~admin_province',
+        'vegueria' = '~admin_vegueria',
+        'region' = '~admin_region',
+        'municipality' = '~admin_municipality'
+      )
+
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
 
-        polygon_object <- switch(
-          data_inputs$admin_div,
-          'aut_community' = 'catalonia_polygons',
-          'province' = 'provinces_polygons',
-          'vegueria' = 'veguerias_polygons',
-          'region' = 'regions_polygons',
-          'municipality' = 'municipalities_polygons'
-        )
 
-        join_var <- switch(
-          data_inputs$admin_div,
-          'aut_community' = 'admin_aut_community',
-          'province' = 'admin_province',
-          'vegueria' = 'admin_vegueria',
-          'region' = 'admin_region',
-          'municipality' = 'admin_municipality'
-        )
-
-        polygon_group <- switch(
-          data_inputs$admin_div,
-          'aut_community' = 'aut_communities',
-          'province' = 'provinces',
-          'vegueria' = 'veguerias',
-          'region' = 'regions',
-          'municipality' = 'municipalities'
-        )
-
-        polygon_labels <- switch(
-          data_inputs$admin_div,
-          'aut_community' = '~admin_aut_community',
-          'province' = '~admin_province',
-          'vegueria' = '~admin_vegueria',
-          'region' = '~admin_region',
-          'municipality' = '~admin_municipality'
-        )
 
         viz_color <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
         # viz_size <- glue::glue("{data_inputs$viz_size}_{data_inputs$viz_statistic}")
@@ -340,34 +357,6 @@ mod_map <- function(
       } else {
         # plots
 
-        # switches
-        polygon_object <- switch(
-          data_inputs$admin_div,
-          'aut_community' = 'catalonia_polygons',
-          'province' = 'provinces_polygons',
-          'vegueria' = 'veguerias_polygons',
-          'region' = 'regions_polygons',
-          'municipality' = 'municipalities_polygons'
-        )
-
-        polygon_group <- switch(
-          data_inputs$admin_div,
-          'aut_community' = 'aut_communities',
-          'province' = 'provinces',
-          'vegueria' = 'veguerias',
-          'region' = 'regions',
-          'municipality' = 'municipalities'
-        )
-
-        polygon_labels <- switch(
-          data_inputs$admin_div,
-          'aut_community' = '~admin_aut_community',
-          'province' = '~admin_province',
-          'vegueria' = '~admin_vegueria',
-          'region' = '~admin_region',
-          'municipality' = '~admin_municipality'
-        )
-
         # color and size vars
         viz_color <- glue::glue("{data_inputs$viz_color}")
         viz_size <- glue::glue("{data_inputs$viz_size}")
@@ -467,24 +456,4 @@ mod_map <- function(
       }
     }
   )
-
-  # map_modificated <- shiny::eventReactive(
-  #   eventExpr = returned_data_inputs,
-  #   valueExpr = {
-  #
-  #     viz_shape <- data_inputs$viz_shape
-  #     admin_div <- glue::glue('admin_{data_inputs$admin_div}')
-  #
-  #     if (viz_shape == 'polygon') {
-  #
-  #       map_data <- returned_data_inputs[['summarised']] %>%
-  #
-  #
-  #     }
-  #
-  #
-  #   }
-  # )
-
-
 }
