@@ -39,6 +39,11 @@ div.inner {
   font-size: 12px;
 }
 
+/* debug */
+#debug {
+  z-index: 1500;
+}
+
 /* Controls */
 #dataControls {
   /* Appearance */

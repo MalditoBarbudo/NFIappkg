@@ -461,4 +461,19 @@ mod_map <- function(
       }
     }
   )
+
+  # collect all the inputs and the data to return them
+  shiny::observe({
+    map_inputs$main_data <- returned_data_inputs$main_data
+    map_inputs$map_bounds <- input$map_bounds
+    map_inputs$map_click <- input$map_click
+    map_inputs$map_groups <- input$map_groups
+    map_inputs$map_shape_click <- input$map_shape_click
+    map_inputs$map_zoom <- input$map_zoom
+    map_inputs$map_draw_new_feature <- input$map_draw_new_feature
+    map_inputs$map_draw_start <- input$map_draw_start
+    map_inputs$map_draw_stop <- input$map_draw_stop
+  })
+
+  return(map_inputs)
 }
