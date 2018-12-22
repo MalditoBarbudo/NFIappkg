@@ -23,21 +23,28 @@ catalonia_polygons <- sf::read_sf('data-raw/shapefiles/catalunya.shp') %>%
   sf::st_transform('+proj=longlat +datum=WGS84') %>%
   dplyr::select(admin_aut_community = NOM_CA, geometry)
 
-enpe_polygons <- sf::read_sf('data-raw/shapefiles/enpe_2017.shp') %>%
+# enpe_polygons
+natural_interest_area_polygons <- sf::read_sf('data-raw/shapefiles/enpe_2017.shp') %>%
   rmapshaper::ms_simplify(0.01) %>%
-  sf::st_transform('+proj=longlat +datum=WGS84')
+  sf::st_transform('+proj=longlat +datum=WGS84') %>%
+  dplyr::select(admin_natural_interest_area = nom, geometry)
 
-pein_polygons <- sf::read_sf('data-raw/shapefiles/pein_2017.shp') %>%
+# pein_polygons
+special_protection_natural_area_polygons <- sf::read_sf('data-raw/shapefiles/pein_2017.shp') %>%
   rmapshaper::ms_simplify(0.01) %>%
-  sf::st_transform('+proj=longlat +datum=WGS84')
+  sf::st_transform('+proj=longlat +datum=WGS84') %>%
+  dplyr::select(admin_special_protection_natural_area = nom, geometry)
 
-xn2000_polygons <- sf::read_sf('data-raw/shapefiles/xn2000_2017.shp') %>%
+# xn2000_polyogns
+natura_network_2000_polygons <- sf::read_sf('data-raw/shapefiles/xn2000_2017.shp') %>%
   rmapshaper::ms_simplify(0.01) %>%
-  sf::st_transform('+proj=longlat +datum=WGS84')
+  sf::st_transform('+proj=longlat +datum=WGS84')%>%
+  dplyr::select(admin_natura_network_2000 = nom_n2, geometry)
 
 devtools::use_data(
   municipalities_polygons, regions_polygons, veguerias_polygons, provinces_polygons,
-  catalonia_polygons, enpe_polygons, pein_polygons, xn2000_polygons,
+  catalonia_polygons, natural_interest_area_polygons,
+  special_protection_natural_area_polygons, natura_network_2000_polygons,
 
 
   internal = TRUE, overwrite = TRUE

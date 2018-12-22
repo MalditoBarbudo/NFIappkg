@@ -30,14 +30,17 @@ mod_dataInput <- function(id, nfidb) {
     'Provinces' = 'province',
     'Veguerias' = 'vegueria',
     'Regions' = 'region',
-    'Municipalities' = 'municipality'
-  )
-
-  protected_areas_choices <- c(
+    'Municipalities' = 'municipality',
     'Natural Interest Area' = 'natural_interest_area',
     'Special Protection Natural Area' = 'special_protection_natural_area',
     'Natura Network 2000' = 'natura_network_2000'
   )
+
+  # protected_areas_choices <- c(
+  #   'Natural Interest Area' = 'natural_interest_area',
+  #   'Special Protection Natural Area' = 'special_protection_natural_area',
+  #   'Natura Network 2000' = 'natura_network_2000'
+  # )
 
   functional_group_choices <- c(
     'Total by plot' = 'plot',
@@ -97,16 +100,16 @@ mod_dataInput <- function(id, nfidb) {
           shiny::column(
             6,
             shinyWidgets::pickerInput(
-              ns('admin_div'), 'Administrative divisions',
+              ns('admin_div'), 'Administrative divisions & Protected areas',
               admin_div_choices, selected = 'region'
             )
           ),
           shiny::column(
-            6,
-            shinyWidgets::pickerInput(
-              ns('protected_areas'), 'Protected areas',
-              protected_areas_choices, selected = 'natural_interest_area'
-            )
+            6#,
+            # shinyWidgets::pickerInput(
+            #   ns('protected_areas'), 'Protected areas',
+            #   protected_areas_choices, selected = 'natural_interest_area'
+            # )
           )
         ),
 
@@ -195,7 +198,7 @@ mod_data <- function(
     data_inputs$nfi <- input$nfi
     data_inputs$viz_shape <- input$viz_shape
     data_inputs$admin_div <- input$admin_div
-    data_inputs$protected_areas <- input$protected_areas
+    # data_inputs$protected_areas <- input$protected_areas
     data_inputs$functional_group <- input$functional_group
     data_inputs$diameter_classes <- input$diameter_classes
   })

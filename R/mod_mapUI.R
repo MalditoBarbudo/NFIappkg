@@ -81,13 +81,17 @@ mod_map <- function(
     eventExpr = data_inputs$admin_div,
     handlerExpr = {
 
+      # browser()
       polygon_object <- switch(
         data_inputs$admin_div,
         'aut_community' = 'catalonia_polygons',
         'province' = 'provinces_polygons',
         'vegueria' = 'veguerias_polygons',
         'region' = 'regions_polygons',
-        'municipality' = 'municipalities_polygons'
+        'municipality' = 'municipalities_polygons',
+        'natural_interest_area' = 'natural_interest_area_polygons',
+        'special_protection_natural_area' = 'special_protection_natural_area_polygons',
+        'natura_network_2000' = 'natura_network_2000_polygons'
       )
 
       polygon_group <- switch(
@@ -96,7 +100,10 @@ mod_map <- function(
         'province' = 'provinces',
         'vegueria' = 'veguerias',
         'region' = 'regions',
-        'municipality' = 'municipalities'
+        'municipality' = 'municipalities',
+        'natural_interest_area' = 'natural_interest_areas',
+        'special_protection_natural_area' = 'special_protection_natural_areas',
+        'natura_network_2000' = 'natura_network_2000s'
       )
 
       polygon_labels <- switch(
@@ -105,7 +112,10 @@ mod_map <- function(
         'province' = '~admin_province',
         'vegueria' = '~admin_vegueria',
         'region' = '~admin_region',
-        'municipality' = '~admin_municipality'
+        'municipality' = '~admin_municipality',
+        'natural_interest_area' = '~admin_natural_interest_area',
+        'special_protection_natural_area' = '~admin_special_protection_natural_area',
+        'natura_network_2000' = '~admin_natura_network_2000'
       )
 
       leaflet::leafletProxy('map') %>%
@@ -113,6 +123,9 @@ mod_map <- function(
         leaflet::clearGroup('regions') %>%
         leaflet::clearGroup('municipalities') %>%
         leaflet::clearGroup('provinces') %>%
+        leaflet::clearGroup('natural_interest_areas') %>%
+        leaflet::clearGroup('special_protection_natural_areas') %>%
+        leaflet::clearGroup('natura_network_2000s') %>%
         leaflet::addPolygons(
           data = rlang::eval_tidy(rlang::sym(polygon_object)),
           group = polygon_group,
@@ -221,22 +234,28 @@ mod_map <- function(
         magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
 
       # switches (polygons objects, labels and groups)
-      polygon_object <- switch(
-        data_inputs$admin_div,
-        'aut_community' = 'catalonia_polygons',
-        'province' = 'provinces_polygons',
-        'vegueria' = 'veguerias_polygons',
-        'region' = 'regions_polygons',
-        'municipality' = 'municipalities_polygons'
-      )
-
       join_var <- switch(
         data_inputs$admin_div,
         'aut_community' = 'admin_aut_community',
         'province' = 'admin_province',
         'vegueria' = 'admin_vegueria',
         'region' = 'admin_region',
-        'municipality' = 'admin_municipality'
+        'municipality' = 'admin_municipality',
+        'natural_interest_area' = 'admin_natural_interest_area',
+        'special_protection_natural_area' = 'admin_special_protection_natural_area',
+        'natura_network_2000' = 'admin_natura_network_2000'
+      )
+
+      polygon_object <- switch(
+        data_inputs$admin_div,
+        'aut_community' = 'catalonia_polygons',
+        'province' = 'provinces_polygons',
+        'vegueria' = 'veguerias_polygons',
+        'region' = 'regions_polygons',
+        'municipality' = 'municipalities_polygons',
+        'natural_interest_area' = 'natural_interest_area_polygons',
+        'special_protection_natural_area' = 'special_protection_natural_area_polygons',
+        'natura_network_2000' = 'natura_network_2000_polygons'
       )
 
       polygon_group <- switch(
@@ -245,7 +264,10 @@ mod_map <- function(
         'province' = 'provinces',
         'vegueria' = 'veguerias',
         'region' = 'regions',
-        'municipality' = 'municipalities'
+        'municipality' = 'municipalities',
+        'natural_interest_area' = 'natural_interest_areas',
+        'special_protection_natural_area' = 'special_protection_natural_areas',
+        'natura_network_2000' = 'natura_network_2000s'
       )
 
       polygon_labels <- switch(
@@ -254,7 +276,10 @@ mod_map <- function(
         'province' = '~admin_province',
         'vegueria' = '~admin_vegueria',
         'region' = '~admin_region',
-        'municipality' = '~admin_municipality'
+        'municipality' = '~admin_municipality',
+        'natural_interest_area' = '~admin_natural_interest_area',
+        'special_protection_natural_area' = '~admin_special_protection_natural_area',
+        'natura_network_2000' = '~admin_natura_network_2000'
       )
 
       # polygons
@@ -337,6 +362,9 @@ mod_map <- function(
           leaflet::clearGroup('regions') %>%
           leaflet::clearGroup('municipalities') %>%
           leaflet::clearGroup('provinces') %>%
+          leaflet::clearGroup('natural_interest_areas') %>%
+          leaflet::clearGroup('special_protection_natural_areas') %>%
+          leaflet::clearGroup('natura_network_2000s') %>%
           leaflet::clearGroup('plots') %>%
           leaflet::addPolygons(
             data = map_data,
@@ -428,6 +456,9 @@ mod_map <- function(
           leaflet::clearGroup('regions') %>%
           leaflet::clearGroup('municipalities') %>%
           leaflet::clearGroup('provinces') %>%
+          leaflet::clearGroup('natural_interest_areas') %>%
+          leaflet::clearGroup('special_protection_natural_areas') %>%
+          leaflet::clearGroup('natura_network_2000s') %>%
           leaflet::clearGroup('plots') %>%
           leaflet::addPolygons(
             data = rlang::eval_tidy(rlang::sym(polygon_object)),
