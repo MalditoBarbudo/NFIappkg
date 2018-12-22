@@ -123,6 +123,7 @@ mod_map <- function(
         leaflet::clearGroup('regions') %>%
         leaflet::clearGroup('municipalities') %>%
         leaflet::clearGroup('provinces') %>%
+        leaflet::clearGroup('aut_communities') %>%
         leaflet::clearGroup('natural_interest_areas') %>%
         leaflet::clearGroup('special_protection_natural_areas') %>%
         leaflet::clearGroup('natura_network_2000s') %>%
@@ -362,6 +363,7 @@ mod_map <- function(
           leaflet::clearGroup('regions') %>%
           leaflet::clearGroup('municipalities') %>%
           leaflet::clearGroup('provinces') %>%
+          leaflet::clearGroup('aut_communities') %>%
           leaflet::clearGroup('natural_interest_areas') %>%
           leaflet::clearGroup('special_protection_natural_areas') %>%
           leaflet::clearGroup('natura_network_2000s') %>%
@@ -456,6 +458,7 @@ mod_map <- function(
           leaflet::clearGroup('regions') %>%
           leaflet::clearGroup('municipalities') %>%
           leaflet::clearGroup('provinces') %>%
+          leaflet::clearGroup('aut_communities') %>%
           leaflet::clearGroup('natural_interest_areas') %>%
           leaflet::clearGroup('special_protection_natural_areas') %>%
           leaflet::clearGroup('natura_network_2000s') %>%
