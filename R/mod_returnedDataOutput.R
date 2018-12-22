@@ -40,7 +40,7 @@ mod_returnedData <- function(
     eventExpr = apply_reactives(),
     valueExpr = {
 
-      # browser()
+      browser()
 
       nfi <- data_inputs$nfi
       viz_shape <- data_inputs$viz_shape
@@ -104,19 +104,31 @@ mod_returnedData <- function(
           )
       }
 
+      # we must to check if the filters wiped out the data
+      if (length(selected_data %>% head(1) %>% dplyr::collect() %>% names()) < 1) {
+        shinyWidgets::sendSweetAlert(
+          session = session,
+          title = 'No data can be retrieved with the actual filters',
+          text = 'Please choose another filter values'
+        )
 
-      if (viz_shape == 'polygon') {
-        summarised_data <- selected_data %>%
-          tidyNFI::nfi_results_summarise(
-            polygon_group = admin_div,
-            functional_group = functional_group,
-            diameter_classes = diameter_classes,
-            conn = nfidb,
-            .collect = FALSE
-          )
+        selected_data <- NULL
+        summarised_data <- NULL
       } else {
-        summarised_data <- selected_data
+        if (viz_shape == 'polygon') {
+          summarised_data <- selected_data %>%
+            tidyNFI::nfi_results_summarise(
+              polygon_group = admin_div,
+              functional_group = functional_group,
+              diameter_classes = diameter_classes,
+              conn = nfidb,
+              .collect = FALSE
+            )
+        } else {
+          summarised_data <- selected_data
+        }
       }
+
 
       return(
         list(selected = selected_data, summarised = summarised_data)

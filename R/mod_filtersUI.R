@@ -114,96 +114,99 @@ mod_filters <- function(
     ns <- session$ns
 
     # create the inputs for each varible selected
-    filters_inputs <- shiny::reactive({
+    filters_inputs <- shiny::eventReactive(
+      eventExpr = input$filter_vars,
+      valueExpr = {
 
-      browser()
+        # browser()
 
-      lapply(
-        input$filter_vars, function(var) {
+        lapply(
+          input$filter_vars, function(var) {
 
-          table_names <- tables_to_look_at()
+            table_names <- tables_to_look_at()
 
-          var_info <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
-            dplyr::filter(var_id == var, var_table %in% table_names) %>%
-            dplyr::select(var_id, var_table, var_type)
+            var_info <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+              dplyr::filter(var_id == var, var_table %in% table_names) %>%
+              dplyr::select(var_id, var_table, var_type)
 
-          # check for special case, plot_id which is present in all the tables,
-          # in that case, we choose the results table, that is the one more
-          # restrictive (less options)
-          if (length(dplyr::pull(var_info, var_table)) > 1){
-            var_info <- var_info %>%
-              dplyr::filter(var_table == table_names[1])
-          }
+            # check for special case, plot_id which is present in all the tables,
+            # in that case, we choose the results table, that is the one more
+            # restrictive (less options)
+            if (length(dplyr::pull(var_info, var_table)) > 1){
+              var_info <- var_info %>%
+                dplyr::filter(var_table == table_names[1])
+            }
 
-          if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
-            var_values <- var_info %>%
-              dplyr::left_join(
-                dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL'), by = c('var_id', 'var_table')
-              ) %>%
-              dplyr::pull(var_values)
-
-            shinyWidgets::pickerInput(
-              ns(var), label = var,
-              choices = var_values,
-              multiple = TRUE,
-              options = list(
-                `actions-box` = TRUE,
-                `deselect-all-text` = 'None selected...',
-                `select-all-text` = 'All selected',
-                `selected-text-format` = 'count',
-                `count-selected-text` = "{0} values selected (of {1})",
-                `size` = 10
-              )
-            )
-          } else {
-            if (var_info %>% dplyr::pull(var_type) %>% unique() %in% c('numeric', 'integer')) {
+            if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
               var_values <- var_info %>%
                 dplyr::left_join(
-                  dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL'), by = c('var_id', 'var_table')
+                  dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL'), by = c('var_id', 'var_table')
                 ) %>%
-                dplyr::select(var_min, var_max) %>%
-                dplyr::collect()
+                dplyr::pull(var_values)
 
-              shiny::sliderInput(
+              shinyWidgets::pickerInput(
                 ns(var), label = var,
-                min = var_values[['var_min']],
-                max = var_values[['var_max']],
-                value = c(var_values[['var_min']], var_values[['var_max']]),
-                width = '100%'
+                choices = var_values,
+                selected = var_values[1], multiple = TRUE,
+                options = list(
+                  `actions-box` = TRUE,
+                  `deselect-all-text` = 'None selected...',
+                  `select-all-text` = 'All selected',
+                  `selected-text-format` = 'count',
+                  `count-selected-text` = "{0} values selected (of {1})",
+                  `size` = 10
+                )
               )
             } else {
-
-              if (var_info %>% dplyr::pull(var_type) %>% unique() == 'logical') {
-                # var_values <- var_info %>%
-                #   dplyr::left_join(dplyr::tbl(nfidb, 'VARIABLES_LOGICAL'), by = 'var_id') %>%
-                #   dplyr::collect()
-                # shinyWidgets::pickerInput(
-                #   ns(var), label = var,
-                #   choices = c('TRUE', 'FALSE'),
-                #   multiple = FALSE,
-                #   options = list(
-                #     `actions-box` = TRUE,
-                #     `deselect-all-text` = 'None selected...',
-                #     `select-all-text` = 'All selected',
-                #     `selected-text-format` = 'count',
-                #     `count-selected-text` = "{0} values selected (of {1})",
-                #     `size` = 10
-                #   )
-                # )
-
-                # TODO que hacemos con las lógicas???
-              } else {
+              if (var_info %>% dplyr::pull(var_type) %>% unique() %in% c('numeric', 'integer')) {
                 var_values <- var_info %>%
-                  dplyr::left_join(dplyr::tbl(nfidb, 'VARIABLES_DTTM'), by = 'var_id') %>%
+                  dplyr::left_join(
+                    dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL'), by = c('var_id', 'var_table')
+                  ) %>%
+                  dplyr::select(var_min, var_max) %>%
                   dplyr::collect()
 
-                # TODO que hacemos con las lógicas???
+                shiny::sliderInput(
+                  ns(var), label = var,
+                  min = var_values[['var_min']],
+                  max = var_values[['var_max']],
+                  value = c(var_values[['var_min']], var_values[['var_max']]),
+                  width = '100%'
+                )
+              } else {
+
+                if (var_info %>% dplyr::pull(var_type) %>% unique() == 'logical') {
+                  # var_values <- var_info %>%
+                  #   dplyr::left_join(dplyr::tbl(nfidb, 'VARIABLES_LOGICAL'), by = 'var_id') %>%
+                  #   dplyr::collect()
+                  # shinyWidgets::pickerInput(
+                  #   ns(var), label = var,
+                  #   choices = c('TRUE', 'FALSE'),
+                  #   multiple = FALSE,
+                  #   options = list(
+                  #     `actions-box` = TRUE,
+                  #     `deselect-all-text` = 'None selected...',
+                  #     `select-all-text` = 'All selected',
+                  #     `selected-text-format` = 'count',
+                  #     `count-selected-text` = "{0} values selected (of {1})",
+                  #     `size` = 10
+                  #   )
+                  # )
+
+                  # TODO que hacemos con las lógicas???
+                } else {
+                  var_values <- var_info %>%
+                    dplyr::left_join(dplyr::tbl(nfidb, 'VARIABLES_DTTM'), by = 'var_id') %>%
+                    dplyr::collect()
+
+                  # TODO que hacemos con las lógicas???
+                }
               }
             }
           }
-        }
-      )
-    })
+        )
+      }
+    )
 
     # return the inputs as a tagList
     shiny::tagList(
@@ -211,51 +214,66 @@ mod_filters <- function(
     )
   })
 
-  ## Filter exprs generators ####
-  data_filter_expressions <- shiny::reactive({
-
-    # browser()
-
-    # check the case of empty filter vars
-    if (is.null(input$filter_vars) || input$filter_vars == '') {
-      return(rlang::quos())
-    }
-
+  # reactive to activate the filter expressions generation
+  on_the_fly_inputs <- shiny::reactive({
     lapply(
-      input$filter_vars, function(var) {
-        table_names <- tables_to_look_at()
-
-        var_info <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
-          dplyr::filter(var_id == var, var_table %in% table_names) %>%
-          dplyr::select(var_id, var_type)
-
-        if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
-          rlang::quo(
-            !!rlang::sym(var) %in% !!input[[var]]
-          )
-        } else {
-          if (var_info %>% dplyr::pull(var_type) %>% unique() %in% c('numeric', 'integer')) {
-            rlang::quo(
-              between(!!rlang::sym(var), !!input[[var]][1], !!input[[var]][2])
-            )
-          } else {
-
-            if (var_info %>% dplyr::pull(var_type) %>% unique() == 'logical') {
-              rlang::quo(
-
-              )
-              # TODO que hacemos con las lógicas???
-            } else {
-              rlang::quo(
-
-              )
-              # TODO que hacemos con las lógicas???
-            }
-          }
-        }
+      input$filter_vars, function(x) {
+        input[[x]]
       }
     )
   })
+
+  ## Filter exprs generators ####
+  data_filter_expressions <- shiny::eventReactive(
+    eventExpr = on_the_fly_inputs(),
+    valueExpr = {
+
+      # check the case of empty filter vars
+      if (is.null(input$filter_vars) || input$filter_vars == '') {
+        return(rlang::quos())
+      }
+
+      lapply(
+        input$filter_vars, function(var) {
+
+          if (is.null(input[[var]])) {
+            return(quo(TRUE))
+          }
+
+          table_names <- tables_to_look_at()
+
+          var_info <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+            dplyr::filter(var_id == var, var_table %in% table_names) %>%
+            dplyr::select(var_id, var_type)
+
+          if (var_info %>% dplyr::pull(var_type) %>% unique() == 'character') {
+            rlang::quo(
+              !!rlang::sym(var) %in% !!input[[var]]
+            )
+          } else {
+            if (var_info %>% dplyr::pull(var_type) %>% unique() %in% c('numeric', 'integer')) {
+              rlang::quo(
+                between(!!rlang::sym(var), !!input[[var]][1], !!input[[var]][2])
+              )
+            } else {
+
+              if (var_info %>% dplyr::pull(var_type) %>% unique() == 'logical') {
+                rlang::quo(
+
+                )
+                # TODO que hacemos con las lógicas???
+              } else {
+                rlang::quo(
+
+                )
+                # TODO que hacemos con las lógicas???
+              }
+            }
+          }
+        }
+      )
+    }
+  )
 
   filter_reactives <- shiny::reactiveValues()
   shiny::observe({

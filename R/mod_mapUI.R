@@ -185,6 +185,11 @@ mod_map <- function(
 
       # browser()
 
+      # First check if data is null (filters too restrictive returning no data)
+      if (is.null(returned_data_inputs$main_data[['selected']])) {
+        return()
+      }
+
       # common things to both, polygons and plots
 
       # filter by functional group value
