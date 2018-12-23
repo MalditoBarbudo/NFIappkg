@@ -40,6 +40,7 @@ mod_returnedData <- function(
     eventExpr = apply_reactives(),
     valueExpr = {
 
+      # browser()
       nfi <- data_inputs$nfi
       viz_shape <- data_inputs$viz_shape
       admin_div <- data_inputs$admin_div
@@ -126,7 +127,6 @@ mod_returnedData <- function(
           summarised_data <- selected_data
         }
       }
-
 
       return(
         list(selected = selected_data, summarised = summarised_data)

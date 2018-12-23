@@ -193,7 +193,7 @@ mod_map <- function(
 
   # draw the new map
   shiny::observeEvent(
-    ignoreNULL = FALSE, ignoreInit = TRUE,
+    ignoreNULL = FALSE, ignoreInit = FALSE,
     eventExpr = apply_reactives(),
     handlerExpr = {
 
@@ -286,37 +286,7 @@ mod_map <- function(
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
 
-
-
         viz_color <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
-        # viz_size <- glue::glue("{data_inputs$viz_size}_{data_inputs$viz_statistic}")
-
-        # # filter by functional group value
-        # if (data_inputs$functional_group != 'plot') {
-        #
-        #   fil_var <- glue::glue("{data_inputs$functional_group}_id")
-        #   fil_val <- data_inputs$viz_functional_group_value
-        #
-        #   # when changing to another functional group from plot there is one run without
-        #   # viz_functional_group_value, so we have to skip it
-        #   if (fil_val == '') {
-        #     return()
-        #   } else {
-        #     gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == fil_val)
-        #   }
-        # } else {
-        #   gf_filter_expr <- rlang::quo()
-        # }
-
-        # # filter by diam class value
-        # if (isTRUE(data_inputs$diameter_classes)) {
-        #   dc_filter_expr <- rlang::quo(diamclass_id == data_inputs$viz_diamclass)
-        # } else {
-        #   dc_filter_expr <- rlang::quo()
-        # }
-
-        # filter_exprs <- rlang::quos(!!!gf_filter_expr, !!!dc_filter_expr) %>%
-        #   magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
 
         map_data_pre <- returned_data_inputs$main_data[['summarised']] %>%
           dplyr::filter(

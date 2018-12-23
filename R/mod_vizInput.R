@@ -29,7 +29,7 @@ mod_vizInput <- function(id, nfidb) {
     shinyWidgets::pickerInput(
       ns('viz_color'),
       'Color:',
-      choices = '',
+      choices = 'density',
       options = list(
         `size` = 10
       )
@@ -175,11 +175,20 @@ mod_viz <- function(
   # color input updater
   shiny::observe({
     color_choices <- vars_to_viz_by()
+
+    # let's make density (or density_balance) the selected var
+    if ('density' %in% color_choices) {
+      selected_col <- 'density'
+    } else {
+      selected_col <- 'density_balance'
+    }
+
     # update the pickerInput
     shinyWidgets::updatePickerInput(
       session, 'viz_color',
       choices = color_choices,
-      label = 'Color:'
+      label = 'Color:',
+      selected = selected_col
     )
   })
 
