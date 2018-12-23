@@ -191,20 +191,18 @@ mod_map <- function(
     apply_reactives$apply_viz <- data_inputs$apply_viz
   })
 
-  # draw the new map
-  shiny::observeEvent(
+  map_data <- shiny::eventReactive(
     ignoreNULL = FALSE, ignoreInit = FALSE,
     eventExpr = apply_reactives(),
-    handlerExpr = {
-
-      # browser()
+    valueExpr = {
 
       # First check if data is null (filters too restrictive returning no data)
-      if (is.null(returned_data_inputs$main_data[['selected']])) {
-        return()
-      }
-
-      # common things to both, polygons and plots
+      shiny::validate(
+        shiny::need(
+          returned_data_inputs$main_data[['selected']],
+          "No data computed yet, no map data can be generated"
+        )
+      )
 
       # filter by functional group value
       if (data_inputs$functional_group != 'plot') {
@@ -259,6 +257,84 @@ mod_map <- function(
         'natura_network_2000' = 'natura_network_2000_polygons'
       )
 
+      # polygons shape
+      if (data_inputs$viz_shape == 'polygon') {
+        viz_color <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
+
+        map_data_pre <- returned_data_inputs$main_data[['summarised']] %>%
+          dplyr::filter(
+            !!! filter_exprs
+          ) %>%
+          dplyr::select(dplyr::one_of(
+            join_var, viz_color, glue::glue("{data_inputs$functional_group}_id"),
+            'dc_id'
+          )) %>%
+          dplyr::collect()
+
+        shiny::validate(
+          shiny::need(
+            nrow(map_data_pre) != 0,
+            "No data to map"
+          )
+        )
+
+        map_data <- map_data_pre %>%
+          dplyr::full_join(
+            rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
+          ) %>%
+          sf::st_as_sf()
+      } else {
+        # plots shape
+        # color and size vars
+        viz_color <- glue::glue("{data_inputs$viz_color}")
+        viz_size <- glue::glue("{data_inputs$viz_size}")
+
+        map_data_pre <- returned_data_inputs$main_data[['selected']] %>%
+          dplyr::filter(
+            !!! filter_exprs
+          ) %>%
+          dplyr::select(dplyr::one_of(
+            c('plot_id', 'coords_longitude', 'coords_latitude'), viz_color, viz_size
+          )) %>%
+          dplyr::collect()
+
+        shiny::validate(
+          shiny::need(
+            nrow(map_data_pre) != 0,
+            "No data to map"
+          )
+        )
+
+        map_data <- map_data_pre %>%
+          sf::st_as_sf(
+            coords = c('coords_longitude', 'coords_latitude'),
+            crs = '+proj=longlat +datum=WGS84'
+          )
+      }
+
+      return(map_data)
+    }
+  )
+
+  # draw the new map
+  # draw the new map
+  shiny::observeEvent(
+    eventExpr = map_data(),
+    handlerExpr = {
+
+      # browser()
+      # map data
+      map_data <- map_data()
+
+      # First check if there is data
+      shiny::validate(
+        shiny::need(
+          map_data,
+          "No data to map"
+        )
+      )
+
+      # switches (polygons objects, labels and groups)
       polygon_group <- switch(
         data_inputs$admin_div,
         'aut_community' = 'aut_communities',
@@ -283,30 +359,22 @@ mod_map <- function(
         'natura_network_2000' = '~admin_natura_network_2000'
       )
 
+      polygon_object <- switch(
+        data_inputs$admin_div,
+        'aut_community' = 'catalonia_polygons',
+        'province' = 'provinces_polygons',
+        'vegueria' = 'veguerias_polygons',
+        'region' = 'regions_polygons',
+        'municipality' = 'municipalities_polygons',
+        'natural_interest_area' = 'natural_interest_area_polygons',
+        'special_protection_natural_area' = 'special_protection_natural_area_polygons',
+        'natura_network_2000' = 'natura_network_2000_polygons'
+      )
+
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
 
         viz_color <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
-
-        map_data_pre <- returned_data_inputs$main_data[['summarised']] %>%
-          dplyr::filter(
-            !!! filter_exprs
-          ) %>%
-          dplyr::select(dplyr::one_of(
-            join_var, viz_color
-          )) %>%
-          dplyr::collect()
-
-        if (nrow(map_data_pre) == 0) {
-          ## TODO a warning
-          return()
-        }
-
-        map_data <- map_data_pre %>%
-          dplyr::full_join(
-            rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
-          ) %>%
-          sf::st_as_sf()
 
         # check if there is color variable
         if (is.null(viz_color) || rlang::is_empty(viz_color)) {
@@ -320,7 +388,7 @@ mod_map <- function(
           pal <- leaflet::colorNumeric(
             scales::gradient_n_pal(
               viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
-              ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
+            ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
           )
         } else {
           pal <- leaflet::colorFactor(
@@ -366,26 +434,6 @@ mod_map <- function(
         viz_color <- glue::glue("{data_inputs$viz_color}")
         viz_size <- glue::glue("{data_inputs$viz_size}")
 
-        map_data_pre <- returned_data_inputs$main_data[['selected']] %>%
-          dplyr::filter(
-            !!! filter_exprs
-          ) %>%
-          dplyr::select(dplyr::one_of(
-            c('plot_id', 'coords_longitude', 'coords_latitude'), viz_color, viz_size
-          )) %>%
-          dplyr::collect()
-
-        if (nrow(map_data_pre) == 0) {
-          ## TODO a warning
-          return()
-        }
-
-        map_data <- map_data_pre %>%
-          sf::st_as_sf(
-            coords = c('coords_longitude', 'coords_latitude'),
-            crs = '+proj=longlat +datum=WGS84'
-          )
-
         # check if there is color variable
         if (is.null(viz_color) || rlang::is_empty(viz_color)) {
           color_vector <- rep('no_color', nrow(map_data))
@@ -399,7 +447,7 @@ mod_map <- function(
           pal <- leaflet::colorNumeric(
             scales::gradient_n_pal(
               viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
-              ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
+            ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
           )
         } else {
           pal <- leaflet::colorFactor(
@@ -415,7 +463,7 @@ mod_map <- function(
             size_vector <- ((map_data[[viz_size]] / max(map_data[[viz_size]], na.rm = TRUE)) * 1500) + 750
           } else {
             size_vector <- ((as.numeric(as.factor(map_data[[viz_size]])) /
-              max(as.numeric(as.factor(map_data[[viz_size]])), na.rm = TRUE)) * 1500) + 750
+                               max(as.numeric(as.factor(map_data[[viz_size]])), na.rm = TRUE)) * 1500) + 750
           }
         }
 
@@ -466,9 +514,285 @@ mod_map <- function(
     }
   )
 
+  # draw the new map
+  # shiny::observeEvent(
+  #   ignoreNULL = FALSE, ignoreInit = FALSE,
+  #   eventExpr = apply_reactives(),
+  #   handlerExpr = {
+  #
+  #     # browser()
+  #
+  #     # First check if data is null (filters too restrictive returning no data)
+  #     if (is.null(returned_data_inputs$main_data[['selected']])) {
+  #       return()
+  #     }
+  #
+  #     # common things to both, polygons and plots
+  #
+  #     # filter by functional group value
+  #     if (data_inputs$functional_group != 'plot') {
+  #
+  #       fil_var <- glue::glue("{data_inputs$functional_group}_id")
+  #       fil_val <- data_inputs$viz_functional_group_value
+  #
+  #       # when changing to another functional group from plot there is one run without
+  #       # viz_functional_group_value, so we have to skip it
+  #       if (fil_val == '') {
+  #         return()
+  #       } else {
+  #         gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == fil_val)
+  #       }
+  #     } else {
+  #       gf_filter_expr <- rlang::quo()
+  #     }
+  #
+  #     # filter by diam class value
+  #     if (isTRUE(data_inputs$diameter_classes)) {
+  #       dc_filter_expr <- rlang::quo(diamclass_id == data_inputs$viz_diamclass)
+  #     } else {
+  #       dc_filter_expr <- rlang::quo()
+  #     }
+  #
+  #     # all the filter expressions
+  #     filter_exprs <- rlang::quos(!!!gf_filter_expr, !!!dc_filter_expr) %>%
+  #       magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
+  #
+  #     # switches (polygons objects, labels and groups)
+  #     join_var <- switch(
+  #       data_inputs$admin_div,
+  #       'aut_community' = 'admin_aut_community',
+  #       'province' = 'admin_province',
+  #       'vegueria' = 'admin_vegueria',
+  #       'region' = 'admin_region',
+  #       'municipality' = 'admin_municipality',
+  #       'natural_interest_area' = 'admin_natural_interest_area',
+  #       'special_protection_natural_area' = 'admin_special_protection_natural_area',
+  #       'natura_network_2000' = 'admin_natura_network_2000'
+  #     )
+  #
+  #     polygon_object <- switch(
+  #       data_inputs$admin_div,
+  #       'aut_community' = 'catalonia_polygons',
+  #       'province' = 'provinces_polygons',
+  #       'vegueria' = 'veguerias_polygons',
+  #       'region' = 'regions_polygons',
+  #       'municipality' = 'municipalities_polygons',
+  #       'natural_interest_area' = 'natural_interest_area_polygons',
+  #       'special_protection_natural_area' = 'special_protection_natural_area_polygons',
+  #       'natura_network_2000' = 'natura_network_2000_polygons'
+  #     )
+  #
+  #     polygon_group <- switch(
+  #       data_inputs$admin_div,
+  #       'aut_community' = 'aut_communities',
+  #       'province' = 'provinces',
+  #       'vegueria' = 'veguerias',
+  #       'region' = 'regions',
+  #       'municipality' = 'municipalities',
+  #       'natural_interest_area' = 'natural_interest_areas',
+  #       'special_protection_natural_area' = 'special_protection_natural_areas',
+  #       'natura_network_2000' = 'natura_network_2000s'
+  #     )
+  #
+  #     polygon_labels <- switch(
+  #       data_inputs$admin_div,
+  #       'aut_community' = '~admin_aut_community',
+  #       'province' = '~admin_province',
+  #       'vegueria' = '~admin_vegueria',
+  #       'region' = '~admin_region',
+  #       'municipality' = '~admin_municipality',
+  #       'natural_interest_area' = '~admin_natural_interest_area',
+  #       'special_protection_natural_area' = '~admin_special_protection_natural_area',
+  #       'natura_network_2000' = '~admin_natura_network_2000'
+  #     )
+  #
+  #     # polygons
+  #     if (data_inputs$viz_shape == 'polygon') {
+  #
+  #       viz_color <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
+  #
+  #       map_data_pre <- returned_data_inputs$main_data[['summarised']] %>%
+  #         dplyr::filter(
+  #           !!! filter_exprs
+  #         ) %>%
+  #         dplyr::select(dplyr::one_of(
+  #           join_var, viz_color
+  #         )) %>%
+  #         dplyr::collect()
+  #
+  #       if (nrow(map_data_pre) == 0) {
+  #         ## TODO a warning
+  #         return()
+  #       }
+  #
+  #       map_data <- map_data_pre %>%
+  #         dplyr::full_join(
+  #           rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
+  #         ) %>%
+  #         sf::st_as_sf()
+  #
+  #       # check if there is color variable
+  #       if (is.null(viz_color) || rlang::is_empty(viz_color)) {
+  #         color_vector <- rep('no_color', nrow(map_data))
+  #       } else {
+  #         color_vector <- map_data %>%
+  #           dplyr::pull(rlang::eval_tidy(rlang::sym(viz_color)))
+  #       }
+  #
+  #       if (is.numeric(color_vector)) {
+  #         pal <- leaflet::colorNumeric(
+  #           scales::gradient_n_pal(
+  #             viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
+  #             ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
+  #         )
+  #       } else {
+  #         pal <- leaflet::colorFactor(
+  #           'plasma', color_vector, reverse = data_inputs$viz_reverse_pal
+  #         )
+  #       }
+  #
+  #       leaflet::leafletProxy('map') %>%
+  #         leaflet::clearGroup('veguerias') %>%
+  #         leaflet::clearGroup('regions') %>%
+  #         leaflet::clearGroup('municipalities') %>%
+  #         leaflet::clearGroup('provinces') %>%
+  #         leaflet::clearGroup('aut_communities') %>%
+  #         leaflet::clearGroup('natural_interest_areas') %>%
+  #         leaflet::clearGroup('special_protection_natural_areas') %>%
+  #         leaflet::clearGroup('natura_network_2000s') %>%
+  #         leaflet::clearGroup('plots') %>%
+  #         leaflet::addPolygons(
+  #           data = map_data,
+  #           group = polygon_group,
+  #           label = as.formula(polygon_labels),
+  #           layerId = as.formula(polygon_labels),
+  #           weight = 1, smoothFactor = 1,
+  #           opacity = 1.0, fill = TRUE,
+  #           color = '#6C7A89FF', fillColor = pal(color_vector),
+  #           fillOpacity = 1,
+  #           highlightOptions = leaflet::highlightOptions(
+  #             color = "#CF000F", weight = 2,
+  #             bringToFront = FALSE
+  #           ),
+  #           options = leaflet::pathOptions(
+  #             pane = 'admin_divs'
+  #           )
+  #         ) %>%
+  #         leaflet::addLegend(
+  #           position = 'topright', pal = pal, values = color_vector, title = viz_color,
+  #           layerId = 'color_legend', opacity = 1
+  #         )
+  #     } else {
+  #       # plots
+  #
+  #       # color and size vars
+  #       viz_color <- glue::glue("{data_inputs$viz_color}")
+  #       viz_size <- glue::glue("{data_inputs$viz_size}")
+  #
+  #       map_data_pre <- returned_data_inputs$main_data[['selected']] %>%
+  #         dplyr::filter(
+  #           !!! filter_exprs
+  #         ) %>%
+  #         dplyr::select(dplyr::one_of(
+  #           c('plot_id', 'coords_longitude', 'coords_latitude'), viz_color, viz_size
+  #         )) %>%
+  #         dplyr::collect()
+  #
+  #       if (nrow(map_data_pre) == 0) {
+  #         ## TODO a warning
+  #         return()
+  #       }
+  #
+  #       map_data <- map_data_pre %>%
+  #         sf::st_as_sf(
+  #           coords = c('coords_longitude', 'coords_latitude'),
+  #           crs = '+proj=longlat +datum=WGS84'
+  #         )
+  #
+  #       # check if there is color variable
+  #       if (is.null(viz_color) || rlang::is_empty(viz_color)) {
+  #         color_vector <- rep('no_color', nrow(map_data))
+  #       } else {
+  #         color_vector <- map_data %>%
+  #           dplyr::pull(rlang::eval_tidy(rlang::sym(viz_color)))
+  #       }
+  #
+  #       # build the color palette
+  #       if (is.numeric(color_vector)) {
+  #         pal <- leaflet::colorNumeric(
+  #           scales::gradient_n_pal(
+  #             viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
+  #             ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
+  #         )
+  #       } else {
+  #         pal <- leaflet::colorFactor(
+  #           'plasma', color_vector, reverse = data_inputs$viz_reverse_pal
+  #         )
+  #       }
+  #
+  #       # check if there is size variable
+  #       if (is.null(viz_size) || rlang::is_empty(viz_size) || viz_size == '') {
+  #         size_vector <- rep(750, nrow(map_data))
+  #       } else {
+  #         if (is.numeric(map_data[[viz_size]])) {
+  #           size_vector <- ((map_data[[viz_size]] / max(map_data[[viz_size]], na.rm = TRUE)) * 1500) + 750
+  #         } else {
+  #           size_vector <- ((as.numeric(as.factor(map_data[[viz_size]])) /
+  #             max(as.numeric(as.factor(map_data[[viz_size]])), na.rm = TRUE)) * 1500) + 750
+  #         }
+  #       }
+  #
+  #       # reduce the size of the nas
+  #       size_vector[is.na(color_vector)] <- 500
+  #
+  #       # build the map
+  #       leaflet::leafletProxy('map') %>%
+  #         leaflet::clearGroup('veguerias') %>%
+  #         leaflet::clearGroup('regions') %>%
+  #         leaflet::clearGroup('municipalities') %>%
+  #         leaflet::clearGroup('provinces') %>%
+  #         leaflet::clearGroup('aut_communities') %>%
+  #         leaflet::clearGroup('natural_interest_areas') %>%
+  #         leaflet::clearGroup('special_protection_natural_areas') %>%
+  #         leaflet::clearGroup('natura_network_2000s') %>%
+  #         leaflet::clearGroup('plots') %>%
+  #         leaflet::addPolygons(
+  #           data = rlang::eval_tidy(rlang::sym(polygon_object)),
+  #           group = polygon_group,
+  #           label = as.formula(polygon_labels),
+  #           layerId = as.formula(polygon_labels),
+  #           weight = 1, smoothFactor = 1,
+  #           opacity = 1.0, fill = TRUE,
+  #           color = '#6C7A89FF', fillColor = "#CF000F00",
+  #           highlightOptions = leaflet::highlightOptions(
+  #             color = "#CF000F", weight = 2,
+  #             bringToFront = FALSE,
+  #             fill = TRUE, fillColor = "#CF000F00"
+  #           ),
+  #           options = leaflet::pathOptions(
+  #             pane = 'admin_divs'
+  #           )
+  #         ) %>%
+  #         leaflet::addCircles(
+  #           data = map_data,
+  #           group = 'plots', label = ~plot_id, layerId = ~plot_id,
+  #           stroke = FALSE, fillOpacity = 0.4, fillColor = pal(color_vector),
+  #           radius = size_vector,
+  #           options = leaflet::pathOptions(pane = 'plots')
+  #         ) %>%
+  #         leaflet::addLegend(
+  #           position = 'topright', pal = pal, values = color_vector, title = viz_color,
+  #           layerId = 'color_legend', opacity = 1
+  #         )
+  #
+  #     }
+  #   }
+  # )
+
   # collect all the inputs and the data to return them
   shiny::observe({
     map_inputs$main_data <- returned_data_inputs$main_data
+    map_inputs$map_data <- map_data()
     map_inputs$map_bounds <- input$map_bounds
     map_inputs$map_click <- input$map_click
     map_inputs$map_groups <- input$map_groups

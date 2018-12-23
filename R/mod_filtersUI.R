@@ -237,7 +237,7 @@ mod_filters <- function(
         input$filter_vars, function(var) {
 
           if (is.null(input[[var]])) {
-            return(quo(TRUE))
+            return(rlang::quo(TRUE))
           }
 
           table_names <- tables_to_look_at()
