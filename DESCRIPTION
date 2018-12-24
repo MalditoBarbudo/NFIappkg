@@ -19,4 +19,8 @@ Imports: shiny,
     sf,
     leaflet,
     leaflet.extras,
-    htmlwidgets
+    htmlwidgets,
+    ggplot2,
+    stringr,
+    tidyr,
+    gt

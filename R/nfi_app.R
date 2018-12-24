@@ -65,7 +65,7 @@ nfi_app <- function() {
 
           ## mod_infoPanel ####
           # mod_infoPanel, it includes the map events info panel
-          # mod_infopanelUI('mod_infopanelUI'),
+          mod_infoOutput('mod_infoOutput'),
 
           ## cite div ####
           shiny::tags$div(
@@ -119,10 +119,10 @@ nfi_app <- function() {
     )
 
     # info panel
-    # shiny::callModule(
-    #   mod_infopanel, 'mod_infopanelUI',
-    #   data_reactives, map_reactives, data_reactives$advancedFilters_reactives, nfidb
-    # )
+    shiny::callModule(
+      mod_info, 'mod_infoOutput',
+      map_reactives, data_reactives, nfidb
+    )
 
     # table
     # shiny::callModule(

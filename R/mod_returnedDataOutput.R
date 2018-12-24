@@ -114,18 +114,26 @@ mod_returnedData <- function(
         selected_data <- NULL
         summarised_data <- NULL
       } else {
-        if (viz_shape == 'polygon') {
-          summarised_data <- selected_data %>%
-            tidyNFI::nfi_results_summarise(
-              polygon_group = admin_div,
-              functional_group = functional_group,
-              diameter_classes = diameter_classes,
-              conn = nfidb,
-              .collect = FALSE
-            )
-        } else {
-          summarised_data <- selected_data
-        }
+        # if (viz_shape == 'polygon') {
+        #   summarised_data <- selected_data %>%
+        #     tidyNFI::nfi_results_summarise(
+        #       polygon_group = admin_div,
+        #       functional_group = functional_group,
+        #       diameter_classes = diameter_classes,
+        #       conn = nfidb,
+        #       .collect = FALSE
+        #     )
+        # } else {
+        #   summarised_data <- selected_data
+        # }
+        summarised_data <- selected_data %>%
+          tidyNFI::nfi_results_summarise(
+            polygon_group = admin_div,
+            functional_group = functional_group,
+            diameter_classes = diameter_classes,
+            conn = nfidb,
+            .collect = FALSE
+          )
       }
 
       return(
