@@ -124,6 +124,7 @@ mod_info <- function(
 
   output$info_plot <- shiny::renderPlot({
     # info_plots_builder()
+    set.seed(25803)
 
     click <- map_inputs$map_shape_click
 
@@ -202,11 +203,15 @@ mod_info <- function(
           'clim_tmean_year_mean', 'clim_prec_year_mean', 'clim_pet_year_mean'
         )) %>%
         head(1) %>%
+        dplyr::mutate_if(is.numeric, round) %>%
         dplyr::collect() %>%
         tidyr::gather('Characteristics', 'Value') %>%
         gt::gt(rowname_col = 'Characteristics') %>%
         gt::tab_header(
           title = glue::glue('{click$id} {data_inputs$admin_div}:')
+        ) %>%
+        gt::tab_options(
+          table.background.color = 'transparent'
         )
     }
   })

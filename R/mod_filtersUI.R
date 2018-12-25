@@ -223,6 +223,12 @@ mod_filters <- function(
     )
   })
 
+  apply_reactives <- shiny::reactive({
+    apply_reactives <- list()
+    apply_reactives$apply_data <- data_inputs$apply_data
+    apply_reactives$apply_viz <- data_inputs$apply_viz
+  })
+
   ## Filter exprs generators ####
   data_filter_expressions <- shiny::eventReactive(
     eventExpr = on_the_fly_inputs(),
