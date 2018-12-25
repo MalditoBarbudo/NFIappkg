@@ -267,7 +267,7 @@ mod_map <- function(
           ) %>%
           dplyr::select(dplyr::one_of(
             join_var, viz_color, glue::glue("{data_inputs$functional_group}_id"),
-            'dc_id'
+            'diamclass_id'
           )) %>%
           dplyr::collect()
 

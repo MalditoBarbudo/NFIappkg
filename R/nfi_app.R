@@ -39,17 +39,17 @@ nfi_app <- function() {
           ),
 
           ########################################################### debug ####
-          shiny::absolutePanel(
-            id = 'debug', class = 'panel panel-default', fixed = TRUE,
-            draggable = TRUE, width = 640, height = 'auto',
-            # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
-            # top = 'auto', left = 'auto', right = 100, bottom = 100,
-            top = 60, left = 'auto', right = 50, bottom = 'auto',
-
-            shiny::textOutput('debug1'),
-            shiny::textOutput('debug2'),
-            shiny::textOutput('debug3')
-          ),
+          # shiny::absolutePanel(
+          #   id = 'debug', class = 'panel panel-default', fixed = TRUE,
+          #   draggable = TRUE, width = 640, height = 'auto',
+          #   # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
+          #   # top = 'auto', left = 'auto', right = 100, bottom = 100,
+          #   top = 60, left = 'auto', right = 50, bottom = 'auto',
+          #
+          #   shiny::textOutput('debug1'),
+          #   shiny::textOutput('debug2'),
+          #   shiny::textOutput('debug3')
+          # ),
           ####################################################### end debug ####
 
           ## mod_data ####
@@ -63,9 +63,17 @@ nfi_app <- function() {
           # mod_map, it includes the map
           mod_mapUI('mod_mapUI'),
 
-          ## mod_infoPanel ####
+          ## mod_info ####
           # mod_infoPanel, it includes the map events info panel
-          mod_infoOutput('mod_infoOutput'),
+          shinyjs::hidden(
+            shiny::absolutePanel(
+              id = 'infoPanel', class = 'panel panel-default', fixed = TRUE,
+              draggable = FALSE, width = '95%', height = 800,
+              top = 60, left = 5, right = 'auto', bottom = 'auto',
+
+              mod_infoUI('mod_infoUI')
+            )
+          ),
 
           ## cite div ####
           shiny::tags$div(
@@ -119,9 +127,22 @@ nfi_app <- function() {
     )
 
     # info panel
-    shiny::callModule(
-      mod_info, 'mod_infoOutput',
+    info_reactives <- shiny::callModule(
+      mod_info, 'mod_infoUI',
       map_reactives, data_reactives, nfidb
+    )
+
+    shiny::observeEvent(
+      eventExpr = map_reactives$map_shape_click,
+      handlerExpr = {
+        shinyjs::showElement('infoPanel')
+      }
+    )
+    shiny::observeEvent(
+      eventExpr = info_reactives$close,
+      handlerExpr = {
+        shinyjs::hideElement('infoPanel')
+      }
     )
 
     # table
@@ -131,15 +152,15 @@ nfi_app <- function() {
     # )
 
     ## debug #####
-    output$debug1 <- shiny::renderPrint({
-      map_reactives$map_groups
-    })
-    output$debug2 <- shiny::renderPrint({
-      map_reactives$map_click
-    })
-    output$debug3 <- shiny::renderPrint({
-      map_reactives$map_shape_click
-    })
+    # output$debug1 <- shiny::renderPrint({
+    #   map_reactives$map_groups
+    # })
+    # output$debug2 <- shiny::renderPrint({
+    #   map_reactives$map_click
+    # })
+    # output$debug3 <- shiny::renderPrint({
+    #   map_reactives$map_shape_click
+    # })
   }
 
   # Run the application

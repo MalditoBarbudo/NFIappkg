@@ -81,6 +81,15 @@ div.inner {
   transition-delay: 0;
 }
 
+#infoPanel {
+  background-color: #bdc3c7;
+  padding: 0 20px 20px 20px;
+  cursor: move;
+  border-radius: 8px;
+  zoom: 0.9;
+  z-index: 1500;
+}
+
 /* Sweet alerts */
 .swal-modal {
   /* Appearance */
