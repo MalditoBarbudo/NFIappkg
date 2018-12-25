@@ -116,8 +116,26 @@ mod_info <- function(
           )) %>%
           dplyr::collect()
 
+        browser()
+
+        # validate if we have data
+        shiny::validate(
+          shiny::need(
+            nrow(plot_data_all) > 0,
+            'No data to show'
+          )
+        )
+
         plot_data_sel <- plot_data_all %>%
           dplyr::filter(!! rlang::sym(admin_sel) == click$id)
+
+        # validate if we have selected data
+        shiny::validate(
+          shiny::need(
+            nrow(plot_data_sel) > 0,
+            'No data in the clicked shape, please click in another'
+          )
+        )
 
         table_data <-  map_inputs$main_data[['summarised']] %>%
           dplyr::ungroup() %>%
@@ -130,6 +148,14 @@ mod_info <- function(
           head(1) %>%
           dplyr::mutate_if(is.numeric, round) %>%
           dplyr::collect()
+
+        # validate if we have table data
+        shiny::validate(
+          shiny::need(
+            nrow(table_data) > 0,
+            'No data to show the general info'
+          )
+        )
       }
 
       # build the plot expression, with glue
