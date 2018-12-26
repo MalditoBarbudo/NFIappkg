@@ -13,6 +13,7 @@ nfi_app <- function() {
 
     shinyjs::useShinyjs(),
     shinyWidgets::chooseSliderSkin(skin = "Shiny", color = '#0DB3D4'),
+    shinyWidgets::useSweetAlert(),
 
     shiny::navbarPage(
       # opts

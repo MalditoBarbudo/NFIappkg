@@ -213,7 +213,14 @@ mod_map <- function(
         )
       )
 
-     # filter by functional group value
+      # start the progress
+      shinyWidgets::progressSweetAlert(
+        session = session, id = 'map_data_progress',
+        title = 'Map data carpentry', value = 0,
+        display_pct = TRUE
+      )
+
+      # filter by functional group value
       if (data_inputs$functional_group != 'plot') {
 
         fil_var <- glue::glue("{data_inputs$functional_group}_id")
@@ -266,6 +273,11 @@ mod_map <- function(
         'natura_network_2000' = 'natura_network_2000_polygons'
       )
 
+      shinyWidgets::updateProgressBar(
+        session = session, id = 'map_data_progress',
+        value = 25
+      )
+
       # polygons shape
       if (data_inputs$viz_shape == 'polygon') {
         viz_color <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
@@ -287,11 +299,23 @@ mod_map <- function(
           )
         )
 
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_data_progress',
+          value = 50
+        )
+
         map_data <- map_data_pre %>%
           dplyr::full_join(
             rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
           ) %>%
           sf::st_as_sf()
+
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_data_progress',
+          value = 75
+        )
+
+
       } else {
         # plots shape
         # color and size vars
@@ -314,13 +338,24 @@ mod_map <- function(
           )
         )
 
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_data_progress',
+          value = 50
+        )
+
         map_data <- map_data_pre %>%
           sf::st_as_sf(
             coords = c('coords_longitude', 'coords_latitude'),
             crs = '+proj=longlat +datum=WGS84'
           )
+
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_data_progress',
+          value = 75
+        )
       }
 
+      shinyWidgets::closeSweetAlert(session = session)
       return(map_data)
     }
   )
@@ -341,6 +376,13 @@ mod_map <- function(
           map_data,
           "No data to map"
         )
+      )
+
+      # start the progress
+      shinyWidgets::progressSweetAlert(
+        session = session, id = 'map_build_progress',
+        title = 'Building the map', value = 0,
+        display_pct = TRUE
       )
 
       # switches (polygons objects, labels and groups)
@@ -380,6 +422,11 @@ mod_map <- function(
         'natura_network_2000' = 'natura_network_2000_polygons'
       )
 
+      shinyWidgets::updateProgressBar(
+        session = session, id = 'map_build_progress',
+        value = 10
+      )
+
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
 
@@ -404,6 +451,11 @@ mod_map <- function(
             'plasma', color_vector, reverse = data_inputs$viz_reverse_pal
           )
         }
+
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_build_progress',
+          value = 30
+        )
 
         leaflet::leafletProxy('map') %>%
           leaflet::clearGroup('veguerias') %>%
@@ -436,6 +488,12 @@ mod_map <- function(
             position = 'topright', pal = pal, values = color_vector, title = viz_color,
             layerId = 'color_legend', opacity = 1
           )
+
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_build_progress',
+          value = 75
+        )
+
       } else {
         # plots
 
@@ -479,6 +537,11 @@ mod_map <- function(
         # reduce the size of the nas
         size_vector[is.na(color_vector)] <- 500
 
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_build_progress',
+          value = 30
+        )
+
         # build the map
         leaflet::leafletProxy('map') %>%
           leaflet::clearGroup('veguerias') %>%
@@ -519,7 +582,13 @@ mod_map <- function(
             layerId = 'color_legend', opacity = 1
           )
 
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_build_progress',
+          value = 75
+        )
       }
+
+      shinyWidgets::closeSweetAlert(session = session)
     }
   )
 
