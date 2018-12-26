@@ -52,6 +52,54 @@ mod_info <- function(
   map_inputs, data_inputs, nfidb
 ) {
 
+  dedupe <- function(r) {
+    shiny::makeReactiveBinding("val")
+    shiny::observe(val <<- r(), priority = 10)
+    shiny::reactive(val)
+  }
+
+  prep_data <- dedupe(shiny::reactive({
+    click <- map_inputs$map_shape_click
+
+    if (is.null(click)) {
+      return()
+    }
+    # browser()
+
+    if (click$group == 'plots') {
+      viz_sel <- data_inputs$viz_color
+      fg_id <- glue::glue("{data_inputs$functional_group}_id")
+      if (fg_id == 'plot_id') {fg_id <- ''}
+      viz_size <- data_inputs$viz_size
+
+      prep_data <- map_inputs$main_data[['selected']] %>%
+        dplyr::select(dplyr::one_of(
+          'plot_id', viz_sel, viz_size, 'diamclass_id', fg_id,
+          'admin_province',
+          'topo_altitude_asl', 'topo_fdm_slope_percentage',
+          'topo_fdm_aspect_cardinal_8',
+          'clim_tmean_year', 'clim_prec_year', 'clim_pet_year'
+        )) %>%
+        dplyr::collect()
+    } else {
+      viz_sel <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
+      fg_id <- glue::glue("{data_inputs$functional_group}_id")
+      if (fg_id == 'plot_id') {fg_id <- ''}
+      viz_size <- ''
+      admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
+
+      prep_data <- map_inputs$main_data[['summarised']] %>%
+        dplyr::select(dplyr::one_of(
+          admin_sel, viz_sel, viz_size, 'diamclass_id', fg_id,
+          'topo_altitude_asl_mean', 'topo_fdm_slope_percentage_mean',
+          'clim_tmean_year_mean', 'clim_prec_year_mean', 'clim_pet_year_mean'
+        )) %>%
+        dplyr::collect()
+
+      return(prep_data)
+    }
+  }))
+
   # reactive to prepare the plot and the table and return them as a list
   plot_and_table <- shiny::eventReactive(
     eventExpr = map_inputs$map_shape_click,
@@ -66,35 +114,20 @@ mod_info <- function(
         if (fg_id == 'plot_id') {fg_id <- ''}
         viz_size <- data_inputs$viz_size
 
-        prep_data <- map_inputs$main_data[['selected']] %>%
-          dplyr::select(dplyr::one_of(
-            'plot_id', viz_sel, viz_size, 'diamclass_id', fg_id,
-            'admin_province',
-            'topo_altitude_asl', 'topo_fdm_slope_percentage',
-            'topo_fdm_aspect_cardinal_8',
-            'clim_tmean_year', 'clim_prec_year', 'clim_pet_year'
-          ))
-
-        plot_data_all <- prep_data %>%
-          dplyr::select(dplyr::one_of(
-            'plot_id', viz_sel, viz_size, 'diamclass_id', fg_id
-          )) %>%
-          dplyr::collect()
+        plot_data_all <- prep_data()
 
         plot_data_sel <- plot_data_all %>%
           dplyr::filter(plot_id == click$id)
 
-        table_data <- map_inputs$main_data[['selected']] %>%
+        table_data <- plot_data_sel %>%
           dplyr::select(dplyr::one_of(
             'plot_id', 'admin_province',
             'topo_altitude_asl', 'topo_fdm_slope_percentage',
             'topo_fdm_aspect_cardinal_8',
             'clim_tmean_year', 'clim_prec_year', 'clim_pet_year'
           )) %>%
-          dplyr::filter(plot_id == click$id) %>%
           head(1) %>%
-          dplyr::mutate_if(is.numeric, round) %>%
-          dplyr::collect()
+          dplyr::mutate_if(is.numeric, round)
       # end if plots, start of != plots
       } else {
         viz_sel <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
@@ -103,33 +136,20 @@ mod_info <- function(
         viz_size <- ''
         admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
 
-        prep_data <- map_inputs$main_data[['summarised']] %>%
-          dplyr::select(dplyr::one_of(
-            admin_sel, viz_sel, viz_size, 'diamclass_id', fg_id,
-            'topo_altitude_asl_mean', 'topo_fdm_slope_percentage_mean',
-            'clim_tmean_year_mean', 'clim_prec_year_mean', 'clim_pet_year_mean'
-          ))
-
-        plot_data_all <- prep_data %>%
-          dplyr::select(dplyr::one_of(
-            admin_sel, viz_sel, viz_size, 'diamclass_id', fg_id
-          )) %>%
-          dplyr::collect()
+        plot_data_all <- prep_data()
 
         plot_data_sel <- plot_data_all %>%
           dplyr::filter(!! rlang::sym(admin_sel) == click$id)
 
-        table_data <-  map_inputs$main_data[['summarised']] %>%
+        table_data <-  plot_data_sel %>%
           dplyr::ungroup() %>%
           dplyr::select(dplyr::one_of(
             admin_sel,
             'topo_altitude_asl_mean', 'topo_fdm_slope_percentage_mean',
             'clim_tmean_year_mean', 'clim_prec_year_mean', 'clim_pet_year_mean'
           )) %>%
-          dplyr::filter(!! rlang::sym(admin_sel) == click$id) %>%
           head(1) %>%
-          dplyr::mutate_if(is.numeric, round) %>%
-          dplyr::collect()
+          dplyr::mutate_if(is.numeric, round)
       }
 
       # validate if we have data
@@ -147,6 +167,7 @@ mod_info <- function(
       if (fg_id %in% names(plot_data_all)) {
         plot_data_all %>%
           dplyr::group_by(!! rlang::sym(fg_id)) %>%
+          dplyr::select(dplyr::one_of('plot_id', viz_sel)) %>%
           dplyr::summarise(n = dplyr::n()) %>%
           dplyr::arrange(dplyr::desc(n)) %>%
           dplyr::pull(!! rlang::sym(fg_id)) -> fg_list
