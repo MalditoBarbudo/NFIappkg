@@ -283,9 +283,12 @@ mod_filters <- function(
 
   filter_reactives <- shiny::reactiveValues()
   shiny::observe({
-    # browser()
     filter_reactives$filter_expressions <- data_filter_expressions()
     filter_reactives$filter_vars <- input$filter_vars
+
+    # inputs created on the fly
+    filter_reactives$otf_filter_inputs <- on_the_fly_inputs() %>%
+      magrittr::set_names(., input$filter_vars)
   })
 
   return(filter_reactives)

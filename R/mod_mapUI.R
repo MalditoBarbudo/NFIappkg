@@ -204,7 +204,7 @@ mod_map <- function(
         )
       )
 
-      # filter by functional group value
+     # filter by functional group value
       if (data_inputs$functional_group != 'plot') {
 
         fil_var <- glue::glue("{data_inputs$functional_group}_id")

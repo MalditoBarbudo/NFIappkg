@@ -254,6 +254,7 @@ mod_data <- function(
     # filters
     data_inputs$filter_expressions <- filters_reactives$filter_expressions
     data_inputs$filter_vars <- filters_reactives$filter_vars
+    data_inputs$otf_filter_inputs <- filters_reactives$otf_filter_inputs
     # apply buttons
     data_inputs$apply_data <- apply_data$apply
     data_inputs$apply_viz <- apply_viz$apply

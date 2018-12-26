@@ -174,19 +174,37 @@ mod_info <- function(
 
         if (length(fg_list) > 5) {
 
-          # warning the user about the trimming
-          shinyWidgets::sendSweetAlert(
-            session,
-            title = 'Too much genera to safely plot them all',
-            text = 'Showing only the 5 more abundant'
-          )
+          # is there a fuctional group value already selected
+          if (
+            data_inputs$viz_functional_group_value != '' &
+            !(data_inputs$viz_functional_group_value %in% fg_list[1:5])
+          ) {
+            fg_list <- c(data_inputs$viz_functional_group_value, fg_list[1:5])
+            # warning the user about the trimming
+            shinyWidgets::sendSweetAlert(
+              session,
+              title = 'Too much functional group levels to safely plot them all',
+              text = glue::glue(
+                "Showing only the 5 levels more abundant",
+                " as well as {data_inputs$viz_functional_group_value}"
+              )
+            )
+          } else {
+            fg_list <- fg_list[1:5]
+            # warning the user about the trimming
+            shinyWidgets::sendSweetAlert(
+              session,
+              title = 'Too much functional group levels to safely plot them all',
+              text = glue::glue("Showing only the 5 levels more abundant")
+            )
+          }
 
           plot_data_sel <- plot_data_sel %>%
-            dplyr::filter(!! rlang::sym(fg_id) %in% fg_list[1:5])
+            dplyr::filter(!! rlang::sym(fg_id) %in% fg_list)
 
           plot_expression <- glue::glue(
             "plot_data_all %>%
-            dplyr::filter({fg_id} %in% fg_list[1:5]) %>%
+            dplyr::filter({fg_id} %in% fg_list) %>%
             ggplot2::ggplot(ggplot2::aes(x = '_', y = {viz_sel})) +"
           )
         } else {
