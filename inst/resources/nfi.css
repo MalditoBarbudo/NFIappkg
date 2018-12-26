@@ -81,6 +81,24 @@ div.inner {
   transition-delay: 0;
 }
 
+#savePanel {
+  /* Appearance */
+  background-color: #bdc3c7;
+  padding: 0 20px 20px 20px;
+  cursor: move;
+  border-radius: 8px;
+  /* Fade out while not hovering */
+  opacity: 0.65;
+  zoom: 0.9;
+  transition: opacity 1s 100ms;
+  z-index: 999;
+}
+#savePanel:hover {
+  /* Fade in while hovering */
+  opacity: 0.95;
+  transition-delay: 0;
+}
+
 #infoPanel {
   background-color: #bdc3c7;
   padding: 0 20px 20px 20px;

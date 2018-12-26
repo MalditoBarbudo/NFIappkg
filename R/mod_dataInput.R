@@ -265,6 +265,7 @@ mod_data <- function(
     data_inputs$viz_statistic <- viz_reactives$viz_statistic
     data_inputs$viz_functional_group_value <- viz_reactives$viz_functional_group_value
     data_inputs$viz_diamclass <- viz_reactives$viz_diamclass
+    data_inputs$show_save <- buttons_reactives$show_save
   })
 
   return(data_inputs)

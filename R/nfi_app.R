@@ -30,12 +30,15 @@ nfi_app <- function() {
             # custom css
             shiny::includeCSS(
               system.file('resources', 'nfi.css', package = 'NFIappkg')
-            ),
+            )
             # custom scripts
             ## easyPrint leaflet plugin
-            shiny::tags$script(
-              src = "https://rawgit.com/rowanwins/leaflet-easyPrint/gh-pages/dist/bundle.js"
-            )
+            # shiny::tags$script(
+            #   src = "https://rawgit.com/rowanwins/leaflet-easyPrint/gh-pages/dist/bundle.js"
+            # )
+            # shiny::includeScript(
+            #   system.file('resources', 'print_map.js', package = 'NFIappkg')
+            # )
           ),
 
           ########################################################### debug ####
@@ -68,10 +71,22 @@ nfi_app <- function() {
           shinyjs::hidden(
             shiny::absolutePanel(
               id = 'infoPanel', class = 'panel panel-default', fixed = TRUE,
-              draggable = FALSE, width = '95%', height = 800,
+              draggable = TRUE, width = '95%', height = 800,
               top = 60, left = 5, right = 'auto', bottom = 'auto',
 
               mod_infoUI('mod_infoUI')
+            )
+          ),
+
+          ## mod_saveMap ####
+          # mod_saveMap
+          shinyjs::hidden(
+            shiny::absolutePanel(
+              id = 'savePanel', class = 'panel panel-default', fixed = TRUE,
+              draggable = TRUE, width = 250, height = 135,
+              top = 'auto', left = 'auto', right = 60, bottom = 5,
+
+              mod_saveMapInput('mod_saveMapInput')
             )
           ),
 
@@ -132,6 +147,12 @@ nfi_app <- function() {
       map_reactives, data_reactives, nfidb
     )
 
+    # saveMap panel
+    shiny::callModule(
+      mod_saveMap, 'mod_saveMapInput',
+      map_reactives
+    )
+
     shiny::observeEvent(
       eventExpr = map_reactives$map_shape_click,
       handlerExpr = {
@@ -144,6 +165,15 @@ nfi_app <- function() {
         shinyjs::hideElement('infoPanel')
       }
     )
+
+    shiny::observeEvent(
+      eventExpr = data_reactives$show_save,
+      handlerExpr = {
+        shinyjs::toggleElement('savePanel')
+      }
+    )
+
+
 
     # table
     # shiny::callModule(

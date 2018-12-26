@@ -19,12 +19,14 @@ mod_buttonsInput <- function(id, nfidb) {
       # buttons
       shinyWidgets::actionGroupButtons(
         inputIds = c(
-          ns('show_agg'), ns('show_filter_def'), ns('show_viz')
+          ns('show_agg'), ns('show_filter_def'), ns('show_viz'),
+          ns('show_save')
         ),
         labels = c(
           'Breakdown level',
           'Filters',
-          'Visualization Controls'
+          'Visualization',
+          'Save the map'
         ),
         status = 'success', size = 'sm',
         direction = 'horizontal', fullwidth = TRUE
@@ -53,6 +55,7 @@ mod_buttons <- function(
     mod_buttons_reactives$show_filter_def <- input$show_filter_def
     mod_buttons_reactives$show_agg <- input$show_agg
     mod_buttons_reactives$show_viz <- input$show_viz
+    mod_buttons_reactives$show_save <- input$show_save
   })
 
   return(mod_buttons_reactives)
