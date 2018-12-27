@@ -64,7 +64,12 @@ mod_info <- function(
     if (is.null(click)) {
       return()
     }
-    # browser()
+    # start the progress
+    # shinyWidgets::progressSweetAlert(
+    #   session = session, id = 'info_data_prep',
+    #   title = 'Info data carpentry', value = 35,
+    #   display_pct = TRUE
+    # )
 
     if (click$group == 'plots') {
       viz_sel <- data_inputs$viz_color
@@ -81,6 +86,11 @@ mod_info <- function(
           'clim_tmean_year', 'clim_prec_year', 'clim_pet_year'
         )) %>%
         dplyr::collect()
+
+      # shinyWidgets::updateProgressBar(
+      #   session = session, id = 'info_data_prep',
+      #   value = 75
+      # )
     } else {
       viz_sel <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
       fg_id <- glue::glue("{data_inputs$functional_group}_id")
@@ -96,8 +106,14 @@ mod_info <- function(
         )) %>%
         dplyr::collect()
 
-      return(prep_data)
+      # shinyWidgets::updateProgressBar(
+      #   session = session, id = 'info_data_prep',
+      #   value = 75
+      # )
     }
+
+    # shinyWidgets::closeSweetAlert(session = session)
+    return(prep_data)
   }))
 
   # reactive to prepare the plot and the table and return them as a list
@@ -106,7 +122,12 @@ mod_info <- function(
     valueExpr = {
 
       click <- map_inputs$map_shape_click
-      # browser()
+      # start the progress
+      # shinyWidgets::progressSweetAlert(
+      #   session = session, id = 'info_buiding',
+      #   title = 'Preparing the info data', value = 10,
+      #   display_pct = TRUE
+      # )
 
       if (click$group == 'plots') {
         viz_sel <- data_inputs$viz_color
@@ -115,6 +136,11 @@ mod_info <- function(
         viz_size <- data_inputs$viz_size
 
         plot_data_all <- prep_data()
+
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'info_data_prep',
+        #   value = 25
+        # )
 
         plot_data_sel <- plot_data_all %>%
           dplyr::filter(plot_id == click$id)
@@ -128,6 +154,11 @@ mod_info <- function(
           )) %>%
           head(1) %>%
           dplyr::mutate_if(is.numeric, round)
+
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'info_data_prep',
+        #   value = 50
+        # )
       # end if plots, start of != plots
       } else {
         viz_sel <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
@@ -137,6 +168,11 @@ mod_info <- function(
         admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
 
         plot_data_all <- prep_data()
+
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'info_data_prep',
+        #   value = 25
+        # )
 
         plot_data_sel <- plot_data_all %>%
           dplyr::filter(!! rlang::sym(admin_sel) == click$id)
@@ -150,6 +186,11 @@ mod_info <- function(
           )) %>%
           head(1) %>%
           dplyr::mutate_if(is.numeric, round)
+
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'info_data_prep',
+        #   value = 50
+        # )
       }
 
       # validate if we have data
@@ -207,6 +248,11 @@ mod_info <- function(
             dplyr::filter({fg_id} %in% fg_list) %>%
             ggplot2::ggplot(ggplot2::aes(x = '_', y = {viz_sel})) +"
           )
+
+          # shinyWidgets::updateProgressBar(
+          #   session = session, id = 'info_data_prep',
+          #   value = 65
+          # )
         } else {
           plot_expression <- glue::glue(
             "plot_data_all %>%
@@ -218,6 +264,11 @@ mod_info <- function(
           "plot_data_all %>%
             ggplot2::ggplot(ggplot2::aes(x = '_', y = {viz_sel})) +"
         )
+
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'info_data_prep',
+        #   value = 65
+        # )
       }
 
       # geom_jiter, different if we have viz_size
@@ -297,11 +348,21 @@ mod_info <- function(
         }
       }
 
+      # shinyWidgets::updateProgressBar(
+      #   session = session, id = 'info_data_prep',
+      #   value = 75
+      # )
+
       info_plot <- rlang::eval_tidy(rlang::parse_expr(plot_expression)) +
         ggplot2::labs(
           title = glue::glue("{viz_sel} from {click$id} compared to other {click$group}")
         ) +
         ggplot2::theme_minimal()
+
+      # shinyWidgets::updateProgressBar(
+      #   session = session, id = 'info_data_prep',
+      #   value = 85
+      # )
 
       # info_table
       info_table <- table_data %>%
@@ -354,6 +415,8 @@ mod_info <- function(
           ),
           locations = gt::cells_data(columns = dplyr::vars(Value))
         )
+
+      # shinyWidgets::closeSweetAlert(session = session)
 
       return(list(info_plot = info_plot, info_table = info_table))
     }
