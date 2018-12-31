@@ -7,7 +7,7 @@
 \usage{
 mod_tableOutput(id)
 
-mod_table(input, output, session, data_inputs, map_inputs, ifndb)
+mod_table(input, output, session, data_inputs, map_inputs, nfidb)
 }
 \arguments{
 \item{id}{shiny id}
@@ -22,7 +22,7 @@ mod_table(input, output, session, data_inputs, map_inputs, ifndb)
 
 \item{map_inputs}{reactive with the mod_map inputs, included main_data}
 
-\item{ifndb}{db pool}
+\item{nfidb}{db pool}
 }
 \description{
 A shiny module to generate the base IFN plots table

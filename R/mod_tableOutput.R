@@ -21,7 +21,7 @@ mod_tableOutput <- function(id) {
           shiny::h4('Column visibility'),
           shinyWidgets::pickerInput(
             ns('col_vis_selector'),
-            # label_getter(ifndb, 'esp', 'col_vis_selector_label'),
+            # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
             label = 'Choose the variables to show',
             choices = '', multiple = TRUE,
             width = '90%',
@@ -69,14 +69,14 @@ mod_tableOutput <- function(id) {
 #'
 #' @param data_inputs reactive with the reactive data and the data inputs
 #' @param map_inputs reactive with the mod_map inputs, included main_data
-#' @param ifndb db pool
+#' @param nfidb db pool
 #'
 #' @export
 #'
 #' @rdname mod_tableOutput
 mod_table <- function(
   input, output, session,
-  data_inputs, map_inputs, ifndb
+  data_inputs, map_inputs, nfidb
 ) {
 
   # we need the data based on the viz shape selected (selected for plots,
@@ -126,9 +126,37 @@ mod_table <- function(
 
   # reactive to build the DT
   build_table <- shiny::reactive({
-    table_data() %>%
+
+    numeric_vars <- table_data() %>%
       dplyr::select(dplyr::one_of(input$col_vis_selector)) %>%
-      DT::datatable()
+      dplyr::select_if(is.numeric) %>%
+      names()
+
+   basic_table <- table_data() %>%
+      dplyr::select(dplyr::one_of(input$col_vis_selector)) %>%
+      DT::datatable(
+        rownames = FALSE,
+        class = 'hover compact order-column stripe nowrap',
+        options = list(
+          pageLength = 20,
+          dom = 'tip'
+        )
+      ) %>%
+     DT::formatRound(
+       columns = numeric_vars,
+       digits = 2
+     )
+   for (var in numeric_vars) {
+     basic_table <- basic_table %>%
+       DT::formatStyle(
+         columns = var,
+         background = DT::styleColorBar(table_data()[[var]],'#3fc380', 90),
+         backgroundSize = '98% 88%',
+         backgroundRepeat = 'no-repeat',
+         backgroundPosition = 'center'
+       )
+   }
+   return(basic_table)
   })
 
   # reactive to build the gt
