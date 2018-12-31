@@ -31,6 +31,10 @@ div.inner {
   overflow: auto;
 }
 
+div.table_container {
+  overflow-y: scroll;
+}
+
 /* Position and style citation */
 #cite {
   position: absolute;

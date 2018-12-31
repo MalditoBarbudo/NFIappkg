@@ -107,8 +107,8 @@ nfi_app <- function() {
         'Data',
 
         shiny::div(
-          class = 'inner'#,
-          # mod_tableOutput('mod_tableOutput', nfidb)
+          class = 'inner',
+          mod_tableOutput('mod_tableOutput')
         )
       ),
 
@@ -154,6 +154,12 @@ nfi_app <- function() {
       map_reactives
     )
 
+    # table
+    shiny::callModule(
+      mod_table, 'mod_tableOutput',
+      data_reactives, map_reactives, nfidb
+    )
+
     shiny::observeEvent(
       eventExpr = map_reactives$map_shape_click,
       handlerExpr = {
@@ -173,14 +179,6 @@ nfi_app <- function() {
         shinyjs::toggleElement('savePanel')
       }
     )
-
-
-
-    # table
-    # shiny::callModule(
-    #   mod_table, 'mod_tableOutput',
-    #   data_reactives, data_reactives$advancedFilters_reactives, map_reactives, nfidb
-    # )
 
     ## debug #####
     # output$debug1 <- shiny::renderPrint({

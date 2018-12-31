@@ -52,12 +52,6 @@ mod_info <- function(
   map_inputs, data_inputs, nfidb
 ) {
 
-  dedupe <- function(r) {
-    shiny::makeReactiveBinding("val")
-    shiny::observe(val <<- r(), priority = 10)
-    shiny::reactive(val)
-  }
-
   prep_data <- dedupe(shiny::reactive({
     click <- map_inputs$map_shape_click
 
