@@ -26,11 +26,15 @@ mod_tableOutput <- function(id) {
             choices = '', multiple = TRUE,
             width = '90%',
             options = list(
-              `actions-box` = TRUE,
+              `actions-box` = FALSE,
               `deselect-all-text` = 'None selected...',
               `select-all-text` = 'All selected',
               `selected-text-format` = 'count',
-              `count-selected-text` = "{0} variables selected (of {1})"
+              `count-selected-text` = "{0} variables selected (of {1})",
+              `size` = 15,
+              `max-options` = 50,
+              `max-options-text` = 'Select limit reached (50)',
+              `live-search` = TRUE
             )
           ),
           # mod_applyButtonInput(ns('mod_applyButtonInput_table')),
@@ -115,7 +119,7 @@ mod_table <- function(
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
         label = 'Choose the variables to show',
-        selected = col_vis_choices[1:10],
+        selected = col_vis_choices[1:5],
         choices = col_vis_choices
       )
     }
@@ -128,19 +132,24 @@ mod_table <- function(
   # reactive to build the DT
   build_table <- shiny::reactive({
 
+    shiny::validate(
+      shiny::need(length(input$col_vis_selector) > 0, 'No data to show')
+    )
+
     numeric_vars <- table_data() %>%
       dplyr::select(dplyr::one_of(input$col_vis_selector)) %>%
       dplyr::select_if(is.numeric) %>%
       names()
 
-   basic_table <- table_data() %>%
+    basic_table <- table_data() %>%
       dplyr::select(dplyr::one_of(input$col_vis_selector)) %>%
+      dplyr::mutate_if(is.character, forcats::as_factor) %>%
       DT::datatable(
         rownames = FALSE,
-        class = 'hover compact order-column stripe nowrap',
-        filter = 'bottom',
+        class = 'hover order-column stripe nowrap',
+        filter = list(position = 'top', clear = TRUE, plain = FALSE),
         options = list(
-          pageLength = 20,
+          pageLength = 15,
           dom = 'tip'
         )
       ) %>%
@@ -148,16 +157,17 @@ mod_table <- function(
        columns = numeric_vars,
        digits = 2
      )
-   for (var in numeric_vars) {
-     basic_table <- basic_table %>%
-       DT::formatStyle(
-         columns = var,
-         background = DT::styleColorBar(table_data()[[var]],'#3fc380', 90),
-         backgroundSize = '98% 88%',
-         backgroundRepeat = 'no-repeat',
-         backgroundPosition = 'center'
-       )
-   }
+   # for (var in numeric_vars) {
+   #   basic_table <- basic_table %>%
+   #     DT::formatStyle(
+   #       columns = var,
+   #       background = DT::styleColorBar(table_data()[[var]],'#3fc380', 90),
+   #       backgroundSize = '98% 88%',
+   #       backgroundRepeat = 'no-repeat',
+   #       backgroundPosition = 'center'
+   #     )
+   # }
+
    return(basic_table)
   })
 
