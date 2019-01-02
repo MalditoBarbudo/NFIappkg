@@ -100,6 +100,7 @@ mod_table <- function(
         return()
       } else {
         map_inputs$main_data[['summarised']] %>%
+          dplyr::ungroup() %>%
           dplyr::collect()
       }
     }
@@ -137,6 +138,7 @@ mod_table <- function(
       DT::datatable(
         rownames = FALSE,
         class = 'hover compact order-column stripe nowrap',
+        filter = 'bottom',
         options = list(
           pageLength = 20,
           dom = 'tip'
