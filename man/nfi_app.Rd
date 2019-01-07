@@ -4,7 +4,7 @@
 \alias{nfi_app}
 \title{function to launch the nfi app}
 \usage{
-nfi_app()
+nfi_app(user = "guest", password = "guest")
 }
 \description{
 function to launch the nfi app

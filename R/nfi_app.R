@@ -3,10 +3,10 @@
 #' @importFrom magrittr %>%
 #'
 #' @export
-nfi_app <- function() {
+nfi_app <- function(user = 'guest', password = 'guest') {
 
   ### DB access ################################################################
-  nfidb <- tidyNFI::nfi_connect()
+  nfidb <- tidyNFI::nfi_connect(user = user, password = password)
 
   ## UI ####
   ui <- shiny::tagList(
