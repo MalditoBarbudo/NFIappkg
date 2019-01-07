@@ -111,3 +111,20 @@ div.table_container {
   zoom: 0.9;
   z-index: 1500;
 }
+
+/* Sweet alerts */
+.swal-modal {
+  /* Appearance */
+  background-color: #bdc3c7;
+  width: 55%;
+}
+
+/* dropdowns */
+.dropdown-toggle {
+  border-bottom-width: 0;
+}
+
+/* buttons stretch */
+.bttn-stretch.bttn-default {
+  color: #67809f;
+}
