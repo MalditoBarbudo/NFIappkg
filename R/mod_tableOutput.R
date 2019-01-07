@@ -34,18 +34,36 @@ mod_tableOutput <- function(id) {
         )
       ),
       shiny::column(
-        1, offset = 8,
+        2,
+        shinyWidgets::actionBttn(
+          ns('show_hri'),
+          'Info',
+          style = 'unite'
+        )
+      ),
+      shiny::column(
+        2,
+        shinyWidgets::downloadBttn(
+          ns('dwl_sql_query'),
+          'SQL query',
+          color = 'default', size = 'sm', block = FALSE,
+          style = 'minimal'
+        )
+      ),
+      shiny::column(
+        2,
+        offset = 3,
         shinyWidgets::downloadBttn(
           ns('dwl_csv_button'),
           'csv',
-          color = 'success', size = 'sm', block = FALSE,
-          style = 'material-flat'
+          color = 'default', size = 'sm', block = FALSE,
+          style = 'minimal'
         ),
         shinyWidgets::downloadBttn(
           ns('dwl_xlsx_button'),
           'xlsx',
-          color = 'success', size = 'sm', block = FALSE,
-          style = 'material-flat'
+          color = 'default', size = 'sm', block = FALSE,
+          style = 'minimal'
         )
       )
     ),
@@ -128,6 +146,8 @@ mod_table <- function(
   # summarised for polygons). All of this with a dedupe function, as it is
   # really expensive and we want to do it only when really necessary
   table_data <- dedupe(shiny::reactive({
+
+    # browser()
 
     # start the progress
     shinyWidgets::progressSweetAlert(
@@ -262,6 +282,32 @@ mod_table <- function(
     },
     content = function(file) {
       writexl::write_xlsx(table_data(), file)
+    }
+  )
+
+  output$dwl_sql_query <- shiny::downloadHandler(
+    filename = function() {
+      'NFI_data_query.sql'
+    },
+    content = function(file) {
+      if (data_inputs$viz_shape == 'plot') {
+        query <- dbplyr::sql_render(map_inputs$main_data$selected)
+      } else {
+        query <- dbplyr::sql_render(map_inputs$main_data$summarised)
+      }
+      writeLines(query, con = file)
+    }
+  )
+
+  shiny::observeEvent(
+    eventExpr = input$show_hri,
+    handlerExpr = {
+      shinyWidgets::sendSweetAlert(
+        session = session,
+        title = 'Data info',
+        text = shiny::tags$div(hri_builder(data_inputs)),
+        html = TRUE
+      )
     }
   )
 
