@@ -59,7 +59,7 @@ mod_tableOutput <- function(id) {
         mainPanel = shiny::mainPanel(
           width = 9,
           # gt::gt_output(ns('nfi_table'))
-          DT::DTOutput(ns('nfi_table'))
+          shinyWidgets::addSpinner(DT::DTOutput(ns('nfi_table')))
         )
       )
     )
@@ -86,9 +86,17 @@ mod_table <- function(
   # we need the data based on the viz shape selected (selected for plots,
   # summarised for polygons). All of this with a dedupe function, as it is
   # really expensive and we want to do it only when really necessary
-  table_data <- dedupe(shiny::reactive({
+  table_data <- shiny::reactive({
+
+    # start the progress
+    shinyWidgets::progressSweetAlert(
+      session = session, id = 'table_build_progress',
+      title = 'Preparing table data', value = 75,
+      display_pct = TRUE
+    )
 
     if (any(is.null(data_inputs$viz_shape), is.null(map_inputs$main_data))) {
+      shinyWidgets::closeSweetAlert(session = session)
       return()
     }
 
@@ -96,19 +104,38 @@ mod_table <- function(
       if (is.null(map_inputs$main_data[['selected']])) {
         return()
       } else {
-        map_inputs$main_data[['selected']] %>%
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'table_build_progress',
+          value = 90
+        )
+        res <- map_inputs$main_data[['selected']] %>%
           dplyr::collect()
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'table_build_progress',
+          value = 99
+        )
       }
     } else {
       if (is.null(map_inputs$main_data[['summarised']])) {
+        shinyWidgets::closeSweetAlert(session = session)
         return()
       } else {
-        map_inputs$main_data[['summarised']] %>%
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'table_build_progress',
+          value = 90
+        )
+        res <- map_inputs$main_data[['summarised']] %>%
           dplyr::ungroup() %>%
           dplyr::collect()
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'table_build_progress',
+          value = 99
+        )
       }
     }
-  }))
+    shinyWidgets::closeSweetAlert(session = session)
+    return(res)
+  })
 
   # update the column visibility input
   shiny::observeEvent(

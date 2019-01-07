@@ -275,7 +275,7 @@ mod_map <- function(
 
       shinyWidgets::updateProgressBar(
         session = session, id = 'map_data_progress',
-        value = 50
+        value = 35
       )
 
       # polygons shape
@@ -301,7 +301,7 @@ mod_map <- function(
 
         shinyWidgets::updateProgressBar(
           session = session, id = 'map_data_progress',
-          value = 75
+          value = 45
         )
 
         map_data <- map_data_pre %>%
@@ -309,6 +309,11 @@ mod_map <- function(
             rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
           ) %>%
           sf::st_as_sf()
+
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_data_progress',
+          value = 50
+        )
 
       } else {
         # plots shape
@@ -334,7 +339,7 @@ mod_map <- function(
 
         shinyWidgets::updateProgressBar(
           session = session, id = 'map_data_progress',
-          value = 75
+          value = 45
         )
 
         map_data <- map_data_pre %>%
@@ -342,12 +347,12 @@ mod_map <- function(
             coords = c('coords_longitude', 'coords_latitude'),
             crs = '+proj=longlat +datum=WGS84'
           )
-      }
 
-      shinyWidgets::updateProgressBar(
-        session = session, id = 'map_data_progress',
-        value = 100
-      )
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_data_progress',
+          value = 50
+        )
+      }
       shinyWidgets::closeSweetAlert(session = session)
       return(map_data)
     }
@@ -372,11 +377,11 @@ mod_map <- function(
       )
 
       # start the progress
-      # shinyWidgets::progressSweetAlert(
-      #   session = session, id = 'map_build_progress',
-      #   title = 'Building the map', value = 0,
-      #   display_pct = TRUE
-      # )
+      shinyWidgets::progressSweetAlert(
+        session = session, id = 'map_build_progress',
+        title = 'Building the map', value = 60,
+        display_pct = TRUE
+      )
 
       # switches (polygons objects, labels and groups)
       polygon_group <- switch(
@@ -415,10 +420,10 @@ mod_map <- function(
         'natura_network_2000' = 'natura_network_2000_polygons'
       )
 
-      # shinyWidgets::updateProgressBar(
-      #   session = session, id = 'map_build_progress',
-      #   value = 10
-      # )
+      shinyWidgets::updateProgressBar(
+        session = session, id = 'map_build_progress',
+        value = 70
+      )
 
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
@@ -445,10 +450,10 @@ mod_map <- function(
           )
         }
 
-        # shinyWidgets::updateProgressBar(
-        #   session = session, id = 'map_build_progress',
-        #   value = 30
-        # )
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_build_progress',
+          value = 85
+        )
 
         leaflet::leafletProxy('map') %>%
           leaflet::clearGroup('veguerias') %>%
@@ -482,10 +487,10 @@ mod_map <- function(
             layerId = 'color_legend', opacity = 1
           )
 
-        # shinyWidgets::updateProgressBar(
-        #   session = session, id = 'map_build_progress',
-        #   value = 75
-        # )
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_build_progress',
+          value = 90
+        )
 
       } else {
         # plots
@@ -530,10 +535,10 @@ mod_map <- function(
         # reduce the size of the nas
         size_vector[is.na(color_vector)] <- 500
 
-        # shinyWidgets::updateProgressBar(
-        #   session = session, id = 'map_build_progress',
-        #   value = 30
-        # )
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_build_progress',
+          value = 85
+        )
 
         # build the map
         leaflet::leafletProxy('map') %>%
@@ -575,13 +580,13 @@ mod_map <- function(
             layerId = 'color_legend', opacity = 1
           )
 
-        # shinyWidgets::updateProgressBar(
-        #   session = session, id = 'map_build_progress',
-        #   value = 75
-        # )
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'map_build_progress',
+          value = 90
+        )
       }
 
-      # shinyWidgets::closeSweetAlert(session = session)
+      shinyWidgets::closeSweetAlert(session = session)
     }
   )
 
