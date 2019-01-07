@@ -78,7 +78,7 @@ mod_dataInput <- function(id, nfidb) {
               ns('nfi'),
               label = 'Data version',
               choices = nfi_choices,
-              selected = 'NFI_4'
+              selected = 'nfi_4'
             )
           ),
           shiny::column(
