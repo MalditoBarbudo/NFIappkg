@@ -163,6 +163,7 @@ mod_table <- function(
 
     if (data_inputs$viz_shape == 'plot') {
       if (is.null(map_inputs$main_data[['selected']])) {
+        shinyWidgets::closeSweetAlert(session = session)
         return()
       } else {
         shinyWidgets::updateProgressBar(
