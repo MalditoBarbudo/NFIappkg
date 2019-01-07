@@ -15,10 +15,44 @@ mod_filtersUI <- function(id, nfidb) {
   shiny::tagList(
     shiny::fluidRow(
       shiny::column(
-        9,
+        4,
         shinyWidgets::pickerInput(
-          ns('filter_vars'),
-          'Select the variable/s to filter data by:',
+          ns('fil_res_vars'),
+          'Results variables to filter by:',
+          choices = '',
+          multiple = TRUE,
+          options = list(
+            `actions-box` = TRUE,
+            `deselect-all-text` = 'None selected...',
+            `select-all-text` = 'All selected',
+            `selected-text-format` = 'count > 3',
+            `count-selected-text` = "{0} variables selected (of {1})",
+            `size` = 10
+          )
+        )
+      ),
+      shiny::column(
+        4,
+        shinyWidgets::pickerInput(
+          ns('fil_clim_vars'),
+          'Climatic variables to filter by:',
+          choices = '',
+          multiple = TRUE,
+          options = list(
+            `actions-box` = TRUE,
+            `deselect-all-text` = 'None selected...',
+            `select-all-text` = 'All selected',
+            `selected-text-format` = 'count > 3',
+            `count-selected-text` = "{0} variables selected (of {1})",
+            `size` = 10
+          )
+        )
+      ),
+      shiny::column(
+        4,
+        shinyWidgets::pickerInput(
+          ns('fil_plot_vars'),
+          'Plot level variables to filter by:',
           choices = '',
           multiple = TRUE,
           options = list(
@@ -90,23 +124,73 @@ mod_filters <- function(
   # we need to update the filter_vars with the variables based on the tables in the
   # scenario
   vars_to_filter_by <- shiny::reactive({
+
+    # browser()
+
     table_names <- tables_to_look_at()
-    dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+    vars_overall <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
       dplyr::filter(var_table %in% table_names) %>%
       dplyr::pull(var_id)
+
+    climatic_vars <- vars_overall[
+      stringr::str_detect(vars_overall, "^clim_")
+    ]
+
+    plot_vars <- vars_overall[
+      stringr::str_detect(vars_overall, "^admin_|^feat_|^topo_")
+    ]
+
+    removed_vars <- vars_overall[
+      stringr::str_detect(vars_overall, "^old_|^coords_|^presence_|plot_id")
+    ]
+
+    res_vars <- vars_overall[
+      !(vars_overall %in% c(climatic_vars, plot_vars, removed_vars))
+    ]
+
+    return(list(
+      res_vars = res_vars,
+      climatic_vars = climatic_vars,
+      plot_vars = plot_vars
+    ))
+
   })
 
   # update the input picker with the options
   shiny::observeEvent(
-    eventExpr = vars_to_filter_by(),
+    eventExpr = vars_to_filter_by()$res_vars,
     handlerExpr = {
       shinyWidgets::updatePickerInput(
-        session, 'filter_vars',
-        choices = vars_to_filter_by(),
-        label = 'Select the variable/s to filter data by:'
+        session, 'fil_res_vars',
+        choices = vars_to_filter_by()$res_vars,
+        label = 'Results variables to filter by:'
       )
     }
   )
+  shiny::observeEvent(
+    eventExpr = vars_to_filter_by()$climatic_vars,
+    handlerExpr = {
+      shinyWidgets::updatePickerInput(
+        session, 'fil_clim_vars',
+        choices = vars_to_filter_by()$climatic_vars,
+        label = 'Climatic variables to filter by:'
+      )
+    }
+  )
+  shiny::observeEvent(
+    eventExpr = vars_to_filter_by()$plot_vars,
+    handlerExpr = {
+      shinyWidgets::updatePickerInput(
+        session, 'fil_plot_vars',
+        choices = vars_to_filter_by()$plot_vars,
+        label = 'Plot level variables to filter by:'
+      )
+    }
+  )
+
+  filter_vars <- reactive({
+    c(input$fil_res_vars, input$fil_clim_vars, input$fil_plot_vars)
+  })
 
   #### Proper filters UI ####
   output$proper_filters <- shiny::renderUI({
@@ -115,13 +199,13 @@ mod_filters <- function(
 
     # create the inputs for each varible selected
     filters_inputs <- shiny::eventReactive(
-      eventExpr = input$filter_vars,
+      eventExpr = filter_vars(),
       valueExpr = {
 
         # browser()
 
         lapply(
-          input$filter_vars, function(var) {
+          filter_vars(), function(var) {
 
             table_names <- tables_to_look_at()
 
@@ -217,7 +301,7 @@ mod_filters <- function(
   # reactive to activate the filter expressions generation
   on_the_fly_inputs <- shiny::reactive({
     lapply(
-      input$filter_vars, function(x) {
+      filter_vars(), function(x) {
         input[[x]]
       }
     )
@@ -235,12 +319,12 @@ mod_filters <- function(
     valueExpr = {
 
       # check the case of empty filter vars
-      if (is.null(input$filter_vars) || input$filter_vars == '') {
+      if (is.null(filter_vars()) || filter_vars() == '') {
         return(rlang::quos())
       }
 
       lapply(
-        input$filter_vars, function(var) {
+        filter_vars(), function(var) {
 
           if (is.null(input[[var]])) {
             return(rlang::quo(TRUE))
@@ -284,11 +368,11 @@ mod_filters <- function(
   filter_reactives <- shiny::reactiveValues()
   shiny::observe({
     filter_reactives$filter_expressions <- data_filter_expressions()
-    filter_reactives$filter_vars <- input$filter_vars
+    filter_reactives$filter_vars <- filter_vars()
 
     # inputs created on the fly
     filter_reactives$otf_filter_inputs <- on_the_fly_inputs() %>%
-      magrittr::set_names(., input$filter_vars)
+      magrittr::set_names(., filter_vars())
   })
 
   return(filter_reactives)
