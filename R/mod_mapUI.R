@@ -229,6 +229,7 @@ mod_map <- function(
         # when changing to another functional group from plot there is one run without
         # viz_functional_group_value, so we have to skip it
         if (fil_val == '') {
+          shinyWidgets::closeSweetAlert(session = session)
           return()
         } else {
           gf_filter_expr <- rlang::quo(!! rlang::sym(fil_var) == fil_val)
@@ -359,7 +360,6 @@ mod_map <- function(
   )
 
   # draw the new map
-  # draw the new map
   shiny::observeEvent(
     eventExpr = map_data(),
     handlerExpr = {
@@ -377,11 +377,11 @@ mod_map <- function(
       )
 
       # start the progress
-      shinyWidgets::progressSweetAlert(
-        session = session, id = 'map_build_progress',
-        title = 'Building the map', value = 60,
-        display_pct = TRUE
-      )
+      # shinyWidgets::progressSweetAlert(
+      #   session = session, id = 'map_build_progress',
+      #   title = 'Building the map', value = 60,
+      #   display_pct = TRUE
+      # )
 
       # switches (polygons objects, labels and groups)
       polygon_group <- switch(
@@ -420,10 +420,10 @@ mod_map <- function(
         'natura_network_2000' = 'natura_network_2000_polygons'
       )
 
-      shinyWidgets::updateProgressBar(
-        session = session, id = 'map_build_progress',
-        value = 70
-      )
+      # shinyWidgets::updateProgressBar(
+      #   session = session, id = 'map_build_progress',
+      #   value = 70
+      # )
 
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
@@ -450,10 +450,10 @@ mod_map <- function(
           )
         }
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'map_build_progress',
-          value = 85
-        )
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'map_build_progress',
+        #   value = 85
+        # )
 
         leaflet::leafletProxy('map') %>%
           leaflet::clearGroup('veguerias') %>%
@@ -487,10 +487,10 @@ mod_map <- function(
             layerId = 'color_legend', opacity = 1
           )
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'map_build_progress',
-          value = 90
-        )
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'map_build_progress',
+        #   value = 90
+        # )
 
       } else {
         # plots
@@ -535,10 +535,10 @@ mod_map <- function(
         # reduce the size of the nas
         size_vector[is.na(color_vector)] <- 500
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'map_build_progress',
-          value = 85
-        )
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'map_build_progress',
+        #   value = 85
+        # )
 
         # build the map
         leaflet::leafletProxy('map') %>%
@@ -580,13 +580,13 @@ mod_map <- function(
             layerId = 'color_legend', opacity = 1
           )
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'map_build_progress',
-          value = 90
-        )
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'map_build_progress',
+        #   value = 90
+        # )
       }
 
-      shinyWidgets::closeSweetAlert(session = session)
+      # shinyWidgets::closeSweetAlert(session = session)
     }
   )
 

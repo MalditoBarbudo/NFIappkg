@@ -149,53 +149,40 @@ mod_table <- function(
 
     # browser()
 
-    # start the progress
-    shinyWidgets::progressSweetAlert(
-      session = session, id = 'table_build_progress',
-      title = 'Preparing table data', value = 75,
-      display_pct = TRUE
-    )
-
     if (any(is.null(data_inputs$viz_shape), is.null(map_inputs$main_data))) {
-      shinyWidgets::closeSweetAlert(session = session)
       return()
     }
 
     if (data_inputs$viz_shape == 'plot') {
       if (is.null(map_inputs$main_data[['selected']])) {
-        shinyWidgets::closeSweetAlert(session = session)
         return()
       } else {
-        shinyWidgets::updateProgressBar(
+        # start the progress
+        shinyWidgets::progressSweetAlert(
           session = session, id = 'table_build_progress',
-          value = 90
+          title = 'Preparing table data', value = 75,
+          display_pct = TRUE
         )
         res <- map_inputs$main_data[['selected']] %>%
           dplyr::collect()
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'table_build_progress',
-          value = 99
-        )
+        shinyWidgets::closeSweetAlert(session = session)
       }
     } else {
       if (is.null(map_inputs$main_data[['summarised']])) {
-        shinyWidgets::closeSweetAlert(session = session)
         return()
       } else {
-        shinyWidgets::updateProgressBar(
+        # start the progress
+        shinyWidgets::progressSweetAlert(
           session = session, id = 'table_build_progress',
-          value = 90
+          title = 'Preparing table data', value = 75,
+          display_pct = TRUE
         )
         res <- map_inputs$main_data[['summarised']] %>%
           dplyr::ungroup() %>%
           dplyr::collect()
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'table_build_progress',
-          value = 99
-        )
+        shinyWidgets::closeSweetAlert(session = session)
       }
     }
-    shinyWidgets::closeSweetAlert(session = session)
     return(res)
   }))
 
