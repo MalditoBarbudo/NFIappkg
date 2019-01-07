@@ -11,58 +11,99 @@ mod_tableOutput <- function(id) {
 
   # ui
   shiny::tagList(
-    shiny::fluidPage(
-      shiny::sidebarLayout(
-        position = 'left',
-        sidebarPanel = shiny::sidebarPanel(
-          width = 3,
-          # inputs
-          # Column visibility
-          shiny::h4('Column visibility'),
-          shinyWidgets::pickerInput(
-            ns('col_vis_selector'),
-            # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
-            label = 'Choose the variables to show',
-            choices = '', multiple = TRUE,
-            width = '90%',
-            options = list(
-              `actions-box` = FALSE,
-              `deselect-all-text` = 'None selected...',
-              `select-all-text` = 'All selected',
-              `selected-text-format` = 'count',
-              `count-selected-text` = "{0} variables selected (of {1})",
-              `size` = 15,
-              `max-options` = 50,
-              `max-options-text` = 'Select limit reached (50)',
-              `live-search` = TRUE
-            )
-          ),
-          # mod_applyButtonInput(ns('mod_applyButtonInput_table')),
-
-          # Save buttons
-          shiny::h4('Save the table'),
-          shiny::fluidRow(
-            shinyWidgets::downloadBttn(
-              ns('dwl_csv_button'),
-              'Save as csv',
-              color = 'primary', size = 'sm', block = FALSE,
-              style = 'stretch'
-            ),
-            shinyWidgets::downloadBttn(
-              ns('dwl_xlsx_button'),
-              'Save as xlsx',
-              color = 'primary', size = 'sm', block = FALSE,
-              style = 'stretch'
-            )
+    shiny::fluidRow(
+      shiny::column(
+        3,
+        shinyWidgets::pickerInput(
+          ns('col_vis_selector'),
+          # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
+          label = 'Choose the variables to show',
+          choices = '', multiple = TRUE,
+          width = '90%',
+          options = list(
+            `actions-box` = FALSE,
+            `deselect-all-text` = 'None selected...',
+            `select-all-text` = 'All selected',
+            `selected-text-format` = 'count',
+            `count-selected-text` = "{0} variables selected (of {1})",
+            `size` = 15,
+            `max-options` = 50,
+            `max-options-text` = 'Select limit reached (50)',
+            `live-search` = TRUE
           )
+        )
+      ),
+      shiny::column(
+        1, offset = 8,
+        shinyWidgets::downloadBttn(
+          ns('dwl_csv_button'),
+          'csv',
+          color = 'success', size = 'sm', block = FALSE,
+          style = 'material-flat'
         ),
-        mainPanel = shiny::mainPanel(
-          width = 9,
-          # gt::gt_output(ns('nfi_table'))
-          shinyWidgets::addSpinner(DT::DTOutput(ns('nfi_table')))
+        shinyWidgets::downloadBttn(
+          ns('dwl_xlsx_button'),
+          'xlsx',
+          color = 'success', size = 'sm', block = FALSE,
+          style = 'material-flat'
         )
       )
+    ),
+    shiny::fluidRow(
+      shinyWidgets::addSpinner(DT::DTOutput(ns('nfi_table')))
     )
+    # shiny::fluidPage(
+    #   shiny::sidebarLayout(
+    #     position = 'left',
+    #     sidebarPanel = shiny::sidebarPanel(
+    #       width = 3,
+    #       # inputs
+    #       # Column visibility
+    #       shiny::h4('Column visibility'),
+    #       shinyWidgets::pickerInput(
+    #         ns('col_vis_selector'),
+    #         # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
+    #         label = 'Choose the variables to show',
+    #         choices = '', multiple = TRUE,
+    #         width = '90%',
+    #         options = list(
+    #           `actions-box` = FALSE,
+    #           `deselect-all-text` = 'None selected...',
+    #           `select-all-text` = 'All selected',
+    #           `selected-text-format` = 'count',
+    #           `count-selected-text` = "{0} variables selected (of {1})",
+    #           `size` = 15,
+    #           `max-options` = 50,
+    #           `max-options-text` = 'Select limit reached (50)',
+    #           `live-search` = TRUE
+    #         )
+    #       ),
+    #       # mod_applyButtonInput(ns('mod_applyButtonInput_table')),
+    #
+    #       # Save buttons
+    #       shiny::h4('Save the table'),
+    #       shiny::fluidRow(
+    #         shinyWidgets::downloadBttn(
+    #           ns('dwl_csv_button'),
+    #           'Save as csv',
+    #           color = 'primary', size = 'sm', block = FALSE,
+    #           style = 'stretch'
+    #         ),
+    #         shinyWidgets::downloadBttn(
+    #           ns('dwl_xlsx_button'),
+    #           'Save as xlsx',
+    #           color = 'primary', size = 'sm', block = FALSE,
+    #           style = 'stretch'
+    #         )
+    #       )
+    #     ),
+    #     mainPanel = shiny::mainPanel(
+    #       width = 9,
+    #       # gt::gt_output(ns('nfi_table'))
+    #       shinyWidgets::addSpinner(DT::DTOutput(ns('nfi_table')))
+    #     )
+    #   )
+    # )
   )
 }
 
@@ -86,7 +127,7 @@ mod_table <- function(
   # we need the data based on the viz shape selected (selected for plots,
   # summarised for polygons). All of this with a dedupe function, as it is
   # really expensive and we want to do it only when really necessary
-  table_data <- shiny::reactive({
+  table_data <- dedupe(shiny::reactive({
 
     # start the progress
     shinyWidgets::progressSweetAlert(
@@ -135,7 +176,7 @@ mod_table <- function(
     }
     shinyWidgets::closeSweetAlert(session = session)
     return(res)
-  })
+  }))
 
   # update the column visibility input
   shiny::observeEvent(
@@ -174,10 +215,11 @@ mod_table <- function(
       DT::datatable(
         rownames = FALSE,
         class = 'hover order-column stripe nowrap',
-        filter = list(position = 'top', clear = TRUE, plain = FALSE),
+        filter = list(position = 'top', clear = FALSE, plain = FALSE),
         options = list(
           pageLength = 15,
-          dom = 'tip'
+          dom = 'tip',
+          autoWidth = FALSE
         )
       ) %>%
      DT::formatRound(
@@ -198,51 +240,29 @@ mod_table <- function(
    return(basic_table)
   })
 
-  # reactive to build the gt
-  # build_table <- shiny::reactive({
-  #   table_data() %>%
-  #     dplyr::select(dplyr::one_of(input$col_vis_selector)) %>%
-  #     gt::gt() %>%
-  #     gt::tab_spanner(
-  #       label = 'Climatic',
-  #       columns = dplyr::vars(dplyr::starts_with('clim_'))
-  #     ) %>%
-  #     gt::tab_spanner(
-  #       label = 'Topo',
-  #       columns = dplyr::vars(dplyr::starts_with('topo_'))
-  #     ) %>%
-  #     gt::tab_spanner(
-  #       label = 'Features',
-  #       columns = dplyr::vars(dplyr::starts_with('feat_'))
-  #     )
-  # })
-
-  # build_table <- shiny::eventReactive(
-  #   ignoreInit = FALSE,
-  #   eventExpr = apply_table$apply,
-  #   valueExpr = {
-  #     table_data() %>%
-  #       dplyr::select(dplyr::one_of(input$col_vis_selector)) %>%
-  #       gt::gt() %>%
-  #       gt::tab_spanner(
-  #         label = 'Climatic',
-  #         columns = dplyr::vars(dplyr::starts_with('clim_'))
-  #       ) %>%
-  #       gt::tab_spanner(
-  #         label = 'Topo',
-  #         columns = dplyr::vars(dplyr::starts_with('topo_'))
-  #       ) %>%
-  #       gt::tab_spanner(
-  #         label = 'Features',
-  #         columns = dplyr::vars(dplyr::starts_with('feat_'))
-  #       )
-  #   }
-  # )
-
   # table per se.
   # output$nfi_table <- gt::render_gt({
   output$nfi_table <- DT::renderDT({
     build_table()
   })
+
+  # download handlers
+  output$dwl_csv_button <- shiny::downloadHandler(
+    filename = function() {
+      'NFI_data.csv'
+    },
+    content = function(file) {
+      readr::write_csv(table_data(), file)
+    }
+  )
+
+  output$dwl_xlsx_button <- shiny::downloadHandler(
+    filename = function() {
+      'NFI_data.xlsx'
+    },
+    content = function(file) {
+      writexl::write_xlsx(table_data(), file)
+    }
+  )
 
 }
