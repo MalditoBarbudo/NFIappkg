@@ -222,7 +222,7 @@ mod_table <- function(
 
     basic_table <- table_data() %>%
       dplyr::select(dplyr::one_of(input$col_vis_selector)) %>%
-      dplyr::mutate_if(is.character, forcats::as_factor) %>%
+      # dplyr::mutate_if(is.character, forcats::as_factor) %>%
       DT::datatable(
         rownames = FALSE,
         class = 'hover order-column stripe nowrap',

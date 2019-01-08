@@ -32,14 +32,6 @@ nfi_app <- function(user = 'guest', password = 'guest') {
             shiny::includeCSS(
               system.file('resources', 'nfi.css', package = 'NFIappkg')
             )
-            # custom scripts
-            ## easyPrint leaflet plugin
-            # shiny::tags$script(
-            #   src = "https://rawgit.com/rowanwins/leaflet-easyPrint/gh-pages/dist/bundle.js"
-            # )
-            # shiny::includeScript(
-            #   system.file('resources', 'print_map.js', package = 'NFIappkg')
-            # )
           ),
 
           ########################################################### debug ####
@@ -60,9 +52,6 @@ nfi_app <- function(user = 'guest', password = 'guest') {
           # mod_data module, it includes the dataSel, dataFil and dataAgg inputs
           mod_dataInput('mod_dataInput', nfidb),
 
-          # just a call to the returned_data module
-          # mod_returnedDataOutput('mod_returnedDataOutput'), ## NOT HERE
-
           ## mod_map ####
           # mod_map, it includes the map
           mod_mapUI('mod_mapUI'),
@@ -78,18 +67,6 @@ nfi_app <- function(user = 'guest', password = 'guest') {
               mod_infoUI('mod_infoUI')
             )
           ),
-
-          ## mod_saveMap ####
-          # mod_saveMap
-          # shinyjs::hidden(
-          #   shiny::absolutePanel(
-          #     id = 'savePanel', class = 'panel panel-default', fixed = TRUE,
-          #     draggable = TRUE, width = 250, height = 135,
-          #     top = 'auto', left = 'auto', right = 60, bottom = 5,
-          #
-          #     mod_saveMapInput('mod_saveMapInput')
-          #   )
-          # ),
 
           ## cite div ####
           shiny::tags$div(
@@ -130,12 +107,6 @@ nfi_app <- function(user = 'guest', password = 'guest') {
       nfidb
     )
 
-    # returned data (NON COLLECTED!!!) ## NOT HERE
-    # returned_data_reactives <- shiny::callModule(
-    #   mod_returnedData, 'mod_returnedDataOutput',
-    #   data_reactives, nfidb
-    # )
-
     # map
     map_reactives <- shiny::callModule(
       mod_map, 'mod_mapUI',
@@ -172,13 +143,6 @@ nfi_app <- function(user = 'guest', password = 'guest') {
         shinyjs::hideElement('infoPanel')
       }
     )
-
-    # shiny::observeEvent(
-    #   eventExpr = data_reactives$show_save,
-    #   handlerExpr = {
-    #     shinyjs::toggleElement('savePanel')
-    #   }
-    # )
 
     ## debug #####
     # output$debug1 <- shiny::renderPrint({
