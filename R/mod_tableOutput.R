@@ -11,59 +11,62 @@ mod_tableOutput <- function(id) {
 
   # ui
   shiny::tagList(
-    shiny::fluidRow(
-      shiny::column(
-        3,
-        shinyWidgets::pickerInput(
-          ns('col_vis_selector'),
-          # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
-          label = 'Choose the variables to show',
-          choices = '', multiple = TRUE,
-          width = '90%',
-          options = list(
-            `actions-box` = FALSE,
-            `deselect-all-text` = 'None selected...',
-            `select-all-text` = 'All selected',
-            `selected-text-format` = 'count',
-            `count-selected-text` = "{0} variables selected (of {1})",
-            `size` = 15,
-            `max-options` = 50,
-            `max-options-text` = 'Select limit reached (50)',
-            `live-search` = TRUE
+    shiny::div(
+      id = 'tableTabHeader',
+      shiny::fluidRow(
+        shiny::column(
+          3,
+          shinyWidgets::pickerInput(
+            ns('col_vis_selector'),
+            # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
+            label = 'Choose the variables to show',
+            choices = '', multiple = TRUE,
+            width = '90%',
+            options = list(
+              `actions-box` = FALSE,
+              `deselect-all-text` = 'None selected...',
+              `select-all-text` = 'All selected',
+              `selected-text-format` = 'count',
+              `count-selected-text` = "{0} variables selected (of {1})",
+              `size` = 15,
+              `max-options` = 50,
+              `max-options-text` = 'Select limit reached (50)',
+              `live-search` = TRUE
+            )
           )
-        )
-      ),
-      shiny::column(
-        2,
-        shinyWidgets::actionBttn(
-          ns('show_hri'),
-          'Info',
-          style = 'unite'
-        )
-      ),
-      shiny::column(
-        2,
-        shinyWidgets::downloadBttn(
-          ns('dwl_sql_query'),
-          'SQL query',
-          color = 'default', size = 'sm', block = FALSE,
-          style = 'minimal'
-        )
-      ),
-      shiny::column(
-        2,
-        offset = 3,
-        shinyWidgets::downloadBttn(
-          ns('dwl_csv_button'),
-          'csv',
-          color = 'default', size = 'sm', block = FALSE,
-          style = 'minimal'
         ),
-        shinyWidgets::downloadBttn(
-          ns('dwl_xlsx_button'),
-          'xlsx',
-          color = 'default', size = 'sm', block = FALSE,
-          style = 'minimal'
+        shiny::column(
+          2,
+          shinyWidgets::actionBttn(
+            ns('show_hri'),
+            'Info',
+            style = 'unite'
+          )
+        ),
+        shiny::column(
+          2,
+          shinyWidgets::downloadBttn(
+            ns('dwl_sql_query'),
+            'SQL query',
+            color = 'default', size = 'sm', block = FALSE,
+            style = 'minimal'
+          )
+        ),
+        shiny::column(
+          2,
+          offset = 3,
+          shinyWidgets::downloadBttn(
+            ns('dwl_csv_button'),
+            'csv',
+            color = 'default', size = 'sm', block = FALSE,
+            style = 'minimal'
+          ),
+          shinyWidgets::downloadBttn(
+            ns('dwl_xlsx_button'),
+            'xlsx',
+            color = 'default', size = 'sm', block = FALSE,
+            style = 'minimal'
+          )
         )
       )
     ),
