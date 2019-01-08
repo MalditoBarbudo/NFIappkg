@@ -40,6 +40,7 @@ mod_map <- function(
   output$map <- leaflet::renderLeaflet({
     leaflet::leaflet() %>%
       leaflet::setView(0.74, 41.70, zoom = 8) %>%
+      leaflet::addProviderTiles(leaflet::providers$Esri.WorldShadedRelief) %>%
       leaflet::addMapPane('admin_divs', zIndex = 410) %>%
       leaflet::addMapPane('plots', zIndex = 420) %>%
       # leaflet.extras plugins
@@ -473,7 +474,7 @@ mod_map <- function(
             weight = 1, smoothFactor = 1,
             opacity = 1.0, fill = TRUE,
             color = '#6C7A89FF', fillColor = pal(color_vector),
-            fillOpacity = 1,
+            fillOpacity = 0.7,
             highlightOptions = leaflet::highlightOptions(
               color = "#CF000F", weight = 2,
               bringToFront = FALSE
