@@ -149,13 +149,13 @@ mod_table <- function(
   # really expensive and we want to do it only when really necessary
   table_data <- dedupe(shiny::reactive({
 
-    # browser()
+    viz_shape <- shiny::isolate({data_inputs$viz_shape})
 
-    if (any(is.null(data_inputs$viz_shape), is.null(map_inputs$main_data))) {
+    if (any(is.null(viz_shape), is.null(map_inputs$main_data))) {
       return()
     }
 
-    if (data_inputs$viz_shape == 'plot') {
+    if (viz_shape == 'plot') {
       if (is.null(map_inputs$main_data[['selected']])) {
         return()
       } else {
@@ -197,7 +197,7 @@ mod_table <- function(
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
         label = 'Choose the variables to show',
-        selected = col_vis_choices[1:5],
+        selected = col_vis_choices[1:7],
         choices = col_vis_choices
       )
     }
@@ -229,13 +229,19 @@ mod_table <- function(
         options = list(
           pageLength = 15,
           dom = 'tip',
-          autoWidth = FALSE
+          autoWidth = FALSE,
+          initComplete = DT::JS(
+            "function(settings, json) {",
+            "$(this.api().table().header()).css({'font-family': 'Montserrat'});",
+            "$(this.api().table().body()).css({'font-family': 'Montserrat'});",
+            "}"
+          )
         )
       ) %>%
-     DT::formatRound(
-       columns = numeric_vars,
-       digits = 2
-     )
+      DT::formatRound(
+        columns = numeric_vars,
+        digits = 2
+      )
    # for (var in numeric_vars) {
    #   basic_table <- basic_table %>%
    #     DT::formatStyle(

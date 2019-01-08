@@ -29,6 +29,7 @@ div.inner {
   bottom: 0;
   padding: 15px 50px 50px 50px;
   overflow: auto;
+  background-color: #DDDDDD;
 }
 
 div.table_container {
