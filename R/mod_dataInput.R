@@ -21,7 +21,7 @@ mod_dataInput <- function(id, nfidb) {
   )
 
   viz_shape_choices <- c(
-    'Polygons' = 'polygon',
+    'Shapes' = 'polygon',
     'Plots' = 'plot'
   )
 
@@ -35,12 +35,6 @@ mod_dataInput <- function(id, nfidb) {
     'Special Protection Natural Area' = 'special_protection_natural_area',
     'Natura Network 2000' = 'natura_network_2000'
   )
-
-  # protected_areas_choices <- c(
-  #   'Natural Interest Area' = 'natural_interest_area',
-  #   'Special Protection Natural Area' = 'special_protection_natural_area',
-  #   'Natura Network 2000' = 'natura_network_2000'
-  # )
 
   functional_group_choices <- c(
     'Total by plot' = 'plot',
@@ -59,7 +53,7 @@ mod_dataInput <- function(id, nfidb) {
     shiny::absolutePanel(
       # panel settings
       id = 'dataControls', class = 'panel panel-default', fixed = TRUE,
-      draggable = TRUE, width = 640, height = 'auto',
+      draggable = TRUE, width = 650, height = 'auto',
       # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
       # top = 'auto', left = 'auto', right = 100, bottom = 100,
       top = 60, right = 'auto', left = 50, bottom = 'auto',
@@ -68,24 +62,12 @@ mod_dataInput <- function(id, nfidb) {
       # 1. data selection (div and id is for shinyjs later application)
       shiny::div(
         id = 'dataSel',
-
-        shiny::h3('Data'),
-
         shiny::fluidRow(
+          shiny::h4('Data selection'),
           shiny::column(
-            4,
-            shinyWidgets::pickerInput(
-              ns('nfi'),
-              label = 'Data version',
-              choices = nfi_choices,
-              selected = 'nfi_4'
-            )
-          ),
-          shiny::column(
-            6, offset = 2,
+            6, offset = 3,
             shinyWidgets::radioGroupButtons(
               ns('viz_shape'),
-              'Visualization shape',
               choices = viz_shape_choices, selected = 'polygon',
               status = 'info', size = 'sm', justified = TRUE,
               checkIcon = list(
@@ -95,84 +77,86 @@ mod_dataInput <- function(id, nfidb) {
             )
           )
         ),
-
         shiny::fluidRow(
           shiny::column(
             6,
             shinyWidgets::pickerInput(
-              ns('admin_div'), 'Administrative divisions & Protected areas',
-              admin_div_choices, selected = 'region'
+              ns('nfi'),
+              label = 'Data version',
+              choices = nfi_choices,
+              selected = 'nfi_4'
             )
           ),
           shiny::column(
-            6#,
-            # shinyWidgets::pickerInput(
-            #   ns('protected_areas'), 'Protected areas',
-            #   protected_areas_choices, selected = 'natural_interest_area'
-            # )
+            6,
+            shinyWidgets::pickerInput(
+              ns('admin_div'), 'Divisions',
+              admin_div_choices, selected = 'region'
+            )
           )
         ),
-
-        # buttons module
-        mod_buttonsInput(ns('mod_buttonsInput'))
-      ),
-
-      # 2. data aggregation level (div and id is for shinyjs later application)
-      shinyjs::hidden(
-        shiny::div(
-          id = ns('data_aggregation'),
-
-          # horizontal rule to separate
-          shiny::hr(),
-
-          shiny::h4('Breakdown level'),
-
-          shiny::fluidRow(
-            shiny::column(
-              9,
-              shinyWidgets::pickerInput(
-                ns('functional_group'), 'Select the breakdown level',
-                choices = functional_group_choices,
-                selected = 'none', width = '100%'
-              ),
-              shinyWidgets::awesomeCheckbox(
-                ns('diameter_classes'),
-                label = 'Extra breakdown by diameter classes?',
-                status = 'info'
+        shiny::hr(),
+        shiny::fluidRow(
+          # shiny::tags$head(
+          #   shiny::tags$style(HTML(
+          #     ".tabbable .nav-pills li:nth-child(4) { float: right; }"
+          #   ))
+          # ),
+          shiny::h4('Additional controls'),
+          shiny::tabsetPanel(
+            # selected = 'Visualization',
+            type = 'pills',
+            # 2. data aggregation level (div and id is for shinyjs later
+            #    application)
+            shiny::tabPanel(
+              title = '1. Breakdown level',
+              shiny::br(),
+              shiny::column(
+                8, offset = 2,
+                shinyWidgets::pickerInput(
+                  ns('functional_group'), 'Select the breakdown level',
+                  choices = functional_group_choices,
+                  selected = 'none', width = '100%'
+                ),
+                shinyWidgets::awesomeCheckbox(
+                  ns('diameter_classes'),
+                  label = 'Extra breakdown by diameter classes?',
+                  status = 'info'
+                )
+              )
+            ),
+            # 3. data filtering (this inputs are located in the mod_filter
+            # module)
+            shiny::tabPanel(
+              title = '2. Filters',
+              shiny::br(),
+              mod_filtersUI(ns('mod_filtersUI'), nfidb)
+            ),
+            # 4. Visualization controls (inputs in the mod_viz)
+            shiny::tabPanel(
+              title = '3. Visualization controls',
+              shiny::column(
+                8, offset = 2,
+                shiny::br(),
+                mod_vizInput(ns('mod_vizInput'), nfidb)
+              )
+            ),
+            # 5. Save (here we call the ui function, but the server function
+            # of the module is called on the parent level, in the nfi_app.R
+            # file)
+            shiny::tabPanel(
+              title = '4. Save the map',
+              shiny::column(
+                8, offset = 2,
+                shiny::br(),
+                mod_saveMapInput('mod_saveMapInput')
               )
             )
           )
-        )
-      ),
-
-      # 3. data filtering (div and id is for shinyjs later application)
-      #   (this inputs are located in the mod_filter module
-      shinyjs::hidden(
-        shiny::div(
-          id = ns('data_filters'),
-          shiny::hr(),
-          shiny::h4('Filter data'),
-          mod_filtersUI(ns('mod_filtersUI'), nfidb)
-
-        )
-      ),
-
-      # apply button
-      shiny::hr(),
-      mod_applyButtonInput(ns('mod_applyButtonInput_data_panel'))
-    ), # absolute panel end
-
-    ## vizControls ####
-    shiny::div(
-      id = ns('vizInputs'),
-      shiny::absolutePanel(
-        id = 'vizControls', class = 'panel panel-default', fixed = TRUE,
-        draggable = TRUE, width = 380, height = 'auto',
-        top = 400, right = 60, left = 'auto', bottom = 'auto',
-
-        mod_vizInput(ns('mod_vizInput'), nfidb),
-
-        mod_applyButtonInput(ns('mod_applyButtonInput_viz_panel'))
+        ),
+        # apply button
+        shiny::hr(),
+        mod_applyButtonInput(ns('mod_applyButtonInput_data_panel'))
       )
     )
   ) # end of tagList
@@ -204,9 +188,9 @@ mod_data <- function(
   })
 
   # calling the modules used
-  buttons_reactives <- shiny::callModule(
-    mod_buttons, 'mod_buttonsInput'
-  )
+  # buttons_reactives <- shiny::callModule(
+  #   mod_buttons, 'mod_buttonsInput'
+  # )
 
   apply_data <- shiny::callModule(
     mod_applyButton, 'mod_applyButtonInput_data_panel'
@@ -217,35 +201,9 @@ mod_data <- function(
     data_inputs, nfidb
   )
 
-  apply_viz <- shiny::callModule(
-    mod_applyButton, 'mod_applyButtonInput_viz_panel'
-  )
-
   filters_reactives <- shiny::callModule(
     mod_filters, 'mod_filtersUI',
     nfidb, data_inputs
-  )
-
-  # show/hide the panels
-  shiny::observeEvent(
-    eventExpr = buttons_reactives$show_filter_def,
-    handlerExpr = {
-      shinyjs::toggleElement(id = 'data_filters')
-    }
-  )
-
-  shiny::observeEvent(
-    eventExpr = buttons_reactives$show_agg,
-    handlerExpr = {
-      shinyjs::toggleElement(id = 'data_aggregation')
-    }
-  )
-
-  shiny::observeEvent(
-    eventExpr = buttons_reactives$show_viz,
-    handlerExpr = {
-      shinyjs::toggleElement(id = 'vizInputs')
-    }
   )
 
   # observer to get the filter expressions and the buttons actions
@@ -257,7 +215,6 @@ mod_data <- function(
     data_inputs$otf_filter_inputs <- filters_reactives$otf_filter_inputs
     # apply buttons
     data_inputs$apply_data <- apply_data$apply
-    data_inputs$apply_viz <- apply_viz$apply
     # viz
     data_inputs$viz_color <- viz_reactives$viz_color
     data_inputs$viz_reverse_pal <- viz_reactives$viz_reverse_pal
@@ -265,7 +222,6 @@ mod_data <- function(
     data_inputs$viz_statistic <- viz_reactives$viz_statistic
     data_inputs$viz_functional_group_value <- viz_reactives$viz_functional_group_value
     data_inputs$viz_diamclass <- viz_reactives$viz_diamclass
-    data_inputs$show_save <- buttons_reactives$show_save
   })
 
   return(data_inputs)

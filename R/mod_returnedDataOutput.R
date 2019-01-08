@@ -28,16 +28,16 @@ mod_returnedData <- function(
   data_inputs, map_inputs = NULL, nfidb
 ) {
 
-  apply_reactives <- shiny::reactive({
-    apply_reactives <- list()
-    apply_reactives$apply_data <- data_inputs$apply_data
-    apply_reactives$apply_viz <- data_inputs$apply_viz
-  })
+  # apply_reactives <- shiny::reactive({
+  #   apply_reactives <- list()
+  #   apply_reactives$apply_data <- data_inputs$apply_data
+  #   apply_reactives$apply_viz <- data_inputs$apply_viz
+  # })
 
   # main data generator
   main_data <- shiny::eventReactive(
     ignoreNULL = FALSE, ignoreInit = FALSE,
-    eventExpr = apply_reactives(),
+    eventExpr = data_inputs$apply_data,
     valueExpr = {
 
       # browser()

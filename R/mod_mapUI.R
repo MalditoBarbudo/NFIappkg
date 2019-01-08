@@ -39,7 +39,7 @@ mod_map <- function(
   # output map
   output$map <- leaflet::renderLeaflet({
     leaflet::leaflet() %>%
-      leaflet::setView(0.8, 41.67, zoom = 8) %>%
+      leaflet::setView(0.74, 41.70, zoom = 8) %>%
       leaflet::addMapPane('admin_divs', zIndex = 410) %>%
       leaflet::addMapPane('plots', zIndex = 420) %>%
       # leaflet.extras plugins
@@ -194,15 +194,15 @@ mod_map <- function(
     data_inputs, map_inputs, nfidb
   )
 
-  apply_reactives <- shiny::reactive({
-    apply_reactives <- list()
-    apply_reactives$apply_data <- data_inputs$apply_data
-    apply_reactives$apply_viz <- data_inputs$apply_viz
-  })
+  # apply_reactives <- shiny::reactive({
+  #   apply_reactives <- list()
+  #   apply_reactives$apply_data <- data_inputs$apply_data
+  #   apply_reactives$apply_viz <- data_inputs$apply_viz
+  # })
 
   map_data <- shiny::eventReactive(
     ignoreNULL = FALSE, ignoreInit = FALSE,
-    eventExpr = apply_reactives(),
+    eventExpr = data_inputs$apply_data,
     valueExpr = {
 
       # First check if data is null (filters too restrictive returning no data)
@@ -483,7 +483,7 @@ mod_map <- function(
             )
           ) %>%
           leaflet::addLegend(
-            position = 'topright', pal = pal, values = color_vector, title = viz_color,
+            position = 'bottomright', pal = pal, values = color_vector, title = viz_color,
             layerId = 'color_legend', opacity = 1
           )
 
@@ -576,7 +576,7 @@ mod_map <- function(
             options = leaflet::pathOptions(pane = 'plots')
           ) %>%
           leaflet::addLegend(
-            position = 'topright', pal = pal, values = color_vector, title = viz_color,
+            position = 'bottomright', pal = pal, values = color_vector, title = viz_color,
             layerId = 'color_legend', opacity = 1
           )
 

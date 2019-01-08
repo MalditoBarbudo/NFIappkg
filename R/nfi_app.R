@@ -43,17 +43,17 @@ nfi_app <- function(user = 'guest', password = 'guest') {
           ),
 
           ########################################################### debug ####
-          # shiny::absolutePanel(
-          #   id = 'debug', class = 'panel panel-default', fixed = TRUE,
-          #   draggable = TRUE, width = 640, height = 'auto',
-          #   # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
-          #   # top = 'auto', left = 'auto', right = 100, bottom = 100,
-          #   top = 60, left = 'auto', right = 50, bottom = 'auto',
-          #
-          #   shiny::textOutput('debug1'),
-          #   shiny::textOutput('debug2'),
-          #   shiny::textOutput('debug3')
-          # ),
+          shiny::absolutePanel(
+            id = 'debug', class = 'panel panel-default', fixed = TRUE,
+            draggable = TRUE, width = 640, height = 'auto',
+            # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
+            # top = 'auto', left = 'auto', right = 100, bottom = 100,
+            top = 60, left = 'auto', right = 50, bottom = 'auto',
+
+            shiny::textOutput('debug1'),
+            shiny::textOutput('debug2'),
+            shiny::textOutput('debug3')
+          ),
           ####################################################### end debug ####
 
           ## mod_data ####
@@ -72,8 +72,8 @@ nfi_app <- function(user = 'guest', password = 'guest') {
           shinyjs::hidden(
             shiny::absolutePanel(
               id = 'infoPanel', class = 'panel panel-default', fixed = TRUE,
-              draggable = TRUE, width = '95%', height = 800,
-              top = 60, left = 5, right = 'auto', bottom = 'auto',
+              draggable = TRUE, width = 'auto', height = 'auto',
+              top = 60, left = '5%', right = '5%', bottom = '2%',
 
               mod_infoUI('mod_infoUI')
             )
@@ -81,15 +81,15 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
           ## mod_saveMap ####
           # mod_saveMap
-          shinyjs::hidden(
-            shiny::absolutePanel(
-              id = 'savePanel', class = 'panel panel-default', fixed = TRUE,
-              draggable = TRUE, width = 250, height = 135,
-              top = 'auto', left = 'auto', right = 60, bottom = 5,
-
-              mod_saveMapInput('mod_saveMapInput')
-            )
-          ),
+          # shinyjs::hidden(
+          #   shiny::absolutePanel(
+          #     id = 'savePanel', class = 'panel panel-default', fixed = TRUE,
+          #     draggable = TRUE, width = 250, height = 135,
+          #     top = 'auto', left = 'auto', right = 60, bottom = 5,
+          #
+          #     mod_saveMapInput('mod_saveMapInput')
+          #   )
+          # ),
 
           ## cite div ####
           shiny::tags$div(
@@ -173,23 +173,23 @@ nfi_app <- function(user = 'guest', password = 'guest') {
       }
     )
 
-    shiny::observeEvent(
-      eventExpr = data_reactives$show_save,
-      handlerExpr = {
-        shinyjs::toggleElement('savePanel')
-      }
-    )
+    # shiny::observeEvent(
+    #   eventExpr = data_reactives$show_save,
+    #   handlerExpr = {
+    #     shinyjs::toggleElement('savePanel')
+    #   }
+    # )
 
     ## debug #####
-    # output$debug1 <- shiny::renderPrint({
-    #   map_reactives$map_groups
-    # })
-    # output$debug2 <- shiny::renderPrint({
-    #   map_reactives$map_click
-    # })
-    # output$debug3 <- shiny::renderPrint({
-    #   map_reactives$map_shape_click
-    # })
+    output$debug1 <- shiny::renderPrint({
+      map_reactives$map_center
+    })
+    output$debug2 <- shiny::renderPrint({
+      map_reactives$map_click
+    })
+    output$debug3 <- shiny::renderPrint({
+      map_reactives$map_shape_click
+    })
   }
 
   # Run the application

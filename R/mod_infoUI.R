@@ -15,10 +15,12 @@ mod_infoUI <- function(id) {
       shiny::column(
         6,
         # plot column
+        shiny::br(),
         shiny::plotOutput(ns("info_plot"), height = "700px")
       ),
       shiny::column(
         6,
+        shiny::br(),
         gt::gt_output(ns('info_table'))
       )
     ),

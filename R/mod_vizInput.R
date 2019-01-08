@@ -23,8 +23,6 @@ mod_vizInput <- function(id, nfidb) {
 
   # UI
   shiny::tagList(
-    shiny::h3('Visualization controls'),
-
     # color
     shinyWidgets::pickerInput(
       ns('viz_color'),
