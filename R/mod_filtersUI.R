@@ -18,7 +18,7 @@ mod_filtersUI <- function(id, nfidb) {
         4,
         shinyWidgets::pickerInput(
           ns('fil_res_vars'),
-          'Results variables to filter by:',
+          'Results filters',
           choices = '',
           multiple = TRUE,
           options = list(
@@ -35,7 +35,7 @@ mod_filtersUI <- function(id, nfidb) {
         4,
         shinyWidgets::pickerInput(
           ns('fil_clim_vars'),
-          'Climatic variables to filter by:',
+          'Climatic filters',
           choices = '',
           multiple = TRUE,
           options = list(
@@ -52,7 +52,7 @@ mod_filtersUI <- function(id, nfidb) {
         4,
         shinyWidgets::pickerInput(
           ns('fil_plot_vars'),
-          'Plot level variables to filter by:',
+          'Other filters',
           choices = '',
           multiple = TRUE,
           options = list(
@@ -163,7 +163,7 @@ mod_filters <- function(
       shinyWidgets::updatePickerInput(
         session, 'fil_res_vars',
         choices = vars_to_filter_by()$res_vars,
-        label = 'Results variables to filter by:'
+        label = 'Results filters'
       )
     }
   )
@@ -173,7 +173,7 @@ mod_filters <- function(
       shinyWidgets::updatePickerInput(
         session, 'fil_clim_vars',
         choices = vars_to_filter_by()$climatic_vars,
-        label = 'Climatic variables to filter by:'
+        label = 'Climatic filters'
       )
     }
   )
@@ -183,7 +183,7 @@ mod_filters <- function(
       shinyWidgets::updatePickerInput(
         session, 'fil_plot_vars',
         choices = vars_to_filter_by()$plot_vars,
-        label = 'Plot level variables to filter by:'
+        label = 'Other filters'
       )
     }
   )
