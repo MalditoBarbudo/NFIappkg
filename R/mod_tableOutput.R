@@ -268,6 +268,12 @@ mod_table <- function(
       'NFI_data.csv'
     },
     content = function(file) {
+      if (isTRUE(data_inputs$diameter_classes)) {
+        shinyWidgets::sendSweetAlert(
+          session, 'Note:',
+          text = 'Saving the data broken down by diameter classes can take some time'
+        )
+      }
       readr::write_csv(table_data(), file)
     }
   )
@@ -277,6 +283,12 @@ mod_table <- function(
       'NFI_data.xlsx'
     },
     content = function(file) {
+      if (isTRUE(data_inputs$diameter_classes)) {
+        shinyWidgets::sendSweetAlert(
+          session, 'Note:',
+          text = 'Saving the data broken down by diameter classes can take some time'
+        )
+      }
       writexl::write_xlsx(table_data(), file)
     }
   )
@@ -306,5 +318,4 @@ mod_table <- function(
       )
     }
   )
-
 }
