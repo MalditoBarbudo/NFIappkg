@@ -16,6 +16,7 @@ mod_tableOutput <- function(id) {
       shiny::fluidRow(
         shiny::column(
           3,
+          # shiny::br(),
           shinyWidgets::pickerInput(
             ns('col_vis_selector'),
             # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
@@ -36,36 +37,34 @@ mod_tableOutput <- function(id) {
           )
         ),
         shiny::column(
-          2,
+          2, offset = 2, align = 'center',
+          # shiny::br(),
+          shiny::p('Data info'),
           shinyWidgets::actionBttn(
             ns('show_hri'),
             'Info',
-            style = 'unite'
+            style = 'material-circle',
+            icon = shiny::icon('info-circle'),
+            color = 'primary', size = 'sm'
           )
         ),
         shiny::column(
-          2,
-          shinyWidgets::downloadBttn(
-            ns('dwl_sql_query'),
-            'SQL query',
-            color = 'default', size = 'sm', block = FALSE,
-            style = 'minimal'
-          )
-        ),
-        shiny::column(
-          2,
-          offset = 3,
+          2, offset = 3,
+          # shiny::br(),
           shinyWidgets::downloadBttn(
             ns('dwl_csv_button'),
             'csv',
-            color = 'default', size = 'sm', block = FALSE,
-            style = 'minimal'
+            style = 'material-flat', color = 'success', size = 'sm', block = TRUE
           ),
           shinyWidgets::downloadBttn(
             ns('dwl_xlsx_button'),
             'xlsx',
-            color = 'default', size = 'sm', block = FALSE,
-            style = 'minimal'
+            style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+          ),
+          shinyWidgets::downloadBttn(
+            ns('dwl_sql_query'),
+            'SQL query',
+            style = 'material-flat', color = 'success', size = 'sm', block = TRUE
           )
         )
       )
