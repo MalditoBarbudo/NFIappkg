@@ -443,11 +443,13 @@ mod_map <- function(
           pal <- leaflet::colorNumeric(
             scales::gradient_n_pal(
               viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
-            ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
+            ),
+            color_vector, 9, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
           )
         } else {
           pal <- leaflet::colorFactor(
-            'plasma', color_vector, reverse = data_inputs$viz_reverse_pal
+            'plasma', color_vector, reverse = data_inputs$viz_reverse_pal,
+            na.color = 'black'
           )
         }
 
@@ -513,11 +515,13 @@ mod_map <- function(
           pal <- leaflet::colorNumeric(
             scales::gradient_n_pal(
               viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
-            ), color_vector, 9, reverse = data_inputs$viz_reverse_pal
+            ),
+            color_vector, 9, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
           )
         } else {
           pal <- leaflet::colorFactor(
-            'plasma', color_vector, reverse = data_inputs$viz_reverse_pal
+            'plasma', color_vector, reverse = data_inputs$viz_reverse_pal,
+            na.color = 'black'
           )
         }
 
@@ -572,7 +576,7 @@ mod_map <- function(
           leaflet::addCircles(
             data = map_data,
             group = 'plots', label = ~plot_id, layerId = ~plot_id,
-            stroke = FALSE, fillOpacity = 0.4, fillColor = pal(color_vector),
+            stroke = FALSE, fillOpacity = 0.7, fillColor = pal(color_vector),
             radius = size_vector,
             options = leaflet::pathOptions(pane = 'plots')
           ) %>%

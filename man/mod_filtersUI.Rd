@@ -27,4 +27,6 @@ we are}
 }
 \description{
 A shiny module to generate and process the filters
+
+mod_filters server function
 }

@@ -20,4 +20,6 @@ mod_applyButton(input, output, session)
 }
 \description{
 A shiny module to create and populate the buttons inputs
+
+mod_applyButton
 }

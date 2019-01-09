@@ -22,4 +22,6 @@ mod_saveMap(input, output, session, map_inputs)
 }
 \description{
 A shiny module to create and populate the buttons inputs
+
+mod_saveMap server function
 }
