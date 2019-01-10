@@ -20,6 +20,12 @@ div.outer {
   padding: 0;
 }
 
+/* map legend */
+div.info.legend.leaflet-control{
+  font-size: 12px;
+}
+
+
 /* table container */
 div.inner {
   position: fixed;
