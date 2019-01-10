@@ -296,7 +296,7 @@ mod_filters <- function(
     shiny::tagList(
       shiny::hr(),
       shiny::tags$strong('Filter the data:'),
-      shiny::br(),
+      shiny::br(), shiny::br(),
       filters_inputs()
     )
   })

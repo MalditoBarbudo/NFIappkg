@@ -126,6 +126,7 @@ mod_info <- function(
       # )
 
       if (click$group == 'plots') {
+
         viz_sel <- data_inputs$viz_color
         fg_id <- glue::glue("{data_inputs$functional_group}_id")
         if (fg_id == 'plot_id') {fg_id <- ''}
@@ -296,9 +297,9 @@ mod_info <- function(
       }
 
       # geom_violin, we can't use quantiles because when we breakdown by diamclass
-      # there is errors. Also we have to check for one row data, in which case we dont
-      # use geom violin
-      if (nrow(plot_data_all) > 1) {
+      # there is errors. Also we have to check for one or two rows data, in which case we
+      # don't use geom violin
+      if (nrow(plot_data_all) > 2) {
         plot_expression <- glue::glue(
           "{plot_expression} +
           ggplot2::geom_violin(
