@@ -157,6 +157,7 @@ mod_info <- function(
         # )
       # end if plots, start of != plots
       } else {
+
         viz_sel <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
         fg_id <- glue::glue("{data_inputs$functional_group}_id")
         if (fg_id == 'plot_id') {fg_id <- ''}
@@ -278,7 +279,7 @@ mod_info <- function(
             ggplot2::geom_jitter(
               data = plot_data_sel, ggplot2::aes(size = {viz_size}), width = 0.1,
               height = 0, alpha = 0.8, color = 'red', show.legend = FALSE
-            ) +"
+            )"
         )
       } else {
         plot_expression <- glue::glue(
@@ -290,20 +291,23 @@ mod_info <- function(
             ggplot2::geom_jitter(
               data = plot_data_sel, width = 0.1, size = 4,
               height = 0, alpha = 0.8, color = 'red', show.legend = FALSE
-            ) +"
+            )"
         )
       }
 
       # geom_violin, we can't use quantiles because when we breakdown by diamclass
-      # there is errors
-      plot_expression <- glue::glue(
-        "{plot_expression}
+      # there is errors. Also we have to check for one row data, in which case we dont
+      # use geom violin
+      if (nrow(plot_data_all) > 1) {
+        plot_expression <- glue::glue(
+          "{plot_expression} +
           ggplot2::geom_violin(
             # draw_quantiles = c(0.05, 0.25, 0.5, 0.75, 0.95),
             adjust = 0.5,
             fill = 'transparent'
           )"
-      )
+        )
+      }
 
       # facet_grid based on the existence of diamclass_id and fg_id
       if (all(c('diamclass_id', fg_id) %in% names(plot_data_all))) {
