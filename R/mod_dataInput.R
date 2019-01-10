@@ -136,7 +136,7 @@ mod_dataInput <- function(id, nfidb) {
             shiny::tabPanel(
               title = '3. Visualization controls',
               shiny::column(
-                8, offset = 2,
+                12, class = 'center',
                 shiny::br(),
                 mod_vizInput(ns('mod_vizInput'), nfidb)
               )
@@ -222,6 +222,7 @@ mod_data <- function(
     data_inputs$viz_statistic <- viz_reactives$viz_statistic
     data_inputs$viz_functional_group_value <- viz_reactives$viz_functional_group_value
     data_inputs$viz_diamclass <- viz_reactives$viz_diamclass
+    data_inputs$viz_pal_config <- viz_reactives$viz_pal_config
   })
 
   return(data_inputs)

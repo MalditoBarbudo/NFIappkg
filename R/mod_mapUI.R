@@ -440,13 +440,34 @@ mod_map <- function(
         }
 
         if (is.numeric(color_vector)) {
-          pal <- leaflet::colorNumeric(
-            scales::gradient_n_pal(
-              viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
-            ),
-            color_vector, 9, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
-          )
+          # class for legend
+          legend_class <- 'info legend na_out'
+
+          # we need to build the color palette based on the inputs
+          if (data_inputs$viz_pal_config == 'low') {
+            pal <- leaflet::colorNumeric(
+              scales::gradient_n_pal(
+                viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
+              ),
+              color_vector, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
+            )
+          } else {
+            if (data_inputs$viz_pal_config == 'high') {
+              pal <- leaflet::colorNumeric(
+                scales::gradient_n_pal(
+                  viridis::plasma(9), c(0, 0.45, 0.65, 0.75, 0.8, 0.85, 0.9, 0.95, 1)
+                ),
+                color_vector, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
+              )
+            } else {
+              pal <- leaflet::colorNumeric(
+                'plasma', color_vector, reverse = data_inputs$viz_reverse_pal,
+                na.color = 'black'
+              )
+            }
+          }
         } else {
+          legend_class <- 'info legend'
           pal <- leaflet::colorFactor(
             'plasma', color_vector, reverse = data_inputs$viz_reverse_pal,
             na.color = 'black'
@@ -487,7 +508,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector, title = viz_color,
-            layerId = 'color_legend', opacity = 1
+            layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
 
         # shinyWidgets::updateProgressBar(
@@ -512,13 +533,38 @@ mod_map <- function(
 
         # build the color palette
         if (is.numeric(color_vector)) {
-          pal <- leaflet::colorNumeric(
-            scales::gradient_n_pal(
-              viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
-            ),
-            color_vector, 9, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
-          )
+          legend_class <- 'info legend na_out'
+          # we need to build the color palette based on the inputs
+          if (data_inputs$viz_pal_config == 'low') {
+            pal <- leaflet::colorNumeric(
+              scales::gradient_n_pal(
+                viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
+              ),
+              color_vector, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
+            )
+          } else {
+            if (data_inputs$viz_pal_config == 'high') {
+              pal <- leaflet::colorNumeric(
+                scales::gradient_n_pal(
+                  viridis::plasma(9), c(0, 0.45, 0.65, 0.75, 0.8, 0.85, 0.9, 0.95, 1)
+                ),
+                color_vector, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
+              )
+            } else {
+              pal <- leaflet::colorNumeric(
+                'plasma', color_vector, reverse = data_inputs$viz_reverse_pal,
+                na.color = 'black'
+              )
+            }
+          }
+          # pal <- leaflet::colorNumeric(
+          #   scales::gradient_n_pal(
+          #     viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
+          #   ),
+          #   color_vector, 9, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
+          # )
         } else {
+          legend_class <- 'info legend circles'
           pal <- leaflet::colorFactor(
             'plasma', color_vector, reverse = data_inputs$viz_reverse_pal,
             na.color = 'black'
@@ -582,7 +628,9 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector, title = viz_color,
-            layerId = 'color_legend', opacity = 1
+            layerId = 'color_legend', opacity = 1,
+            className = legend_class,
+            na.label = ''
           )
 
         # shinyWidgets::updateProgressBar(

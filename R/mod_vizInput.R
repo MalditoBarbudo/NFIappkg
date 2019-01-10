@@ -23,58 +23,76 @@ mod_vizInput <- function(id, nfidb) {
 
   # UI
   shiny::tagList(
-    # color
-    shinyWidgets::pickerInput(
-      ns('viz_color'),
-      'Color:',
-      choices = 'density',
-      options = list(
-        `size` = 10
-      )
-    ),
+    # color & palette settings
+    shiny::fluidRow(
+      shiny::column(
+        8,
+        shinyWidgets::pickerInput(
+          ns('viz_color'),
+          'Color:',
+          choices = 'density',
+          options = list(
+            `size` = 10
+          )
+        ),
 
-    # reverse palette
-    shinyWidgets::awesomeCheckbox(
-      ns('viz_reverse_pal'),
-      label = 'Reverse the palette?',
-      value = FALSE, status = 'info'
-    ),
+        # size
+        shinyjs::hidden(
+          shinyWidgets::pickerInput(
+            ns('viz_size'), 'Size:',
+            choices = '',
+            options = list(
+              `size` = 10
+            )
+          )
+        ),
 
-    # size
-    shinyjs::hidden(
-      shinyWidgets::pickerInput(
-        ns('viz_size'), 'Size:',
-        choices = '',
-        options = list(
-          `size` = 10
+        # statistic
+        shinyjs::hidden(
+          shinyWidgets::pickerInput(
+            ns('viz_statistic'), 'Statistic:',
+            choices = statistic_choices
+          )
+        ),
+
+        # functional group value
+        shinyjs::hidden(
+          shinyWidgets::pickerInput(
+            ns('viz_functional_group_value'), '',
+            choices = '',
+            options = list(
+              `size` = 10
+            )
+          )
+        ),
+
+        # diameter class to visualize
+        shinyjs::hidden(
+          shinyWidgets::pickerInput(
+            ns('viz_diamclass'), 'Diameter class to visualize:',
+            choices = '10'
+          )
         )
-      )
-    ),
-
-    # statistic
-    shinyjs::hidden(
-      shinyWidgets::pickerInput(
-        ns('viz_statistic'), 'Statistic:',
-        choices = statistic_choices
-      )
-    ),
-
-    # functional group value
-    shinyjs::hidden(
-      shinyWidgets::pickerInput(
-        ns('viz_functional_group_value'), '',
-        choices = '',
-        options = list(
-          `size` = 10
+      ),
+      shiny::column(
+        4,
+        # low, normal or high palette
+        shinyWidgets::radioGroupButtons(
+          ns('viz_pal_config'),
+          'Config palette', size = 'sm',
+          choices = c(
+            'Discriminate lower vales' = 'low',
+            'Normal' = 'normal',
+            'Discriminate higher vales' = 'high'
+          ),
+          selected = 'normal', direction = 'vertical', status = 'warning'
+        ),
+        # reverse palette
+        shinyWidgets::awesomeCheckbox(
+          ns('viz_reverse_pal'),
+          label = 'Reverse the palette?',
+          value = FALSE, status = 'info'
         )
-      )
-    ),
-
-    # diameter class to visualize
-    shinyjs::hidden(
-      shinyWidgets::pickerInput(
-        ns('viz_diamclass'), 'Diameter class to visualize:',
-        choices = '10'
       )
     ),
 
@@ -260,6 +278,7 @@ mod_viz <- function(
     viz_reactives$viz_statistic <- input$viz_statistic
     viz_reactives$viz_functional_group_value <- input$viz_functional_group_value
     viz_reactives$viz_diamclass <- input$viz_diamclass
+    viz_reactives$viz_pal_config <- input$viz_pal_config
   })
 
   return(viz_reactives)
