@@ -14,9 +14,10 @@ mod_vizInput <- function(id, nfidb) {
   ## precalculated choices
   statistic_choices <- c(
     'Mean' = '_mean',
-    'SD' = '_sd',
+    'SE' = '_se',
     'Min' = '_min',
-    'Max' = '_max'
+    'Max' = '_max',
+    'Number' = '_n'
   )
 
   # diameter_classes_choices <- seq(10, 70, 5) %>% as.character()
