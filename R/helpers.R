@@ -28,3 +28,26 @@ hri_builder <- function(data_inputs) {
     })
   )
 }
+
+var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
+
+  if (summ) {
+
+  } else {
+    vars_trans <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+      dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%
+      dplyr::filter(var_id %in% vars) %>%
+      dplyr::distinct() %>%
+      dplyr::collect() %>%
+      as.data.frame()
+
+    vars_names <- vars %>%
+      purrr::map_chr(
+        ~ vars_trans[vars_trans$var_id == .x, glue::glue('translation_{lang}')]
+      )
+
+    names(vars) <- vars_names
+  }
+
+  return(vars[!is.na(names(vars))])
+}

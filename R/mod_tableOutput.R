@@ -194,11 +194,14 @@ mod_table <- function(
     handlerExpr = {
       col_vis_choices <- names(table_data())
 
+      browser()
+
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
         label = 'Choose the variables to show',
-        selected = col_vis_choices[1:7],
-        choices = col_vis_choices
+        # choices = var_names_input_builder(col_vis_choices, 'eng', nfidb),
+        choices = col_vis_choices,
+        selected = col_vis_choices[1:7]
       )
     }
   )

@@ -507,7 +507,9 @@ mod_map <- function(
             )
           ) %>%
           leaflet::addLegend(
-            position = 'bottomright', pal = pal, values = color_vector, title = viz_color,
+            position = 'bottomright', pal = pal, values = color_vector,
+            title = glue::glue("{names(var_names_input_builder(data_inputs$viz_color, 'eng', nfidb))}
+                               {stringr::str_remove(data_inputs$viz_statistic, '_')}"),
             layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
 
@@ -627,7 +629,8 @@ mod_map <- function(
             options = leaflet::pathOptions(pane = 'plots')
           ) %>%
           leaflet::addLegend(
-            position = 'bottomright', pal = pal, values = color_vector, title = viz_color,
+            position = 'bottomright', pal = pal, values = color_vector,
+            title = names(var_names_input_builder(data_inputs$viz_color, 'eng', nfidb)),
             layerId = 'color_legend', opacity = 1,
             className = legend_class,
             na.label = ''

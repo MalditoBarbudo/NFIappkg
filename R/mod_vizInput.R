@@ -180,10 +180,12 @@ mod_viz <- function(
       selected_col <- 'density_balance'
     }
 
+    # browser()
+
     # update the pickerInput
     shinyWidgets::updatePickerInput(
       session, 'viz_color',
-      choices = color_choices,
+      choices = var_names_input_builder(color_choices, 'eng', nfidb) %>% sort(),
       label = 'Color:',
       selected = selected_col
     )
@@ -197,7 +199,7 @@ mod_viz <- function(
       # update the pickerInput
       shinyWidgets::updatePickerInput(
         session, 'viz_size',
-        choices = c('', size_choices),
+        choices = c('', var_names_input_builder(size_choices, 'eng', nfidb) %>% sort()),
         label = 'Size:'
       )
 

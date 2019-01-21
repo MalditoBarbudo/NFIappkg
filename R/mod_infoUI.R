@@ -244,7 +244,7 @@ mod_info <- function(
           plot_expression <- glue::glue(
             "plot_data_all %>%
             dplyr::filter({fg_id} %in% fg_list) %>%
-            ggplot2::ggplot(ggplot2::aes(x = '_', y = {viz_sel})) +"
+            ggplot2::ggplot(ggplot2::aes(x = ' ', y = {viz_sel})) +"
           )
 
           # shinyWidgets::updateProgressBar(
@@ -254,13 +254,13 @@ mod_info <- function(
         } else {
           plot_expression <- glue::glue(
             "plot_data_all %>%
-            ggplot2::ggplot(ggplot2::aes(x = '_', y = {viz_sel})) +"
+            ggplot2::ggplot(ggplot2::aes(x = ' ', y = {viz_sel})) +"
           )
         }
       } else {
         plot_expression <- glue::glue(
           "plot_data_all %>%
-            ggplot2::ggplot(ggplot2::aes(x = '_', y = {viz_sel})) +"
+            ggplot2::ggplot(ggplot2::aes(x = ' ', y = {viz_sel})) +"
         )
 
         # shinyWidgets::updateProgressBar(
@@ -368,6 +368,11 @@ mod_info <- function(
       # info_table
       info_table <- table_data %>%
         tidyr::gather('Characteristics', 'Value') %>%
+        dplyr::mutate(
+          Characteristics = names(var_names_input_builder(
+            stringr::str_remove(.$Characteristics, '_mean'), 'eng', nfidb)
+          )
+        ) %>%
         gt::gt(rowname_col = 'Characteristics') %>%
         gt::tab_header(
           title = glue::glue('General info for {click$id}:')

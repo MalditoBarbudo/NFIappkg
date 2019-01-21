@@ -162,7 +162,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_res_vars',
-        choices = vars_to_filter_by()$res_vars,
+        choices = var_names_input_builder(vars_to_filter_by()$res_vars, 'eng', nfidb) %>% sort(),
         label = 'Results filters'
       )
     }
@@ -172,7 +172,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_clim_vars',
-        choices = vars_to_filter_by()$climatic_vars,
+        choices = var_names_input_builder(vars_to_filter_by()$climatic_vars, 'eng', nfidb) %>% sort(),
         label = 'Climatic filters'
       )
     }
@@ -182,7 +182,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_plot_vars',
-        choices = vars_to_filter_by()$plot_vars,
+        choices = var_names_input_builder(vars_to_filter_by()$plot_vars, 'eng', nfidb) %>% sort(),
         label = 'Other filters'
       )
     }
@@ -229,7 +229,7 @@ mod_filters <- function(
                 dplyr::pull(var_values)
 
               shinyWidgets::pickerInput(
-                ns(var), label = var,
+                ns(var), label = names(var_names_input_builder(var, 'eng', nfidb)),
                 choices = var_values,
                 selected = var_values[1], multiple = TRUE,
                 options = list(
@@ -251,7 +251,7 @@ mod_filters <- function(
                   dplyr::collect()
 
                 shiny::sliderInput(
-                  ns(var), label = var,
+                  ns(var), label = names(var_names_input_builder(var, 'eng', nfidb)),
                   min = var_values[['var_min']],
                   max = var_values[['var_max']],
                   value = c(var_values[['var_min']], var_values[['var_max']]),
