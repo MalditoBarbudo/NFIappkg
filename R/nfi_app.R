@@ -9,11 +9,14 @@ nfi_app <- function(user = 'guest', password = 'guest') {
   nfidb <- tidyNFI::nfi_connect(user = user, password = password)
 
   ### Language options #########################################################
-  # lang_choices <- c('spa', 'eng')
-  # lang_flags <- c(
-  #   glue::glue("<img src={system.file('resources', 'spa.png', package = 'NFIappkg')} width=30px><div class='flag-lang'>%s</div></img>"),
-  #   glue::glue("<img src={system.file('resources', 'eng.png', package = 'NFIappkg')} width=30px><div class='flag-lang'>%s</div></img>")
-  # )
+  shiny::addResourcePath(
+    'images', system.file('resources', 'images', package = 'NFIappkg')
+  )
+  lang_choices <- c('spa', 'eng')
+  lang_flags <- c(
+    glue::glue("<img class='flag-image' src='images/spa.png' width=20px><div class='flag-lang'>%s</div></img>"),
+    glue::glue("<img class='flag-image' src='images/eng.png' width=20px><div class='flag-lang'>%s</div></img>")
+  )
 
   ## UI ####
   ui <- shiny::tagList(
@@ -30,24 +33,24 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
       # navbar with inputs (helpers.R) accepts an input argument, we use it for the lang
       # selector
-      # inputs = shinyWidgets::pickerInput(
-      #   'lang', NULL,
-      #   choices = c('spa', 'eng'),
-      #   selected = 'eng',
-      #   width = '150px',
-      #   choicesOpt = list(
-      #     content = c(
-      #       sprintf(lang_flags[1], lang_choices[1]),
-      #       sprintf(lang_flags[2], lang_choices[2])
-      #     )
-      #   )
-      # ),
-      inputs = shiny::selectInput(
+      inputs = shinyWidgets::pickerInput(
         'lang', NULL,
         choices = c('spa', 'eng'),
         selected = 'eng',
-        width = '75px'
+        width = '100px',
+        choicesOpt = list(
+          content = c(
+            sprintf(lang_flags[1], lang_choices[1]),
+            sprintf(lang_flags[2], lang_choices[2])
+          )
+        )
       ),
+      # inputs = shiny::selectInput(
+      #   'lang', NULL,
+      #   choices = c('spa', 'eng'),
+      #   selected = 'eng',
+      #   width = '75px'
+      # ),
 
       # contents
       shiny::tabPanel(
@@ -63,17 +66,17 @@ nfi_app <- function(user = 'guest', password = 'guest') {
           ),
 
           ########################################################### debug ####
-          shiny::absolutePanel(
-            id = 'debug', class = 'panel panel-default', fixed = TRUE,
-            draggable = TRUE, width = 640, height = 'auto',
-            # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
-            # top = 'auto', left = 'auto', right = 100, bottom = 100,
-            top = 60, left = 'auto', right = 50, bottom = 'auto',
-
-            shiny::textOutput('debug1'),
-            shiny::textOutput('debug2'),
-            shiny::textOutput('debug3')
-          ),
+          # shiny::absolutePanel(
+          #   id = 'debug', class = 'panel panel-default', fixed = TRUE,
+          #   draggable = TRUE, width = 640, height = 'auto',
+          #   # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
+          #   # top = 'auto', left = 'auto', right = 100, bottom = 100,
+          #   top = 60, left = 'auto', right = 50, bottom = 'auto',
+          #
+          #   shiny::textOutput('debug1'),
+          #   shiny::textOutput('debug2'),
+          #   shiny::textOutput('debug3')
+          # ),
           ####################################################### end debug ####
 
           ## mod_data ####
@@ -178,9 +181,9 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     )
 
     ## debug #####
-    output$debug1 <- shiny::renderPrint({
-      lang()
-    })
+    # output$debug1 <- shiny::renderPrint({
+    #   lang()
+    # })
     # output$debug2 <- shiny::renderPrint({
     #   map_reactives$map_click
     # })

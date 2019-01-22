@@ -137,3 +137,7 @@ div.table_container {
   vertical-align: middle;
   padding-left: 10px;
 }
+
+.flag-image {
+  border-radius: 50%;
+}
