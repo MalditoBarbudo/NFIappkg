@@ -29,6 +29,13 @@ hri_builder <- function(data_inputs) {
   )
 }
 
+text_translate <- function(text, lang, pool) {
+  dplyr::tbl(pool, 'TEXTS_THESAURUS') %>%
+    dplyr::select(dplyr::one_of('text_id', glue::glue("text_{lang}"))) %>%
+    dplyr::filter(text_id == text) %>%
+    dplyr::pull(!!rlang::sym(glue::glue("text_{lang}")))
+}
+
 var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
 
   if (is.null(lang)) {
