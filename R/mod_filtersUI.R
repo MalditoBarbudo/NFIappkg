@@ -78,6 +78,7 @@ mod_filtersUI <- function(id, nfidb) {
 #' @param nfidb pool object to access the nfi db
 #' @param data_inputs reactives from the data_inputsInput module, to know about which scenario
 #'   we are
+#' @param lang lang value
 #'
 #' @importFrom dplyr between
 #'
@@ -86,7 +87,7 @@ mod_filtersUI <- function(id, nfidb) {
 #' @rdname mod_filtersUI
 mod_filters <- function(
   input, output, session,
-  nfidb, data_inputs
+  nfidb, data_inputs, lang
 ) {
 
   #### Filter vars and update picker ####
@@ -162,7 +163,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_res_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$res_vars, 'eng', nfidb) %>% sort(),
+        choices = var_names_input_builder(vars_to_filter_by()$res_vars, lang(), nfidb) %>% sort(),
         label = 'Results filters'
       )
     }
@@ -172,7 +173,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_clim_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$climatic_vars, 'eng', nfidb) %>% sort(),
+        choices = var_names_input_builder(vars_to_filter_by()$climatic_vars, lang(), nfidb) %>% sort(),
         label = 'Climatic filters'
       )
     }
@@ -182,7 +183,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_plot_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$plot_vars, 'eng', nfidb) %>% sort(),
+        choices = var_names_input_builder(vars_to_filter_by()$plot_vars, lang(), nfidb) %>% sort(),
         label = 'Other filters'
       )
     }
@@ -229,7 +230,7 @@ mod_filters <- function(
                 dplyr::pull(var_values)
 
               shinyWidgets::pickerInput(
-                ns(var), label = names(var_names_input_builder(var, 'eng', nfidb)),
+                ns(var), label = names(var_names_input_builder(var, lang(), nfidb)),
                 choices = var_values,
                 selected = var_values[1], multiple = TRUE,
                 options = list(
@@ -251,7 +252,7 @@ mod_filters <- function(
                   dplyr::collect()
 
                 shiny::sliderInput(
-                  ns(var), label = names(var_names_input_builder(var, 'eng', nfidb)),
+                  ns(var), label = names(var_names_input_builder(var, lang(), nfidb)),
                   min = var_values[['var_min']],
                   max = var_values[['var_max']],
                   value = c(var_values[['var_min']], var_values[['var_max']]),

@@ -135,13 +135,14 @@ mod_tableOutput <- function(id) {
 #' @param data_inputs reactive with the reactive data and the data inputs
 #' @param map_inputs reactive with the mod_map inputs, included main_data
 #' @param nfidb db pool
+#' @param lang lang value
 #'
 #' @export
 #'
 #' @rdname mod_tableOutput
 mod_table <- function(
   input, output, session,
-  data_inputs, map_inputs, nfidb
+  data_inputs, map_inputs, nfidb, lang
 ) {
 
   # we need the data based on the viz shape selected (selected for plots,
@@ -203,8 +204,8 @@ mod_table <- function(
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
         label = 'Choose the variables to show',
-        # choices = var_names_input_builder(col_vis_choices, 'eng', nfidb),
-        choices = var_names_input_builder(col_vis_choices, 'eng', nfidb, summ) %>% sort(),
+        # choices = var_names_input_builder(col_vis_choices, lang(), nfidb),
+        choices = var_names_input_builder(col_vis_choices, lang(), nfidb, summ) %>% sort(),
         selected = col_vis_choices[1:7]
       )
     }
@@ -237,7 +238,7 @@ mod_table <- function(
       # dplyr::mutate_if(is.character, forcats::as_factor) %>%
       DT::datatable(
         rownames = FALSE,
-        colnames = names(var_names_input_builder(names(.), 'eng', nfidb, summ)),
+        colnames = names(var_names_input_builder(names(.), lang(), nfidb, summ)),
         class = 'hover order-column stripe nowrap',
         filter = list(position = 'top', clear = FALSE, plain = FALSE),
         options = list(

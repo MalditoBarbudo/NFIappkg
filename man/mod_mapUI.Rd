@@ -7,7 +7,7 @@
 \usage{
 mod_mapUI(id, nfidb)
 
-mod_map(input, output, session, data_inputs, nfidb)
+mod_map(input, output, session, data_inputs, nfidb, lang)
 }
 \arguments{
 \item{id}{shiny id}
@@ -21,6 +21,8 @@ mod_map(input, output, session, data_inputs, nfidb)
 \item{session}{internal}
 
 \item{data_inputs}{reactive with the reactive data and the data inputs}
+
+\item{lang}{lang value}
 
 \item{nfidb}{pool with database connection object}
 }

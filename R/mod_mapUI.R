@@ -27,13 +27,14 @@ mod_mapUI <- function(id, nfidb) {
 #'
 #' @param data_inputs reactive with the reactive data and the data inputs
 #' @param nfidb pool with database connection object
+#' @param lang lang value
 #'
 #' @export
 #'
 #' @rdname mod_mapUI
 mod_map <- function(
   input, output, session,
-  data_inputs, nfidb
+  data_inputs, nfidb, lang
 ) {
 
   # output map
@@ -508,7 +509,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = glue::glue("{names(var_names_input_builder(data_inputs$viz_color, 'eng', nfidb))}
+            title = glue::glue("{names(var_names_input_builder(data_inputs$viz_color, lang(), nfidb))}
                                {stringr::str_remove(data_inputs$viz_statistic, '_')}"),
             layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
@@ -630,7 +631,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = names(var_names_input_builder(data_inputs$viz_color, 'eng', nfidb)),
+            title = names(var_names_input_builder(data_inputs$viz_color, lang(), nfidb)),
             layerId = 'color_legend', opacity = 1,
             className = legend_class,
             na.label = ''

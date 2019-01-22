@@ -4,7 +4,7 @@
 \alias{mod_data}
 \title{mod_data server function}
 \usage{
-mod_data(input, output, session, nfidb)
+mod_data(input, output, session, nfidb, lang)
 }
 \arguments{
 \item{input}{internal}
@@ -14,6 +14,8 @@ mod_data(input, output, session, nfidb)
 \item{session}{internal}
 
 \item{nfidb}{pool object to access the nfi db}
+
+\item{lang}{lang value}
 }
 \description{
 mod_data server function

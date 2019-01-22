@@ -31,6 +31,10 @@ hri_builder <- function(data_inputs) {
 
 var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
 
+  if (is.null(lang)) {
+    lang <- 'eng'
+  }
+
   if (summ) {
 
     vars_id <- stringr::str_remove(vars, '_mean$|_se$|_min$|_max$|_n$')
@@ -74,4 +78,18 @@ var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
   }
 
   return(vars[!is.na(names(vars))])
+}
+
+# Call this function with an input (such as `textInput("text", NULL, "Search")`) if you
+# want to add an input to the navbar
+navbarPageWithInputs <- function(..., inputs) {
+  navbar <- shiny::navbarPage(...)
+  form <- shiny::tags$form(class = "navbar-form", inputs)
+
+  # browser()
+
+  navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
+    navbar[[3]][[1]]$children[[1]]$children[[2]], form
+  )
+  navbar
 }

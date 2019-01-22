@@ -12,7 +12,7 @@ input[type="number"] {
 /* map container */
 div.outer {
   position: fixed;
-  top: 41px;
+  top: 46px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -120,4 +120,14 @@ div.table_container {
   background-color: #bdc3c7;
   padding: 6px 10px 6px 10px;
   border-radius: 8px;
+}
+
+.navbar-form {
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+
+.navbar-form > .form-group {
+  position: fixed;
+  right: 25px;
 }

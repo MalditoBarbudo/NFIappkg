@@ -15,11 +15,20 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     shinyWidgets::chooseSliderSkin(skin = "Shiny", color = '#0DB3D4'),
     shinyWidgets::useSweetAlert(),
 
-    shiny::navbarPage(
+    navbarPageWithInputs(
       # opts
       title = 'NFI app',
       id = 'nav',
       collapsible = TRUE,
+
+      # navbar with inputs (helpers.R) accepts an input argument, we use it for the lang
+      # selector
+      inputs = shiny::selectInput(
+        'lang', NULL,
+        choices = c('spa', 'eng'),
+        selected = 'spa',
+        width = '75px'
+      ),
 
       # contents
       shiny::tabPanel(
@@ -35,17 +44,17 @@ nfi_app <- function(user = 'guest', password = 'guest') {
           ),
 
           ########################################################### debug ####
-          # shiny::absolutePanel(
-          #   id = 'debug', class = 'panel panel-default', fixed = TRUE,
-          #   draggable = TRUE, width = 640, height = 'auto',
-          #   # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
-          #   # top = 'auto', left = 'auto', right = 100, bottom = 100,
-          #   top = 60, left = 'auto', right = 50, bottom = 'auto',
-          #
-          #   shiny::textOutput('debug1'),
-          #   shiny::textOutput('debug2'),
-          #   shiny::textOutput('debug3')
-          # ),
+          shiny::absolutePanel(
+            id = 'debug', class = 'panel panel-default', fixed = TRUE,
+            draggable = TRUE, width = 640, height = 'auto',
+            # top = 100, left = 100, rigth = 'auto', bottom = 'auto',
+            # top = 'auto', left = 'auto', right = 100, bottom = 100,
+            top = 60, left = 'auto', right = 50, bottom = 'auto',
+
+            shiny::textOutput('debug1'),
+            shiny::textOutput('debug2'),
+            shiny::textOutput('debug3')
+          ),
           ####################################################### end debug ####
 
           ## mod_data ####
@@ -99,24 +108,29 @@ nfi_app <- function(user = 'guest', password = 'guest') {
   ## SERVER ####
   server <- function(input, output, session) {
 
+    # get the lang in a reactive way
+    lang <- shiny::reactive({
+      input$lang
+    })
+
     ## module calling ####
 
     # data inputs
     data_reactives <- shiny::callModule(
       mod_data, 'mod_dataInput',
-      nfidb
+      nfidb, lang
     )
 
     # map
     map_reactives <- shiny::callModule(
       mod_map, 'mod_mapUI',
-      data_reactives, nfidb
+      data_reactives, nfidb, lang
     )
 
     # info panel
     info_reactives <- shiny::callModule(
       mod_info, 'mod_infoUI',
-      map_reactives, data_reactives, nfidb
+      map_reactives, data_reactives, nfidb, lang
     )
 
     # saveMap panel
@@ -128,7 +142,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # table
     shiny::callModule(
       mod_table, 'mod_tableOutput',
-      data_reactives, map_reactives, nfidb
+      data_reactives, map_reactives, nfidb, lang
     )
 
     shiny::observeEvent(
@@ -145,9 +159,9 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     )
 
     ## debug #####
-    # output$debug1 <- shiny::renderPrint({
-    #   map_reactives$map_center
-    # })
+    output$debug1 <- shiny::renderPrint({
+      lang()
+    })
     # output$debug2 <- shiny::renderPrint({
     #   map_reactives$map_click
     # })
