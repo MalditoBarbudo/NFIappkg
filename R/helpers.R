@@ -50,7 +50,12 @@ var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
 
     dummy_creator <- function(x, y) {
       name <- vars_trans[vars_trans$var_id == x, glue::glue('translation_{lang}')]
-      glue::glue("{name} {y}")
+
+      if (is.na(y)) {
+        name
+      } else {
+        glue::glue("{name} {y}")
+      }
     }
 
     vars_names <- vars_id %>%

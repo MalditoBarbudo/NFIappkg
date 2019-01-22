@@ -131,3 +131,9 @@ div.table_container {
   position: fixed;
   right: 25px;
 }
+
+.flag-lang {
+  display: inline;
+  vertical-align: middle;
+  padding-left: 10px;
+}

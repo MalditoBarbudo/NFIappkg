@@ -8,6 +8,13 @@ nfi_app <- function(user = 'guest', password = 'guest') {
   ### DB access ################################################################
   nfidb <- tidyNFI::nfi_connect(user = user, password = password)
 
+  ### Language options #########################################################
+  # lang_choices <- c('spa', 'eng')
+  # lang_flags <- c(
+  #   glue::glue("<img src={system.file('resources', 'spa.png', package = 'NFIappkg')} width=30px><div class='flag-lang'>%s</div></img>"),
+  #   glue::glue("<img src={system.file('resources', 'eng.png', package = 'NFIappkg')} width=30px><div class='flag-lang'>%s</div></img>")
+  # )
+
   ## UI ####
   ui <- shiny::tagList(
 
@@ -23,10 +30,22 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
       # navbar with inputs (helpers.R) accepts an input argument, we use it for the lang
       # selector
+      # inputs = shinyWidgets::pickerInput(
+      #   'lang', NULL,
+      #   choices = c('spa', 'eng'),
+      #   selected = 'eng',
+      #   width = '150px',
+      #   choicesOpt = list(
+      #     content = c(
+      #       sprintf(lang_flags[1], lang_choices[1]),
+      #       sprintf(lang_flags[2], lang_choices[2])
+      #     )
+      #   )
+      # ),
       inputs = shiny::selectInput(
         'lang', NULL,
         choices = c('spa', 'eng'),
-        selected = 'spa',
+        selected = 'eng',
         width = '75px'
       ),
 
