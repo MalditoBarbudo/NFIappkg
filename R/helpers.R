@@ -33,6 +33,30 @@ var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
 
   if (summ) {
 
+    vars_id <- stringr::str_remove(vars, '_mean$|_se$|_min$|_max$|_n$')
+    vars_stat <- stringr::str_extract(vars, '_mean$|_se$|_min$|_max$|_n$') %>%
+      stringr::str_remove('_')
+
+    vars_trans <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+      dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%
+      dplyr::filter(var_id %in% vars_id) %>%
+      dplyr::distinct() %>%
+      dplyr::collect() %>%
+      as.data.frame()
+
+    dummy_creator <- function(x, y) {
+      name <- vars_trans[vars_trans$var_id == x, glue::glue('translation_{lang}')]
+      glue::glue("{name} {y}")
+    }
+
+    vars_names <- vars_id %>%
+      purrr::map2_chr(
+        vars_stat,
+        ~ dummy_creator(.x, .y)
+      )
+
+    names(vars) <- vars_names
+
   } else {
     vars_trans <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
       dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%

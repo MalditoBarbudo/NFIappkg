@@ -194,13 +194,17 @@ mod_table <- function(
     handlerExpr = {
       col_vis_choices <- names(table_data())
 
-      browser()
+      if (data_inputs$viz_shape == 'polygon') {
+        summ <- TRUE
+      } else {
+        summ <- FALSE
+      }
 
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
         label = 'Choose the variables to show',
         # choices = var_names_input_builder(col_vis_choices, 'eng', nfidb),
-        choices = col_vis_choices,
+        choices = var_names_input_builder(col_vis_choices, 'eng', nfidb, summ) %>% sort(),
         selected = col_vis_choices[1:7]
       )
     }
@@ -217,6 +221,12 @@ mod_table <- function(
       shiny::need(length(input$col_vis_selector) > 0, 'No data to show')
     )
 
+    if (data_inputs$viz_shape == 'polygon') {
+      summ <- TRUE
+    } else {
+      summ <- FALSE
+    }
+
     numeric_vars <- table_data() %>%
       dplyr::select(dplyr::one_of(input$col_vis_selector)) %>%
       dplyr::select_if(is.numeric) %>%
@@ -227,6 +237,7 @@ mod_table <- function(
       # dplyr::mutate_if(is.character, forcats::as_factor) %>%
       DT::datatable(
         rownames = FALSE,
+        colnames = names(var_names_input_builder(names(.), 'eng', nfidb, summ)),
         class = 'hover order-column stripe nowrap',
         filter = list(position = 'top', clear = FALSE, plain = FALSE),
         options = list(
