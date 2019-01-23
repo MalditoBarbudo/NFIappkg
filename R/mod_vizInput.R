@@ -119,6 +119,11 @@ mod_viz <- function(
 ) {
 
   tables_to_look_at <- shiny::reactive({
+
+    shiny::validate(
+      shiny::need(data_inputs$nfi, 'no data')
+    )
+
     nfi <- data_inputs$nfi
 
     if (nfi == 'nfi_2_nfi_3') {
@@ -153,6 +158,10 @@ mod_viz <- function(
 
     table_names <- tables_to_look_at()
 
+    shiny::validate(
+      shiny::need(table_names, 'no data')
+    )
+
     all_variables <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
       dplyr::filter(var_table %in% table_names) %>%
       dplyr::pull(var_id)
@@ -174,6 +183,10 @@ mod_viz <- function(
   shiny::observe({
     color_choices <- vars_to_viz_by()
 
+    shiny::validate(
+      shiny::need(color_choices, 'no data')
+    )
+
     # let's make density (or density_balance) the selected var
     if ('density' %in% color_choices) {
       selected_col <- 'density'
@@ -194,10 +207,13 @@ mod_viz <- function(
 
   # size input updater
   shiny::observe({
+
+    shiny::validate(
+      shiny::need(data_inputs$viz_shape, 'no data')
+    )
+
     if (data_inputs$viz_shape == 'plot') {
       size_choices <- vars_to_viz_by()
-
-      browser()
 
       # update the pickerInput
       shinyWidgets::updatePickerInput(
@@ -215,6 +231,11 @@ mod_viz <- function(
 
   # statistic input updater
   shiny::observe({
+
+    shiny::validate(
+      shiny::need(data_inputs$viz_shape, 'no data')
+    )
+
     if (data_inputs$viz_shape != 'plot') {
       shinyjs::show('viz_statistic')
     } else {
@@ -224,6 +245,11 @@ mod_viz <- function(
 
   # functional group value updater
   shiny::observe({
+
+    shiny::validate(
+      shiny::need(data_inputs$functional_group, 'no data')
+    )
+
     if (data_inputs$functional_group != 'plot') {
 
       functional_group <- data_inputs$functional_group
@@ -254,6 +280,11 @@ mod_viz <- function(
 
   # diameter_classes
   shiny::observe({
+
+    shiny::validate(
+      shiny::need(data_inputs$diameter_classes, 'no data')
+    )
+
     if (isTRUE(data_inputs$diameter_classes)) {
 
       diameter_classes_choices <- seq(10, 70, 5) %>% as.character()

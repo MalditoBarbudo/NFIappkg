@@ -4,9 +4,10 @@
 #'
 #' @param id shiny id
 #' @param nfidb pool object to access the nfi db
+#' @param lang lang value
 #'
 #' @export
-mod_dataInput <- function(id, nfidb) {
+mod_dataInput <- function(id, nfidb, lang) {
 
   # ns
   ns <- shiny::NS(id)
@@ -189,10 +190,6 @@ mod_data <- function(
   })
 
   # calling the modules used
-  # buttons_reactives <- shiny::callModule(
-  #   mod_buttons, 'mod_buttonsInput'
-  # )
-
   apply_data <- shiny::callModule(
     mod_applyButton, 'mod_applyButtonInput_data_panel'
   )

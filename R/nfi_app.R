@@ -81,7 +81,10 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
           ## mod_data ####
           # mod_data module, it includes the dataSel, dataFil and dataAgg inputs
-          mod_dataInput('mod_dataInput', nfidb),
+          shiny::uiOutput(
+            'data_module_container'
+          ),
+          # mod_dataInput('mod_dataInput', nfidb, lang),
 
           ## mod_map ####
           # mod_map, it includes the map
@@ -138,6 +141,12 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     ## module calling ####
 
     # data inputs
+    # due to internationalization, we must render the data module with a renderUI, and we
+    # must also retrieve the data_reactives, so lets do that
+    output$data_module_container <- shiny::renderUI({
+      mod_dataInput('mod_dataInput', nfidb, lang)
+    })
+
     data_reactives <- shiny::callModule(
       mod_data, 'mod_dataInput',
       nfidb, lang
@@ -148,6 +157,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
       mod_map, 'mod_mapUI',
       data_reactives, nfidb, lang
     )
+    # map_reactives <- NULL
 
     # info panel
     info_reactives <- shiny::callModule(

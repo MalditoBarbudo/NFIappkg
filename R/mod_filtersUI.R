@@ -93,6 +93,10 @@ mod_filters <- function(
   #### Filter vars and update picker ####
   tables_to_look_at <- shiny::reactive({
 
+    shiny::validate(
+      shiny::need(data_inputs$nfi, 'no data')
+    )
+
     nfi <- data_inputs$nfi
 
     if (nfi == 'nfi_2_nfi_3') {
@@ -126,9 +130,13 @@ mod_filters <- function(
   # scenario
   vars_to_filter_by <- shiny::reactive({
 
-    # browser()
+    lang <- lang()
 
     table_names <- tables_to_look_at()
+    shiny::validate(
+      shiny::need(table_names, 'no data')
+    )
+
     vars_overall <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
       dplyr::filter(var_table %in% table_names) %>%
       dplyr::pull(var_id)
@@ -189,7 +197,7 @@ mod_filters <- function(
     }
   )
 
-  filter_vars <- reactive({
+  filter_vars <- shiny::reactive({
     c(input$fil_res_vars, input$fil_clim_vars, input$fil_plot_vars)
   })
 
@@ -202,8 +210,6 @@ mod_filters <- function(
     filters_inputs <- shiny::eventReactive(
       eventExpr = filter_vars(),
       valueExpr = {
-
-        # browser()
 
         lapply(
           filter_vars(), function(var) {

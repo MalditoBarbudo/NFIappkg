@@ -4,12 +4,14 @@
 \alias{mod_dataInput}
 \title{mod_dataInput and mod_data}
 \usage{
-mod_dataInput(id, nfidb)
+mod_dataInput(id, nfidb, lang)
 }
 \arguments{
 \item{id}{shiny id}
 
 \item{nfidb}{pool object to access the nfi db}
+
+\item{lang}{lang value}
 }
 \description{
 A shiny module to create and populate the data inputs

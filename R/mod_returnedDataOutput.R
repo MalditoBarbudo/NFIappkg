@@ -40,7 +40,10 @@ mod_returnedData <- function(
     eventExpr = data_inputs$apply_data,
     valueExpr = {
 
-      # browser()
+      shiny::validate(
+        shiny::need(data_inputs$nfi, 'no data')
+      )
+
       nfi <- data_inputs$nfi
       viz_shape <- data_inputs$viz_shape
       admin_div <- data_inputs$admin_div

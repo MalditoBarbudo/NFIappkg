@@ -16,7 +16,7 @@ mod_mapUI <- function(id, nfidb) {
     leaflet::leafletOutput(ns('map'), height = '100%'),
 
     # mod returned data
-    mod_returnedDataOutput('mod_returnedDataOutput')
+    mod_returnedDataOutput(ns('mod_returnedDataOutput'))
   )
 }
 
@@ -92,7 +92,10 @@ mod_map <- function(
     eventExpr = data_inputs$admin_div,
     handlerExpr = {
 
-      # browser()
+      shiny::validate(
+        shiny::need(data_inputs$admin_div, 'no data')
+      )
+
       polygon_object <- switch(
         data_inputs$admin_div,
         'aut_community' = 'catalonia_polygons',
@@ -212,7 +215,8 @@ mod_map <- function(
         shiny::need(
           returned_data_inputs$main_data[['selected']],
           "No data computed yet, no map data can be generated"
-        )
+        ),
+        shiny::need(data_inputs$admin_div, 'no data')
       )
 
       # start the progress
@@ -366,7 +370,6 @@ mod_map <- function(
     eventExpr = map_data(),
     handlerExpr = {
 
-      # browser()
       # map data
       map_data <- map_data()
 
@@ -375,7 +378,8 @@ mod_map <- function(
         shiny::need(
           map_data,
           "No data to map"
-        )
+        ),
+        shiny::need(data_inputs$admin_div, 'no data')
       )
 
       # start the progress
