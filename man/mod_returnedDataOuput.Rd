@@ -5,7 +5,7 @@
 \title{mod_returnedData server function}
 \usage{
 mod_returnedData(input, output, session, data_inputs, map_inputs = NULL,
-  nfidb)
+  nfidb, lang)
 }
 \arguments{
 \item{input}{internal}
@@ -19,4 +19,6 @@ mod_returnedData(input, output, session, data_inputs, map_inputs = NULL,
 \item{map_inputs}{map input with custom_polygon sf object, if any}
 
 \item{nfidb}{pool object to access the nfi db}
+
+\item{lang}{lang value}
 }

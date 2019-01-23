@@ -38,8 +38,8 @@ mod_tableOutput <- function(id) {
         ),
         shiny::column(
           2, offset = 2, align = 'center',
-          # shiny::br(),
-          shiny::p('Data info'),
+          shiny::br(),
+          # shiny::p('Data info'),
           shinyWidgets::actionBttn(
             ns('show_hri'),
             'Info',
@@ -72,58 +72,6 @@ mod_tableOutput <- function(id) {
     shiny::fluidRow(
       shinyWidgets::addSpinner(DT::DTOutput(ns('nfi_table')))
     )
-    # shiny::fluidPage(
-    #   shiny::sidebarLayout(
-    #     position = 'left',
-    #     sidebarPanel = shiny::sidebarPanel(
-    #       width = 3,
-    #       # inputs
-    #       # Column visibility
-    #       shiny::h4('Column visibility'),
-    #       shinyWidgets::pickerInput(
-    #         ns('col_vis_selector'),
-    #         # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
-    #         label = 'Choose the variables to show',
-    #         choices = '', multiple = TRUE,
-    #         width = '90%',
-    #         options = list(
-    #           `actions-box` = FALSE,
-    #           `deselect-all-text` = 'None selected...',
-    #           `select-all-text` = 'All selected',
-    #           `selected-text-format` = 'count',
-    #           `count-selected-text` = "{0} variables selected (of {1})",
-    #           `size` = 15,
-    #           `max-options` = 50,
-    #           `max-options-text` = 'Select limit reached (50)',
-    #           `live-search` = TRUE
-    #         )
-    #       ),
-    #       # mod_applyButtonInput(ns('mod_applyButtonInput_table')),
-    #
-    #       # Save buttons
-    #       shiny::h4('Save the table'),
-    #       shiny::fluidRow(
-    #         shinyWidgets::downloadBttn(
-    #           ns('dwl_csv_button'),
-    #           'Save as csv',
-    #           color = 'primary', size = 'sm', block = FALSE,
-    #           style = 'stretch'
-    #         ),
-    #         shinyWidgets::downloadBttn(
-    #           ns('dwl_xlsx_button'),
-    #           'Save as xlsx',
-    #           color = 'primary', size = 'sm', block = FALSE,
-    #           style = 'stretch'
-    #         )
-    #       )
-    #     ),
-    #     mainPanel = shiny::mainPanel(
-    #       width = 9,
-    #       # gt::gt_output(ns('nfi_table'))
-    #       shinyWidgets::addSpinner(DT::DTOutput(ns('nfi_table')))
-    #     )
-    #   )
-    # )
   )
 }
 
@@ -163,7 +111,7 @@ mod_table <- function(
         # start the progress
         shinyWidgets::progressSweetAlert(
           session = session, id = 'table_build_progress',
-          title = 'Preparing table data', value = 75,
+          title = text_translate('table_build_progress', lang(), nfidb), value = 75,
           display_pct = TRUE
         )
         res <- map_inputs$main_data[['selected']] %>%
@@ -177,7 +125,7 @@ mod_table <- function(
         # start the progress
         shinyWidgets::progressSweetAlert(
           session = session, id = 'table_build_progress',
-          title = 'Preparing table data', value = 75,
+          title = text_translate('table_build_progress', lang(), nfidb), value = 75,
           display_pct = TRUE
         )
         res <- map_inputs$main_data[['summarised']] %>%
@@ -203,8 +151,7 @@ mod_table <- function(
 
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
-        label = 'Choose the variables to show',
-        # choices = var_names_input_builder(col_vis_choices, lang(), nfidb),
+        label = text_translate('col_vis_selector_input', lang(), nfidb),
         choices = var_names_input_builder(col_vis_choices, lang(), nfidb, summ) %>% sort(),
         selected = col_vis_choices[1:7]
       )
@@ -285,8 +232,8 @@ mod_table <- function(
     content = function(file) {
       if (isTRUE(data_inputs$diameter_classes)) {
         shinyWidgets::sendSweetAlert(
-          session, 'Note:',
-          text = 'Saving the data broken down by diameter classes can take some time'
+          session, text_translate('sweet_alert_table_dc_title', lang(), nfidb),
+          text = text_translate('sweet_alert_table_dc_text', lang(), nfidb)
         )
       }
       readr::write_csv(table_data(), file)
@@ -300,8 +247,8 @@ mod_table <- function(
     content = function(file) {
       if (isTRUE(data_inputs$diameter_classes)) {
         shinyWidgets::sendSweetAlert(
-          session, 'Note:',
-          text = 'Saving the data broken down by diameter classes can take some time'
+          session, text_translate('sweet_alert_table_dc_title', lang(), nfidb),
+          text = text_translate('sweet_alert_table_dc_text', lang(), nfidb)
         )
       }
       writexl::write_xlsx(table_data(), file)
@@ -327,7 +274,7 @@ mod_table <- function(
     handlerExpr = {
       shinyWidgets::sendSweetAlert(
         session = session,
-        title = 'Data info',
+        title = text_translate('sweet_alert_hri_title', lang(), nfidb),
         text = shiny::tags$div(hri_builder(data_inputs)),
         html = TRUE
       )

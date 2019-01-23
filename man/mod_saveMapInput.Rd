@@ -5,12 +5,16 @@
 \alias{mod_saveMap}
 \title{mod_saveMapInput and mod_saveMap}
 \usage{
-mod_saveMapInput(id)
+mod_saveMapInput(id, nfidb, lang)
 
 mod_saveMap(input, output, session, map_inputs)
 }
 \arguments{
 \item{id}{shiny id}
+
+\item{nfidb}{pool object to access the database}
+
+\item{lang}{lang value}
 
 \item{input}{internal}
 

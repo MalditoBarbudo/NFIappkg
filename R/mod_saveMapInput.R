@@ -3,9 +3,11 @@
 #' @description A shiny module to create and populate the buttons inputs
 #'
 #' @param id shiny id
+#' @param nfidb pool object to access the database
+#' @param lang lang value
 #'
 #' @export
-mod_saveMapInput <- function(id) {
+mod_saveMapInput <- function(id, nfidb, lang) {
 
   # ns
   ns <- shiny::NS(id)
@@ -15,16 +17,16 @@ mod_saveMapInput <- function(id) {
     shiny::column(
       12,
       # title
-      shiny::tags$strong('Save the map'),
+      shiny::tags$strong(text_translate('save_the_map', lang, nfidb)),
       shiny::br(),
       # buttons
       shinyWidgets::downloadBttn(
-        ns('save_shp'), label = 'Save as shapefile',
+        ns('save_shp'), label = text_translate('save_shp_button', lang, nfidb),
         style = 'material-flat', color = 'success', size = 'sm', block = TRUE
       ),
       shiny::br(),
       shinyWidgets::downloadBttn(
-        ns('save_wkt'), label = 'Save as wkt',
+        ns('save_wkt'), label = text_translate('save_wkt_button', lang, nfidb),
         style = 'material-flat', color = 'success', size = 'sm', block = TRUE
       )
     )

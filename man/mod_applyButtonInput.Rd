@@ -5,12 +5,16 @@
 \alias{mod_applyButton}
 \title{mod_applyButtonInput and mod_applyButton}
 \usage{
-mod_applyButtonInput(id)
+mod_applyButtonInput(id, nfidb, lang)
 
 mod_applyButton(input, output, session)
 }
 \arguments{
 \item{id}{shiny id}
+
+\item{nfidb}{pool object to access the database}
+
+\item{lang}{lang value}
 
 \item{input}{internal}
 

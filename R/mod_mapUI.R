@@ -196,18 +196,19 @@ mod_map <- function(
   # returned data (NON COLLECTED!!!)
   returned_data_inputs <- shiny::callModule(
     mod_returnedData, 'mod_returnedDataOutput',
-    data_inputs, map_inputs, nfidb
+    data_inputs, map_inputs, nfidb, lang
   )
 
-  # apply_reactives <- shiny::reactive({
-  #   apply_reactives <- list()
-  #   apply_reactives$apply_data <- data_inputs$apply_data
-  #   apply_reactives$apply_viz <- data_inputs$apply_viz
-  # })
+  apply_reactives <- shiny::reactive({
+    apply_reactives <- list()
+    apply_reactives$apply_data <- data_inputs$apply_data
+    apply_reactives$lang <- lang()
+  })
 
   map_data <- shiny::eventReactive(
     ignoreNULL = FALSE, ignoreInit = FALSE,
-    eventExpr = data_inputs$apply_data,
+    # eventExpr = data_inputs$apply_data,
+    eventExpr = apply_reactives(),
     valueExpr = {
 
       # First check if data is null (filters too restrictive returning no data)
@@ -222,7 +223,7 @@ mod_map <- function(
       # start the progress
       shinyWidgets::progressSweetAlert(
         session = session, id = 'map_data_progress',
-        title = 'Map data carpentry', value = 25,
+        title = text_translate('map_data_progress', lang(), nfidb), value = 25,
         display_pct = TRUE
       )
 
@@ -483,6 +484,7 @@ mod_map <- function(
         #   session = session, id = 'map_build_progress',
         #   value = 85
         # )
+        stat_code <- glue::glue("{stringr::str_remove(data_inputs$viz_statistic, '_')}_stat")
 
         leaflet::leafletProxy('map') %>%
           leaflet::clearGroup('veguerias') %>%
@@ -514,7 +516,7 @@ mod_map <- function(
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
             title = glue::glue("{names(var_names_input_builder(data_inputs$viz_color, lang(), nfidb))}
-                               {stringr::str_remove(data_inputs$viz_statistic, '_')}"),
+                               {text_translate(stat_code, lang(), nfidb) %>% tolower()}"),
             layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
 

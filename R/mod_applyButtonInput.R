@@ -3,9 +3,11 @@
 #' @description A shiny module to create and populate the buttons inputs
 #'
 #' @param id shiny id
+#' @param nfidb pool object to access the database
+#' @param lang lang value
 #'
 #' @export
-mod_applyButtonInput <- function(id) {
+mod_applyButtonInput <- function(id, nfidb, lang) {
 
   # ns
   ns <- shiny::NS(id)
@@ -14,7 +16,7 @@ mod_applyButtonInput <- function(id) {
   shiny::fluidRow(
     shinyWidgets::actionBttn(
       ns('apply'),
-      'Apply',
+      text_translate('apply', lang, nfidb),
       icon = shiny::icon('check-circle'), style = 'stretch', block = FALSE, size = 'sm'
     )
   )

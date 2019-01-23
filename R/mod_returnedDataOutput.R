@@ -19,13 +19,14 @@ mod_returnedDataOutput <- function(id) {
 #' @param data_inputs reactives from dataInput module
 #' @param map_inputs map input with custom_polygon sf object, if any
 #' @param nfidb pool object to access the nfi db
+#' @param lang lang value
 #'
 #' @export
 #'
 #' @rdname mod_returnedDataOuput
 mod_returnedData <- function(
   input, output, session,
-  data_inputs, map_inputs = NULL, nfidb
+  data_inputs, map_inputs = NULL, nfidb, lang
 ) {
 
   # apply_reactives <- shiny::reactive({
@@ -110,8 +111,8 @@ mod_returnedData <- function(
       if (length(selected_data %>% head(1) %>% dplyr::collect() %>% names()) < 1) {
         shinyWidgets::sendSweetAlert(
           session = session,
-          title = 'No data can be retrieved with the actual filters',
-          text = 'Please choose another filter values'
+          title = text_translate('sweet_alert_returned_data_title', lang(), nfidb),
+          text = text_translate('sweet_alert_returned_data_text', lang(), nfidb)
         )
 
         selected_data <- NULL

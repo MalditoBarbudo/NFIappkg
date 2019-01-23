@@ -4,12 +4,14 @@
 \alias{mod_vizInput}
 \title{mod_vizInput and mod_viz}
 \usage{
-mod_vizInput(id, nfidb)
+mod_vizInput(id, nfidb, lang)
 }
 \arguments{
 \item{id}{shiny id}
 
 \item{nfidb}{pool object to access nfi db}
+
+\item{lang}{lang value}
 }
 \description{
 A shiny module to generate and populate the visualization inputs

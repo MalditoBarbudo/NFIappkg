@@ -4,10 +4,14 @@
 \alias{mod_infoUI}
 \title{mod_infoUI and mod_info}
 \usage{
-mod_infoUI(id)
+mod_infoUI(id, nfidb, lang)
 }
 \arguments{
 \item{id}{shiny id}
+
+\item{nfidb}{pool object to access the database}
+
+\item{lang}{lang value}
 }
 \description{
 A shiny module to create and populate the data inputs

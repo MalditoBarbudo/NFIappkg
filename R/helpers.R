@@ -30,10 +30,19 @@ hri_builder <- function(data_inputs) {
 }
 
 text_translate <- function(text, lang, pool) {
-  dplyr::tbl(pool, 'TEXTS_THESAURUS') %>%
+
+  text[is.na(text)] <- 'NA_'
+
+  text_df <- dplyr::tbl(pool, 'TEXTS_THESAURUS') %>%
     dplyr::select(dplyr::one_of('text_id', glue::glue("text_{lang}"))) %>%
-    dplyr::filter(text_id == text) %>%
-    dplyr::pull(!!rlang::sym(glue::glue("text_{lang}")))
+    dplyr::filter(text_id %in% text) %>%
+    dplyr::collect() %>%
+    as.data.frame()
+
+  text %>%
+    purrr::map_chr(
+      ~ text_df[text_df$text_id == .x, glue::glue('text_{lang}')]
+    )
 }
 
 var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
@@ -46,7 +55,10 @@ var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
 
     vars_id <- stringr::str_remove(vars, '_mean$|_se$|_min$|_max$|_n$')
     vars_stat <- stringr::str_extract(vars, '_mean$|_se$|_min$|_max$|_n$') %>%
-      stringr::str_remove('_')
+      stringr::str_remove('_') %>%
+      stringr::str_c('_stat') %>%
+      text_translate(lang, nfidb) %>%
+      tolower()
 
     vars_trans <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
       dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%

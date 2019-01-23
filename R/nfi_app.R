@@ -95,10 +95,13 @@ nfi_app <- function(user = 'guest', password = 'guest') {
           shinyjs::hidden(
             shiny::absolutePanel(
               id = 'infoPanel', class = 'panel panel-default', fixed = TRUE,
-              draggable = TRUE, width = 'auto', height = 'auto',
-              top = 60, left = '5%', right = '5%', bottom = '2%',
+              draggable = FALSE, width = 'auto', height = 'auto',
+              top = 60, left = '5%', right = '5%', bottom = '5%',
 
-              mod_infoUI('mod_infoUI')
+              # mod_infoUI('mod_infoUI')
+              shiny::uiOutput(
+                'info_module_container'
+              )
             )
           ),
 
@@ -144,7 +147,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # due to internationalization, we must render the data module with a renderUI, and we
     # must also retrieve the data_reactives, so lets do that
     output$data_module_container <- shiny::renderUI({
-      mod_dataInput('mod_dataInput', nfidb, lang)
+      mod_dataInput('mod_dataInput', nfidb, lang())
     })
 
     data_reactives <- shiny::callModule(
@@ -160,6 +163,10 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # map_reactives <- NULL
 
     # info panel
+    output$info_module_container <- shiny::renderUI({
+      mod_infoUI('mod_infoUI', nfidb, lang())
+    })
+
     info_reactives <- shiny::callModule(
       mod_info, 'mod_infoUI',
       map_reactives, data_reactives, nfidb, lang

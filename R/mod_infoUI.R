@@ -3,9 +3,11 @@
 #' @description A shiny module to create and populate the data inputs
 #'
 #' @param id shiny id
+#' @param nfidb pool object to access the database
+#' @param lang lang value
 #'
 #' @export
-mod_infoUI <- function(id) {
+mod_infoUI <- function(id, nfidb, lang) {
   # ns
   ns <- shiny::NS(id)
 
@@ -30,7 +32,7 @@ mod_infoUI <- function(id) {
         shiny::hr(),
         shinyWidgets::actionBttn(
           ns('close'),
-          'Close',
+          text_translate('close', lang, nfidb),
           icon = shiny::icon('check-circle'), style = 'stretch',
           block = FALSE, size = 'sm'
         )
@@ -355,9 +357,20 @@ mod_info <- function(
       #   value = 75
       # )
 
+      # plot tile internationaliztion (used inside text_translate in the title argument of
+      # ggplot2::labs)
+      if (click$group != 'plots') {
+        summ_title <- TRUE
+      } else {
+        summ_title <- FALSE
+      }
+      title_viz_sel <- names(var_names_input_builder(viz_sel, lang(), nfidb, summ_title))
+      title_click_group <- text_translate(click$group, lang(), nfidb) %>%
+        tolower()
+
       info_plot <- rlang::eval_tidy(rlang::parse_expr(plot_expression)) +
         ggplot2::labs(
-          title = glue::glue("{viz_sel} from {click$id} compared to other {click$group}")
+          title = glue::glue(text_translate('info_plot_title', lang(), nfidb))
         ) +
         ggplot2::theme_minimal()
 
@@ -376,7 +389,7 @@ mod_info <- function(
         ) %>%
         gt::gt(rowname_col = 'Characteristics') %>%
         gt::tab_header(
-          title = glue::glue('General info for {click$id}:')
+          title = glue::glue(text_translate("info_tab_header", lang(), nfidb))
         ) %>%
         gt::tab_options(
           table.background.color = 'transparent',

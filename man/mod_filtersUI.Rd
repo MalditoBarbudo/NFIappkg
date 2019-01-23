@@ -5,7 +5,7 @@
 \alias{mod_filters}
 \title{mod_filtersUI and mod_filters}
 \usage{
-mod_filtersUI(id, nfidb)
+mod_filtersUI(id, nfidb, lang)
 
 mod_filters(input, output, session, nfidb, data_inputs, lang)
 }
@@ -13,6 +13,8 @@ mod_filters(input, output, session, nfidb, data_inputs, lang)
 \item{id}{shiny id}
 
 \item{nfidb}{pool object to access the nfi db}
+
+\item{lang}{lang value}
 
 \item{input}{internal}
 
@@ -23,9 +25,9 @@ mod_filters(input, output, session, nfidb, data_inputs, lang)
 \item{data_inputs}{reactives from the data_inputsInput module, to know about which scenario
 we are}
 
-\item{lang}{lang value}
-
 \item{nfidb}{pool object to access the nfi db}
+
+\item{lang}{lang value}
 }
 \description{
 A shiny module to generate and process the filters
