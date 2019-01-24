@@ -137,6 +137,9 @@ mod_info <- function(
 
         plot_data_all <- prep_data()
 
+        plot_data_clean <- plot_data_all %>%
+          dplyr::filter(plot_id != click$id)
+
         # shinyWidgets::updateProgressBar(
         #   session = session, id = 'info_data_prep',
         #   value = 25
@@ -169,6 +172,9 @@ mod_info <- function(
         admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
 
         plot_data_all <- prep_data()
+
+        plot_data_clean <- plot_data_all %>%
+          dplyr::filter(!! rlang::sym(admin_sel) != click$id)
 
         # shinyWidgets::updateProgressBar(
         #   session = session, id = 'info_data_prep',
@@ -244,6 +250,9 @@ mod_info <- function(
           plot_data_sel <- plot_data_sel %>%
             dplyr::filter(!! rlang::sym(fg_id) %in% fg_list)
 
+          plot_data_clean <- plot_data_clean %>%
+            dplyr::filter(!! rlang::sym(fg_id) %in% fg_list)
+
           plot_expression <- glue::glue(
             "plot_data_all %>%
             dplyr::filter({fg_id} %in% fg_list) %>%
@@ -277,6 +286,7 @@ mod_info <- function(
         plot_expression <- glue::glue(
           "{plot_expression}
             ggplot2::geom_jitter(
+              data = plot_data_clean,
               ggplot2::aes(size = {viz_size}), width = 0.1, height = 0,
               alpha = 0.3, color = 'grey66', show.legend = FALSE
             ) +
@@ -289,6 +299,7 @@ mod_info <- function(
         plot_expression <- glue::glue(
           "{plot_expression}
             ggplot2::geom_jitter(
+              data = plot_data_clean,
               width = 0.1, height = 0, alpha = 0.3, size = 4,
               color = 'grey66', show.legend = FALSE
             ) +
@@ -324,9 +335,8 @@ mod_info <- function(
                 subtitle = 'Facetted by {fg_id} and diamclass_id'
               )"
         )
-      }
-      else {
-        if('diamclass_id' %in% names(plot_data_all)) {
+      } else {
+        if ('diamclass_id' %in% names(plot_data_all)) {
           # browser()
           plot_expression <- glue::glue(
             "{plot_expression} +
@@ -368,6 +378,7 @@ mod_info <- function(
       title_click_group <- text_translate(click$group, lang(), nfidb) %>%
         tolower()
 
+      browser()
       info_plot <- rlang::eval_tidy(rlang::parse_expr(plot_expression)) +
         ggplot2::labs(
           title = glue::glue(text_translate('info_plot_title', lang(), nfidb))
