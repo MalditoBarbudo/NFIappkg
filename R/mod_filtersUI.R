@@ -171,6 +171,7 @@ mod_filters <- function(
   shiny::observeEvent(
     eventExpr = vars_to_filter_by()$res_vars,
     handlerExpr = {
+
       shinyWidgets::updatePickerInput(
         session, 'fil_res_vars',
         choices = var_names_input_builder(vars_to_filter_by()$res_vars, lang(), nfidb) %>% sort(),

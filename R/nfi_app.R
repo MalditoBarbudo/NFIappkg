@@ -54,7 +54,8 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
       # contents
       shiny::tabPanel(
-        title = 'Map',
+        title = '',
+        icon = shiny::icon('globe', class = 'fa-oneandhalf'),
 
         shiny::div(
           class = "outer",
@@ -118,7 +119,8 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
       # data tab
       shiny::tabPanel(
-        'Data',
+        title = '',
+        icon = shiny::icon('database', class = 'fa-oneandhalf'),
 
         shiny::div(
           class = 'inner',

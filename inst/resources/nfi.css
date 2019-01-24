@@ -141,3 +141,6 @@ div.table_container {
 .flag-image {
   border-radius: 50%;
 }
+
+/* glyphicon sizes */
+.fa-oneandhalf{font-size: 1.5em;}

@@ -3,8 +3,6 @@
 #' @description A shiny module to generate the base IFN plots table
 #'
 #' @param id shiny id
-#' @param nfidb pool object to access the database
-#' @param lang lang value
 #'
 #' @export
 mod_tableOutput <- function(id) {
@@ -137,17 +135,30 @@ mod_table <- function(
     return(res)
   }))
 
+  # col_vis_sel_triggers <- shiny::reactive({
+  #   triggers <- list()
+  #   triggers$data <- table_data()
+  #   triggers$lang <- lang()
+  # })
+
   # update the col vis selector input
+  # shiny::observeEvent(
+  #   eventExpr = col_vis_sel_triggers(),
+  #   handlerExpr = {
+  #
+  #   }
+  # )
   shiny::observe({
     col_vis_choices <- names(table_data())
     lang <- lang()
+    viz_shape <- shiny::isolate(data_inputs$viz_shape)
 
     shiny::validate(
-      shiny::need(data_inputs$viz_shape, 'no data'),
+      shiny::need(viz_shape, 'no data'),
       shiny::need(col_vis_choices, 'no data')
     )
 
-    if (data_inputs$viz_shape == 'polygon') {
+    if (viz_shape == 'polygon') {
       summ <- TRUE
     } else {
       summ <- FALSE
