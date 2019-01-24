@@ -288,7 +288,7 @@ mod_info <- function(
             ggplot2::geom_jitter(
               data = plot_data_clean,
               ggplot2::aes(size = {viz_size}), width = 0.1, height = 0,
-              alpha = 0.3, color = 'grey66', show.legend = FALSE
+              alpha = 0.3, color = 'black', show.legend = FALSE
             ) +
             ggplot2::geom_jitter(
               data = plot_data_sel, ggplot2::aes(size = {viz_size}), width = 0.1,
@@ -301,7 +301,7 @@ mod_info <- function(
             ggplot2::geom_jitter(
               data = plot_data_clean,
               width = 0.1, height = 0, alpha = 0.3, size = 4,
-              color = 'grey66', show.legend = FALSE
+              color = 'black', show.legend = FALSE
             ) +
             ggplot2::geom_jitter(
               data = plot_data_sel, width = 0.1, size = 4,
@@ -378,12 +378,22 @@ mod_info <- function(
       title_click_group <- text_translate(click$group, lang(), nfidb) %>%
         tolower()
 
-      browser()
       info_plot <- rlang::eval_tidy(rlang::parse_expr(plot_expression)) +
         ggplot2::labs(
           title = glue::glue(text_translate('info_plot_title', lang(), nfidb))
         ) +
-        ggplot2::theme_minimal()
+        ggplot2::theme_classic() +
+        ggplot2::theme(
+          panel.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+          plot.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+          legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+          legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA),
+          axis.line.x = ggplot2::element_blank(),
+          axis.title = ggplot2::element_blank(),
+          # plot.title = ggplot2::element_blank(),
+          axis.text = ggplot2::element_blank(),
+          axis.ticks = ggplot2::element_blank()
+        )
 
       # shinyWidgets::updateProgressBar(
       #   session = session, id = 'info_data_prep',
@@ -454,19 +464,13 @@ mod_info <- function(
   )
 
   # outputs
-  output$info_plot <- shiny::renderPlot({
-    plot_and_table()$info_plot
-  })
+  output$info_plot <- shiny::renderPlot({plot_and_table()$info_plot}, bg = 'transparent')
 
-  output$info_table <- gt::render_gt({
-    plot_and_table()$info_table
-  })
+  output$info_table <- gt::render_gt({plot_and_table()$info_table})
 
   # reactives to return the close button
   info_reactives <- shiny::reactiveValues()
-  shiny::observe({
-    info_reactives$close <- input$close
-  })
+  shiny::observe({info_reactives$close <- input$close})
 
   return(info_reactives)
 }
