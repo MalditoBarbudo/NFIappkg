@@ -3,6 +3,8 @@
 #' @description A shiny module to generate the base IFN plots table
 #'
 #' @param id shiny id
+#' @param nfidb pool object to access the database
+#' @param lang lang value
 #'
 #' @export
 mod_tableOutput <- function(id) {
@@ -19,19 +21,18 @@ mod_tableOutput <- function(id) {
           # shiny::br(),
           shinyWidgets::pickerInput(
             ns('col_vis_selector'),
-            # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
-            label = 'Choose the variables to show',
+            label = '',
             choices = '', multiple = TRUE,
             width = '90%',
             options = list(
               `actions-box` = FALSE,
-              `deselect-all-text` = 'None selected...',
-              `select-all-text` = 'All selected',
+              # `deselect-all-text` = text_translate('deselect-all-text', lang, nfidb),
+              # `select-all-text` = text_translate('select-all-text', lang, nfidb),
               `selected-text-format` = 'count',
-              `count-selected-text` = "{0} variables selected (of {1})",
+              # `count-selected-text` = text_translate('count-selected-text-value', lang, nfidb),
               `size` = 15,
               `max-options` = 50,
-              `max-options-text` = 'Select limit reached (50)',
+              # `max-options-text` = text_translate('max-options-text', lang, nfidb),
               `live-search` = TRUE
             )
           )
@@ -42,7 +43,6 @@ mod_tableOutput <- function(id) {
           # shiny::p('Data info'),
           shinyWidgets::actionBttn(
             ns('show_hri'),
-            'Info',
             style = 'material-circle',
             icon = shiny::icon('info-circle'),
             color = 'primary', size = 'sm'
@@ -137,36 +137,36 @@ mod_table <- function(
     return(res)
   }))
 
-  # update the column visibility input
-  shiny::observeEvent(
-    eventExpr = table_data(),
-    handlerExpr = {
-      col_vis_choices <- names(table_data())
+  # update the col vis selector input
+  shiny::observe({
+    col_vis_choices <- names(table_data())
+    lang <- lang()
 
-      if (data_inputs$viz_shape == 'polygon') {
-        summ <- TRUE
-      } else {
-        summ <- FALSE
-      }
+    shiny::validate(
+      shiny::need(data_inputs$viz_shape, 'no data'),
+      shiny::need(col_vis_choices, 'no data')
+    )
 
-      shinyWidgets::updatePickerInput(
-        session = session, 'col_vis_selector',
-        label = text_translate('col_vis_selector_input', lang(), nfidb),
-        choices = var_names_input_builder(col_vis_choices, lang(), nfidb, summ) %>% sort(),
-        selected = col_vis_choices[1:7]
-      )
+    if (data_inputs$viz_shape == 'polygon') {
+      summ <- TRUE
+    } else {
+      summ <- FALSE
     }
-  )
 
-  # apply_table <- shiny::callModule(
-  #   mod_applyButton, 'mod_applyButtonInput_table'
-  # )
+    shinyWidgets::updatePickerInput(
+      session = session, 'col_vis_selector',
+      label = text_translate('col_vis_selector_input', lang, nfidb),
+      choices = var_names_input_builder(col_vis_choices, lang, nfidb, summ) %>% sort(),
+      selected = col_vis_choices[1:7]
+    )
+  })
 
   # reactive to build the DT
   build_table <- shiny::reactive({
 
     shiny::validate(
-      shiny::need(length(input$col_vis_selector) > 0, 'No data to show')
+      shiny::need(length(input$col_vis_selector) > 0, 'No data to show'),
+      shiny::need(data_inputs$viz_shape, 'no data')
     )
 
     if (data_inputs$viz_shape == 'polygon') {
@@ -195,7 +195,7 @@ mod_table <- function(
           initComplete = DT::JS(
             "function(settings, json) {",
             "$(this.api().table().header()).css({'font-family': 'Montserrat'});",
-            "$(this.api().table().body()).css({'font-family': 'Montserrat'});",
+            "$(this.api().table().body()).css({'font-family': 'Hack'});",
             "}"
           )
         )
@@ -204,17 +204,6 @@ mod_table <- function(
         columns = numeric_vars,
         digits = 2
       )
-   # for (var in numeric_vars) {
-   #   basic_table <- basic_table %>%
-   #     DT::formatStyle(
-   #       columns = var,
-   #       background = DT::styleColorBar(table_data()[[var]],'#3fc380', 90),
-   #       backgroundSize = '98% 88%',
-   #       backgroundRepeat = 'no-repeat',
-   #       backgroundPosition = 'center'
-   #     )
-   # }
-
    return(basic_table)
   })
 

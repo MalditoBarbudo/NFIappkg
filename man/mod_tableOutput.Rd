@@ -22,6 +22,10 @@ mod_table(input, output, session, data_inputs, map_inputs, nfidb, lang)
 
 \item{map_inputs}{reactive with the mod_map inputs, included main_data}
 
+\item{nfidb}{pool object to access the database}
+
+\item{lang}{lang value}
+
 \item{nfidb}{db pool}
 
 \item{lang}{lang value}

@@ -124,12 +124,12 @@ nfi_app <- function(user = 'guest', password = 'guest') {
           class = 'inner',
           mod_tableOutput('mod_tableOutput')
         )
-      ),
+      )#,
 
       # Alometrias tab
-      shiny::tabPanel(
-        'Allometries'
-      )
+      # shiny::tabPanel(
+      #   'Allometries'
+      # )
     )
   )
 
@@ -184,6 +184,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
       data_reactives, map_reactives, nfidb, lang
     )
 
+    # show/hide infopanel
     shiny::observeEvent(
       eventExpr = map_reactives$map_shape_click,
       handlerExpr = {
@@ -216,7 +217,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
       ## on stop routine to cloose the db pool
       shiny::onStop(function() {
-        pool::poolClose(nfidb)
+        tidyNFI::nfi_close(nfidb)
       })
     }
   )

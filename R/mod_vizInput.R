@@ -201,8 +201,6 @@ mod_viz <- function(
       selected_col <- 'density_balance'
     }
 
-    # browser()
-
     # update the pickerInput
     shinyWidgets::updatePickerInput(
       session, 'viz_color',
