@@ -168,11 +168,12 @@ mod_dataInput <- function(id, nfidb) {
 #' @param session internal
 #'
 #' @param nfidb pool object to access the nfi db
+#' @param var_thes variables thesaurus df
 #'
 #' @export
 mod_data <- function(
   input, output, session,
-  nfidb
+  nfidb, var_thes
 ) {
 
   # reactive values to return and use in other modules
@@ -198,12 +199,12 @@ mod_data <- function(
 
   viz_reactives <- shiny::callModule(
     mod_viz, 'mod_vizInput',
-    data_inputs, nfidb
+    data_inputs, nfidb, var_thes
   )
 
   filters_reactives <- shiny::callModule(
     mod_filters, 'mod_filtersUI',
-    nfidb, data_inputs
+    nfidb, data_inputs, var_thes
   )
 
   # observer to get the filter expressions and the buttons actions

@@ -108,13 +108,14 @@ mod_vizInput <- function(id, nfidb) {
 #'
 #' @param data_inputs reactive with the reactive data and the data inputs
 #' @param nfidb pool object to access nfi db
+#' @param var_thes variables thesaurus df
 #'
 #' @export
 #'
 #' @rdname mod_vizUI
 mod_viz <- function(
   input, output, session,
-  data_inputs, nfidb
+  data_inputs, nfidb, var_thes
 ) {
 
   tables_to_look_at <- shiny::reactive({
@@ -185,7 +186,7 @@ mod_viz <- function(
     # update the pickerInput
     shinyWidgets::updatePickerInput(
       session, 'viz_color',
-      choices = var_names_input_builder(color_choices, 'eng', nfidb) %>% sort(),
+      choices = var_names_input_builder(color_choices, 'eng', var_thes) %>% sort(),
       label = 'Color:',
       selected = selected_col
     )
@@ -199,7 +200,7 @@ mod_viz <- function(
       # update the pickerInput
       shinyWidgets::updatePickerInput(
         session, 'viz_size',
-        choices = c('', var_names_input_builder(size_choices, 'eng', nfidb) %>% sort()),
+        choices = c('', var_names_input_builder(size_choices, 'eng', var_thes) %>% sort()),
         label = 'Size:'
       )
 

@@ -7,7 +7,7 @@
 \usage{
 mod_filtersUI(id, nfidb)
 
-mod_filters(input, output, session, nfidb, data_inputs)
+mod_filters(input, output, session, nfidb, data_inputs, var_thes)
 }
 \arguments{
 \item{id}{shiny id}
@@ -22,6 +22,8 @@ mod_filters(input, output, session, nfidb, data_inputs)
 
 \item{data_inputs}{reactives from the data_inputsInput module, to know about which scenario
 we are}
+
+\item{var_thes}{variables thesaurus df}
 
 \item{nfidb}{pool object to access the nfi db}
 }

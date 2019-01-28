@@ -29,7 +29,7 @@ hri_builder <- function(data_inputs) {
   )
 }
 
-var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
+var_names_input_builder <- function(vars, lang, var_thes, summ = FALSE) {
 
   if (summ) {
 
@@ -37,7 +37,7 @@ var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
     vars_stat <- stringr::str_extract(vars, '_mean$|_se$|_min$|_max$|_n$') %>%
       stringr::str_remove('_')
 
-    vars_trans <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+    vars_trans <- var_thes %>%
       dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%
       dplyr::filter(var_id %in% vars_id) %>%
       dplyr::distinct() %>%
@@ -58,7 +58,7 @@ var_names_input_builder <- function(vars, lang, nfidb, summ = FALSE) {
     names(vars) <- vars_names
 
   } else {
-    vars_trans <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
+    vars_trans <- var_thes %>%
       dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%
       dplyr::filter(var_id %in% vars) %>%
       dplyr::distinct() %>%

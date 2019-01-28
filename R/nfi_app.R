@@ -8,6 +8,9 @@ nfi_app <- function(user = 'guest', password = 'guest') {
   ### DB access ################################################################
   nfidb <- tidyNFI::nfi_connect(user = user, password = password)
 
+  ### Variables names inter ####################################################
+  var_thes <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>% dplyr::collect()
+
   ## UI ####
   ui <- shiny::tagList(
 
@@ -104,19 +107,19 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # data inputs
     data_reactives <- shiny::callModule(
       mod_data, 'mod_dataInput',
-      nfidb
+      nfidb, var_thes
     )
 
     # map
     map_reactives <- shiny::callModule(
       mod_map, 'mod_mapUI',
-      data_reactives, nfidb
+      data_reactives, nfidb, var_thes
     )
 
     # info panel
     info_reactives <- shiny::callModule(
       mod_info, 'mod_infoUI',
-      map_reactives, data_reactives, nfidb
+      map_reactives, data_reactives, nfidb, var_thes
     )
 
     # saveMap panel
@@ -128,7 +131,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # table
     shiny::callModule(
       mod_table, 'mod_tableOutput',
-      data_reactives, map_reactives, nfidb
+      data_reactives, map_reactives, nfidb, var_thes
     )
 
     shiny::observeEvent(

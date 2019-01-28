@@ -135,58 +135,104 @@ mod_tableOutput <- function(id) {
 #' @param data_inputs reactive with the reactive data and the data inputs
 #' @param map_inputs reactive with the mod_map inputs, included main_data
 #' @param nfidb db pool
+#' @param var_thes variables thesaurus df
 #'
 #' @export
 #'
 #' @rdname mod_tableOutput
 mod_table <- function(
   input, output, session,
-  data_inputs, map_inputs, nfidb
+  data_inputs, map_inputs, nfidb, var_thes
 ) {
+
+  # table data from map_inputs, but only updated when apply button is pressed
+  table_data <- shiny::eventReactive(
+    ignoreNULL = FALSE, ignoreInit = FALSE,
+    eventExpr = data_inputs$apply_data,
+    valueExpr = {
+      viz_shape <- shiny::isolate({data_inputs$viz_shape})
+
+      if (any(is.null(viz_shape), is.null(map_inputs$main_data))) {
+        return()
+      }
+
+      if (viz_shape == 'plot') {
+        if (is.null(map_inputs$main_data[['selected']])) {
+          return()
+        } else {
+          # start the progress
+          # shinyWidgets::progressSweetAlert(
+          #   session = session, id = 'table_build_progress',
+          #   title = 'Preparing table data', value = 75,
+          #   display_pct = TRUE
+          # )
+          res <- map_inputs$main_data[['selected']] #%>%
+          # dplyr::collect()
+          # shinyWidgets::closeSweetAlert(session = session)
+        }
+      } else {
+        if (is.null(map_inputs$main_data[['summarised']])) {
+          return()
+        } else {
+          # start the progress
+          # shinyWidgets::progressSweetAlert(
+          #   session = session, id = 'table_build_progress',
+          #   title = 'Preparing table data', value = 75,
+          #   display_pct = TRUE
+          # )
+          res <- map_inputs$main_data[['summarised']] %>%
+            dplyr::ungroup() #%>%
+          # dplyr::collect()
+          # shinyWidgets::closeSweetAlert(session = session)
+        }
+      }
+      return(res)
+    }
+  )
 
   # we need the data based on the viz shape selected (selected for plots,
   # summarised for polygons). All of this with a dedupe function, as it is
   # really expensive and we want to do it only when really necessary
-  table_data <- dedupe(shiny::reactive({
-
-    viz_shape <- shiny::isolate({data_inputs$viz_shape})
-
-    if (any(is.null(viz_shape), is.null(map_inputs$main_data))) {
-      return()
-    }
-
-    if (viz_shape == 'plot') {
-      if (is.null(map_inputs$main_data[['selected']])) {
-        return()
-      } else {
-        # start the progress
-        # shinyWidgets::progressSweetAlert(
-        #   session = session, id = 'table_build_progress',
-        #   title = 'Preparing table data', value = 75,
-        #   display_pct = TRUE
-        # )
-        res <- map_inputs$main_data[['selected']] #%>%
-          # dplyr::collect()
-        # shinyWidgets::closeSweetAlert(session = session)
-      }
-    } else {
-      if (is.null(map_inputs$main_data[['summarised']])) {
-        return()
-      } else {
-        # start the progress
-        # shinyWidgets::progressSweetAlert(
-        #   session = session, id = 'table_build_progress',
-        #   title = 'Preparing table data', value = 75,
-        #   display_pct = TRUE
-        # )
-        res <- map_inputs$main_data[['summarised']] %>%
-          dplyr::ungroup() #%>%
-          # dplyr::collect()
-        # shinyWidgets::closeSweetAlert(session = session)
-      }
-    }
-    return(res)
-  }))
+  # table_data <- dedupe(shiny::reactive({
+  #
+  #   viz_shape <- shiny::isolate({data_inputs$viz_shape})
+  #
+  #   if (any(is.null(viz_shape), is.null(map_inputs$main_data))) {
+  #     return()
+  #   }
+  #
+  #   if (viz_shape == 'plot') {
+  #     if (is.null(map_inputs$main_data[['selected']])) {
+  #       return()
+  #     } else {
+  #       # start the progress
+  #       # shinyWidgets::progressSweetAlert(
+  #       #   session = session, id = 'table_build_progress',
+  #       #   title = 'Preparing table data', value = 75,
+  #       #   display_pct = TRUE
+  #       # )
+  #       res <- map_inputs$main_data[['selected']] #%>%
+  #         # dplyr::collect()
+  #       # shinyWidgets::closeSweetAlert(session = session)
+  #     }
+  #   } else {
+  #     if (is.null(map_inputs$main_data[['summarised']])) {
+  #       return()
+  #     } else {
+  #       # start the progress
+  #       # shinyWidgets::progressSweetAlert(
+  #       #   session = session, id = 'table_build_progress',
+  #       #   title = 'Preparing table data', value = 75,
+  #       #   display_pct = TRUE
+  #       # )
+  #       res <- map_inputs$main_data[['summarised']] %>%
+  #         dplyr::ungroup() #%>%
+  #         # dplyr::collect()
+  #       # shinyWidgets::closeSweetAlert(session = session)
+  #     }
+  #   }
+  #   return(res)
+  # }))
 
   # update the column visibility input
   shiny::observeEvent(
@@ -203,8 +249,8 @@ mod_table <- function(
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
         label = 'Choose the variables to show',
-        # choices = var_names_input_builder(col_vis_choices, 'eng', nfidb),
-        choices = var_names_input_builder(col_vis_choices, 'eng', nfidb, summ) %>% sort(),
+        # choices = var_names_input_builder(col_vis_choices, 'eng', var_thes),
+        choices = var_names_input_builder(col_vis_choices, 'eng', var_thes, summ) %>% sort(),
         selected = col_vis_choices[1:7]
       )
     }
@@ -221,7 +267,7 @@ mod_table <- function(
       shiny::need(length(input$col_vis_selector) > 0, 'No data to show')
     )
 
-    if (data_inputs$viz_shape == 'polygon') {
+    if (shiny::isolate(data_inputs$viz_shape) == 'polygon') {
       summ <- TRUE
     } else {
       summ <- FALSE
@@ -237,7 +283,7 @@ mod_table <- function(
       # dplyr::mutate_if(is.character, forcats::as_factor) %>%
       DT::datatable(
         rownames = FALSE,
-        colnames = names(var_names_input_builder(names(.), 'eng', nfidb, summ)),
+        colnames = names(var_names_input_builder(names(.), 'eng', var_thes, summ)),
         class = 'hover order-column stripe nowrap',
         filter = list(position = 'top', clear = FALSE, plain = FALSE),
         options = list(

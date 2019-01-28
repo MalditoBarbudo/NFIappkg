@@ -4,7 +4,7 @@
 \alias{mod_data}
 \title{mod_data server function}
 \usage{
-mod_data(input, output, session, nfidb)
+mod_data(input, output, session, nfidb, var_thes)
 }
 \arguments{
 \item{input}{internal}
@@ -14,6 +14,8 @@ mod_data(input, output, session, nfidb)
 \item{session}{internal}
 
 \item{nfidb}{pool object to access the nfi db}
+
+\item{var_thes}{variables thesaurus df}
 }
 \description{
 mod_data server function

@@ -47,11 +47,12 @@ mod_infoUI <- function(id) {
 #' @param map_inputs map module reactives, including returned data
 #' @param data_inputs data inputs module reactives
 #' @param nfidb pool object with the db connection
+#' @param var_thes variables thesaurus df
 #'
 #' @export
 mod_info <- function(
   input, output, session,
-  map_inputs, data_inputs, nfidb
+  map_inputs, data_inputs, nfidb, var_thes
 ) {
 
   prep_data <- dedupe(shiny::reactive({
@@ -370,7 +371,7 @@ mod_info <- function(
         tidyr::gather('Characteristics', 'Value') %>%
         dplyr::mutate(
           Characteristics = names(var_names_input_builder(
-            stringr::str_remove(.$Characteristics, '_mean'), 'eng', nfidb)
+            stringr::str_remove(.$Characteristics, '_mean'), 'eng', var_thes)
           )
         ) %>%
         gt::gt(rowname_col = 'Characteristics') %>%

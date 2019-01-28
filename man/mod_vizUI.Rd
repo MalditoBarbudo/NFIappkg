@@ -4,7 +4,7 @@
 \alias{mod_viz}
 \title{mod_viz server function}
 \usage{
-mod_viz(input, output, session, data_inputs, nfidb)
+mod_viz(input, output, session, data_inputs, nfidb, var_thes)
 }
 \arguments{
 \item{input}{internal}
@@ -16,6 +16,8 @@ mod_viz(input, output, session, data_inputs, nfidb)
 \item{data_inputs}{reactive with the reactive data and the data inputs}
 
 \item{nfidb}{pool object to access nfi db}
+
+\item{var_thes}{variables thesaurus df}
 }
 \description{
 mod_viz server function

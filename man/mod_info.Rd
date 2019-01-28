@@ -4,7 +4,7 @@
 \alias{mod_info}
 \title{mod_info server function}
 \usage{
-mod_info(input, output, session, map_inputs, data_inputs, nfidb)
+mod_info(input, output, session, map_inputs, data_inputs, nfidb, var_thes)
 }
 \arguments{
 \item{input}{internal}
@@ -18,6 +18,8 @@ mod_info(input, output, session, map_inputs, data_inputs, nfidb)
 \item{data_inputs}{data inputs module reactives}
 
 \item{nfidb}{pool object with the db connection}
+
+\item{var_thes}{variables thesaurus df}
 }
 \description{
 mod_info server function
