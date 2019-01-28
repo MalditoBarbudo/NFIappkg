@@ -89,16 +89,9 @@ mod_info <- function(
           admin_sel, viz_sel, viz_size, 'diamclass_id', fg_id,
           'topo_altitude_asl_mean', 'topo_fdm_slope_percentage_mean',
           'clim_tmean_year_mean', 'clim_prec_year_mean', 'clim_pet_year_mean'
-        )) #%>%
-        # dplyr::collect()
-
-      # shinyWidgets::updateProgressBar(
-      #   session = session, id = 'info_data_prep',
-      #   value = 75
-      # )
+        ))
     }
 
-    # shinyWidgets::closeSweetAlert(session = session)
     return(prep_data)
   }))
 
@@ -314,12 +307,12 @@ mod_info <- function(
         tidyr::gather('Characteristics', 'Value') %>%
         dplyr::mutate(
           Characteristics = names(var_names_input_builder(
-            stringr::str_remove(.$Characteristics, '_mean'), 'eng', var_thes, texts_thes)
+            stringr::str_remove(.$Characteristics, '_mean'), lang(), var_thes, texts_thes)
           )
         ) %>%
         gt::gt(rowname_col = 'Characteristics') %>%
         gt::tab_header(
-          title = glue::glue('General info for {click$id}:')
+          title = glue::glue(text_translate("info_tab_header", lang(), nfidb))
         ) %>%
         gt::tab_options(
           table.background.color = 'transparent',
