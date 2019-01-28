@@ -6,7 +6,7 @@
 #' @param nfidb pool object to access the nfi db
 #'
 #' @export
-mod_filtersUI <- function(id, nfidb) {
+mod_filtersUI <- function(id, nfidb, lang, texts_thes) {
 
   # ns
   ns <- shiny::NS(id)
@@ -18,15 +18,15 @@ mod_filtersUI <- function(id, nfidb) {
         4,
         shinyWidgets::pickerInput(
           ns('fil_res_vars'),
-          'Results filters',
+          text_translate('fil_res_vars_input', lang, texts_thes),
           choices = '',
           multiple = TRUE,
           options = list(
             `actions-box` = TRUE,
-            `deselect-all-text` = 'None selected...',
-            `select-all-text` = 'All selected',
+            `deselect-all-text` = text_translate('deselect-all-text', lang, texts_thes),
+            `select-all-text` = text_translate('select-all-text', lang, texts_thes),
             `selected-text-format` = 'count > 3',
-            `count-selected-text` = "{0} variables selected (of {1})",
+            `count-selected-text` = text_translate('count-selected-text-var', lang, texts_thes),
             `size` = 10
           )
         )
@@ -35,15 +35,15 @@ mod_filtersUI <- function(id, nfidb) {
         4,
         shinyWidgets::pickerInput(
           ns('fil_clim_vars'),
-          'Climatic filters',
+          text_translate('fil_clim_vars_input', lang, texts_thes),
           choices = '',
           multiple = TRUE,
           options = list(
             `actions-box` = TRUE,
-            `deselect-all-text` = 'None selected...',
-            `select-all-text` = 'All selected',
+            `deselect-all-text` = text_translate('deselect-all-text', lang, texts_thes),
+            `select-all-text` = text_translate('select-all-text', lang, texts_thes),
             `selected-text-format` = 'count > 3',
-            `count-selected-text` = "{0} variables selected (of {1})",
+            `count-selected-text` = text_translate('count-selected-text-var', lang, texts_thes),
             `size` = 10
           )
         )
@@ -52,15 +52,15 @@ mod_filtersUI <- function(id, nfidb) {
         4,
         shinyWidgets::pickerInput(
           ns('fil_plot_vars'),
-          'Other filters',
+          text_translate('fil_plot_vars_input', lang, texts_thes),
           choices = '',
           multiple = TRUE,
           options = list(
             `actions-box` = TRUE,
-            `deselect-all-text` = 'None selected...',
-            `select-all-text` = 'All selected',
+            `deselect-all-text` = text_translate('deselect-all-text', lang, texts_thes),
+            `select-all-text` = text_translate('select-all-text', lang, texts_thes),
             `selected-text-format` = 'count > 3',
-            `count-selected-text` = "{0} variables selected (of {1})",
+            `count-selected-text` = text_translate('count-selected-text-var', lang, texts_thes),
             `size` = 10
           )
         )
@@ -87,7 +87,7 @@ mod_filtersUI <- function(id, nfidb) {
 #' @rdname mod_filtersUI
 mod_filters <- function(
   input, output, session,
-  nfidb, data_inputs, var_thes, texts_thes
+  nfidb, data_inputs, var_thes, texts_thes, lang
 ) {
 
   #### Filter vars and update picker ####
@@ -130,7 +130,8 @@ mod_filters <- function(
   # scenario
   vars_to_filter_by <- shiny::reactive({
 
-    # browser()
+    # activate if lang changes
+    lang <- lang()
 
     table_names <- tables_to_look_at()
     vars_overall <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>%
@@ -167,8 +168,8 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_res_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$res_vars, 'eng', var_thes, texts_thes) %>% sort(),
-        label = 'Results filters'
+        choices = var_names_input_builder(vars_to_filter_by()$res_vars, lang(), var_thes, texts_thes) %>% sort(),
+        label = text_translate('fil_res_vars_input', lang(), texts_thes)
       )
     }
   )
@@ -177,8 +178,8 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_clim_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$climatic_vars, 'eng', var_thes, texts_thes) %>% sort(),
-        label = 'Climatic filters'
+        choices = var_names_input_builder(vars_to_filter_by()$climatic_vars, lang(), var_thes, texts_thes) %>% sort(),
+        label = text_translate('fil_clim_vars_input', lang(), texts_thes)
       )
     }
   )
@@ -187,8 +188,8 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_plot_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$plot_vars, 'eng', var_thes, texts_thes) %>% sort(),
-        label = 'Other filters'
+        choices = var_names_input_builder(vars_to_filter_by()$plot_vars, lang(), var_thes, texts_thes) %>% sort(),
+        label = text_translate('fil_plot_vars_input', lang(), texts_thes)
       )
     }
   )
@@ -234,15 +235,15 @@ mod_filters <- function(
                 dplyr::pull(var_values)
 
               shinyWidgets::pickerInput(
-                ns(var), label = names(var_names_input_builder(var, 'eng', var_thes, texts_thes)),
+                ns(var), label = names(var_names_input_builder(var, lang(), var_thes, texts_thes)),
                 choices = var_values,
                 selected = var_values[1], multiple = TRUE,
                 options = list(
                   `actions-box` = TRUE,
-                  `deselect-all-text` = 'None selected...',
-                  `select-all-text` = 'All selected',
+                  `deselect-all-text` = text_translate('deselect-all-text', lang(), texts_thes),
+                  `select-all-text` = text_translate('select-all-text', lang(), texts_thes),
                   `selected-text-format` = 'count',
-                  `count-selected-text` = "{0} values selected (of {1})",
+                  `count-selected-text` = text_translate('count-selected-text-value', lang(), texts_thes),
                   `size` = 10
                 )
               )
@@ -256,7 +257,7 @@ mod_filters <- function(
                   dplyr::collect()
 
                 shiny::sliderInput(
-                  ns(var), label = names(var_names_input_builder(var, 'eng', var_thes, texts_thes)),
+                  ns(var), label = names(var_names_input_builder(var, lang(), var_thes, texts_thes)),
                   min = var_values[['var_min']],
                   max = var_values[['var_max']],
                   value = c(var_values[['var_min']], var_values[['var_max']]),
@@ -300,7 +301,7 @@ mod_filters <- function(
     # return the inputs as a tagList
     shiny::tagList(
       shiny::hr(),
-      shiny::tags$strong('Filter the data:'),
+      shiny::tags$strong(text_translate('filter_the_data', lang(), texts_thes)),
       shiny::br(), shiny::br(),
       filters_inputs()
     )

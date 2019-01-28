@@ -12,6 +12,16 @@ nfi_app <- function(user = 'guest', password = 'guest') {
   var_thes <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>% dplyr::collect()
   texts_thes <- dplyr::tbl(nfidb, 'TEXTS_THESAURUS') %>% dplyr::collect()
 
+  ### Language input ###########################################################
+  shiny::addResourcePath(
+    'images', system.file('resources', 'images', package = 'NFIappkg')
+  )
+  lang_choices <- c('spa', 'eng')
+  lang_flags <- c(
+    glue::glue("<img class='flag-image' src='images/spa.png' width=20px><div class='flag-lang'>%s</div></img>"),
+    glue::glue("<img class='flag-image' src='images/eng.png' width=20px><div class='flag-lang'>%s</div></img>")
+  )
+
   ## UI ####
   ui <- shiny::tagList(
 
@@ -19,11 +29,26 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     shinyWidgets::chooseSliderSkin(skin = "Shiny", color = '#0DB3D4'),
     shinyWidgets::useSweetAlert(),
 
-    shiny::navbarPage(
+    navbarPageWithInputs(
       # opts
       title = 'NFI app',
       id = 'nav',
       collapsible = TRUE,
+
+      # navbar with inputs (helpers.R) accepts an input argument, we use it for the lang
+      # selector
+      inputs = shinyWidgets::pickerInput(
+        'lang', NULL,
+        choices = c('spa', 'eng'),
+        selected = 'eng',
+        width = '100px',
+        choicesOpt = list(
+          content = c(
+            sprintf(lang_flags[1], lang_choices[1]),
+            sprintf(lang_flags[2], lang_choices[2])
+          )
+        )
+      ),
 
       # contents
       shiny::tabPanel(
@@ -103,12 +128,17 @@ nfi_app <- function(user = 'guest', password = 'guest') {
   ## SERVER ####
   server <- function(input, output, session) {
 
+    # lang reactive
+    lang <- shiny::reactive({
+      input$lang
+    })
+
     ## module calling ####
 
     # data inputs
     data_reactives <- shiny::callModule(
       mod_data, 'mod_dataInput',
-      nfidb, var_thes, texts_thes
+      nfidb, var_thes, texts_thes, lang
     )
 
     # map

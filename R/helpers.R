@@ -101,3 +101,17 @@ var_names_input_builder <- function(vars, lang, var_thes, texts_thes, summ = FAL
 
   return(vars[!is.na(names(vars))])
 }
+
+# Call this function with an input (such as `textInput("text", NULL, "Search")`) if you
+# want to add an input to the navbar
+navbarPageWithInputs <- function(..., inputs) {
+  navbar <- shiny::navbarPage(...)
+  form <- shiny::tags$form(class = "navbar-form", inputs)
+
+  # browser()
+
+  navbar[[3]][[1]]$children[[1]]$children[[2]] <- htmltools::tagAppendChild(
+    navbar[[3]][[1]]$children[[1]]$children[[2]], form
+  )
+  navbar
+}

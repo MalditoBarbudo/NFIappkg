@@ -121,3 +121,24 @@ div.table_container {
   padding: 6px 10px 6px 10px;
   border-radius: 8px;
 }
+
+/* language selector */
+.navbar-form {
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+
+.navbar-form > .form-group {
+  position: fixed;
+  right: 25px;
+}
+
+.flag-lang {
+  display: inline;
+  vertical-align: middle;
+  padding-left: 10px;
+}
+
+.flag-image {
+  border-radius: 50%;
+}

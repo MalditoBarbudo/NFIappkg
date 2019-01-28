@@ -4,21 +4,24 @@
 #'
 #' @param id shiny id
 #' @param nfidb pool object to access nfi db
+#' @param lang lang value
+#' @param text_thes textsx thesaurus df
 #'
 #' @export
-mod_vizInput <- function(id, nfidb) {
+mod_vizInput <- function(id, nfidb, lang, texts_thes) {
 
   # ns
   ns <- shiny::NS(id)
 
   ## precalculated choices
-  statistic_choices <- c(
-    'Mean' = '_mean',
-    'SE' = '_se',
-    'Min' = '_min',
-    'Max' = '_max',
-    'Number' = '_n'
-  )
+  statistic_choices <- c('_mean', '_se', '_min', '_max', '_n') %>%
+    magrittr::set_names(c(
+      text_translate('mean_stat', lang, texts_thes),
+      text_translate('se_stat', lang, texts_thes),
+      text_translate('min_stat', lang, texts_thes),
+      text_translate('max_stat', lang, texts_thes),
+      text_translate('n_stat', lang, texts_thes)
+    ))
 
   # diameter_classes_choices <- seq(10, 70, 5) %>% as.character()
 
@@ -30,7 +33,7 @@ mod_vizInput <- function(id, nfidb) {
         8,
         shinyWidgets::pickerInput(
           ns('viz_color'),
-          'Color:',
+          text_translate('viz_color_input', lang, texts_thes),
           choices = 'density',
           options = list(
             `size` = 10
@@ -40,7 +43,7 @@ mod_vizInput <- function(id, nfidb) {
         # size
         shinyjs::hidden(
           shinyWidgets::pickerInput(
-            ns('viz_size'), 'Size:',
+            ns('viz_size'), text_translate('viz_size_input', lang, texts_thes),
             choices = '',
             options = list(
               `size` = 10
@@ -49,11 +52,15 @@ mod_vizInput <- function(id, nfidb) {
         ),
 
         # statistic
-        shinyjs::hidden(
-          shinyWidgets::pickerInput(
-            ns('viz_statistic'), 'Statistic:',
-            choices = statistic_choices
-          )
+        # shinyjs::hidden(
+        #   shinyWidgets::pickerInput(
+        #     ns('viz_statistic'), text_translate('viz_statistic_input', lang, texts_thes),
+        #     choices = statistic_choices
+        #   )
+        # ),
+        shinyWidgets::pickerInput(
+          ns('viz_statistic'), text_translate('viz_statistic_input', lang, texts_thes),
+          choices = statistic_choices
         ),
 
         # functional group value
@@ -70,7 +77,7 @@ mod_vizInput <- function(id, nfidb) {
         # diameter class to visualize
         shinyjs::hidden(
           shinyWidgets::pickerInput(
-            ns('viz_diamclass'), 'Diameter class to visualize:',
+            ns('viz_diamclass'), text_translate('viz_diamclass_input', lang, texts_thes),
             choices = '10'
           )
         )
@@ -80,18 +87,19 @@ mod_vizInput <- function(id, nfidb) {
         # low, normal or high palette
         shinyWidgets::radioGroupButtons(
           ns('viz_pal_config'),
-          'Config palette', size = 'sm',
-          choices = c(
-            'Discriminate lower vales' = 'low',
-            'Normal' = 'normal',
-            'Discriminate higher vales' = 'high'
-          ),
+          text_translate('viz_pal_config_input', lang, texts_thes),, size = 'sm',
+          choices = c('low', 'normal', 'high') %>%
+            magrittr::set_names(c(
+              text_translate('pal_low', lang, texts_thes),
+              text_translate('pal_normal', lang, texts_thes),
+              text_translate('pal_high', lang, texts_thes)
+            )),
           selected = 'normal', direction = 'vertical', status = 'warning'
         ),
         # reverse palette
         shinyWidgets::awesomeCheckbox(
           ns('viz_reverse_pal'),
-          label = 'Reverse the palette?',
+          label = text_translate('viz_reverse_pal_input', lang, texts_thes),
           value = FALSE, status = 'info'
         )
       )
@@ -109,13 +117,14 @@ mod_vizInput <- function(id, nfidb) {
 #' @param data_inputs reactive with the reactive data and the data inputs
 #' @param nfidb pool object to access nfi db
 #' @param var_thes variables thesaurus df
+#' @param lang lang value
 #'
 #' @export
 #'
 #' @rdname mod_vizUI
 mod_viz <- function(
   input, output, session,
-  data_inputs, nfidb, var_thes, texts_thes
+  data_inputs, nfidb, var_thes, texts_thes, lang
 ) {
 
   tables_to_look_at <- shiny::reactive({
@@ -195,8 +204,8 @@ mod_viz <- function(
     # update the pickerInput
     shinyWidgets::updatePickerInput(
       session, 'viz_color',
-      choices = var_names_input_builder(color_choices, 'eng', var_thes, texts_thes) %>% sort(),
-      label = 'Color:',
+      choices = var_names_input_builder(color_choices, lang(), var_thes, texts_thes) %>% sort(),
+      label = text_translate('viz_color_input', lang(), texts_thes),
       selected = selected_col
     )
   })
@@ -214,8 +223,8 @@ mod_viz <- function(
       # update the pickerInput
       shinyWidgets::updatePickerInput(
         session, 'viz_size',
-        choices = c('', var_names_input_builder(size_choices, 'eng', var_thes, texts_thes) %>% sort()),
-        label = 'Size:'
+        choices = c('', var_names_input_builder(size_choices, lang(), var_thes, texts_thes) %>% sort()),
+        label = text_translate('viz_size_input', lang(), texts_thes)
       )
 
       # show and enable
@@ -266,7 +275,7 @@ mod_viz <- function(
       shinyWidgets::updatePickerInput(
         session, 'viz_functional_group_value',
         choices = viz_functional_group_value_choices,
-        label = glue::glue("{functional_group} to visualize:")
+        label = glue::glue(text_translate('viz_functional_group_value_input', lang(), texts_thes))
       )
       shinyjs::show('viz_functional_group_value')
     } else {
@@ -293,7 +302,7 @@ mod_viz <- function(
       shinyWidgets::updatePickerInput(
         session, 'viz_diamclass',
         choices = diameter_classes_choices,
-        label = glue::glue("Diameter class to visualize:")
+        label = glue::glue(text_translate('viz_diamclass_input', lang(), texts_thes))
       )
       shinyjs::show('viz_diamclass')
     } else {

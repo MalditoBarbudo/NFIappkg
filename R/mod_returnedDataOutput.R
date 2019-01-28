@@ -46,7 +46,6 @@ mod_returnedData <- function(
 
       # browser()
       nfi <- data_inputs$nfi
-      viz_shape <- data_inputs$viz_shape
       admin_div <- data_inputs$admin_div
       functional_group <- data_inputs$functional_group
       diameter_classes <- data_inputs$diameter_classes
@@ -55,8 +54,8 @@ mod_returnedData <- function(
 
       shinyWidgets::progressSweetAlert(
         session = session, id = 'data_progress',
-        title = 'Retrieving data', value = 25,
-        display_pct = TRUE
+        title = 'Retrieving data. When diameter classes are selected this can take a while',
+        value = 25, display_pct = TRUE, striped = TRUE
       )
 
       # custom_polygon_fil_expr needs some extra checking:
@@ -137,18 +136,6 @@ mod_returnedData <- function(
         selected_data <- NULL
         summarised_data <- NULL
       } else {
-        # if (viz_shape == 'polygon') {
-        #   summarised_data <- selected_data %>%
-        #     tidyNFI::nfi_results_summarise(
-        #       polygon_group = admin_div,
-        #       functional_group = functional_group,
-        #       diameter_classes = diameter_classes,
-        #       conn = nfidb,
-        #       .collect = FALSE
-        #     )
-        # } else {
-        #   summarised_data <- selected_data
-        # }
         summarised_data <- selected_data %>%
           tidyNFI::nfi_results_summarise(
             polygon_group = admin_div,

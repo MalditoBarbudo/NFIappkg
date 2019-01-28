@@ -4,7 +4,7 @@
 \alias{mod_data}
 \title{mod_data server function}
 \usage{
-mod_data(input, output, session, nfidb, var_thes, texts_thes)
+mod_data(input, output, session, nfidb, var_thes, texts_thes, lang)
 }
 \arguments{
 \item{input}{internal}
@@ -16,6 +16,8 @@ mod_data(input, output, session, nfidb, var_thes, texts_thes)
 \item{nfidb}{pool object to access the nfi db}
 
 \item{var_thes}{variables thesaurus df}
+
+\item{lang}{lang value}
 }
 \description{
 mod_data server function

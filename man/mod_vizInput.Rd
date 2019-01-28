@@ -4,12 +4,16 @@
 \alias{mod_vizInput}
 \title{mod_vizInput and mod_viz}
 \usage{
-mod_vizInput(id, nfidb)
+mod_vizInput(id, nfidb, lang, texts_thes)
 }
 \arguments{
 \item{id}{shiny id}
 
 \item{nfidb}{pool object to access nfi db}
+
+\item{lang}{lang value}
+
+\item{text_thes}{textsx thesaurus df}
 }
 \description{
 A shiny module to generate and populate the visualization inputs

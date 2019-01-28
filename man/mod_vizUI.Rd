@@ -4,7 +4,7 @@
 \alias{mod_viz}
 \title{mod_viz server function}
 \usage{
-mod_viz(input, output, session, data_inputs, nfidb, var_thes, texts_thes)
+mod_viz(input, output, session, data_inputs, nfidb, var_thes, texts_thes, lang)
 }
 \arguments{
 \item{input}{internal}
@@ -18,6 +18,8 @@ mod_viz(input, output, session, data_inputs, nfidb, var_thes, texts_thes)
 \item{nfidb}{pool object to access nfi db}
 
 \item{var_thes}{variables thesaurus df}
+
+\item{lang}{lang value}
 }
 \description{
 mod_viz server function

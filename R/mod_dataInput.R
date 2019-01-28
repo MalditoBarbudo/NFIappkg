@@ -173,11 +173,12 @@ mod_dataInput <- function(id, nfidb) {
 #'
 #' @param nfidb pool object to access the nfi db
 #' @param var_thes variables thesaurus df
+#' @param lang lang value
 #'
 #' @export
 mod_data <- function(
   input, output, session,
-  nfidb, var_thes, texts_thes
+  nfidb, var_thes, texts_thes, lang
 ) {
 
   # renderUI
@@ -186,38 +187,45 @@ mod_data <- function(
     ns <- session$ns
 
     ## preacalculated choices ####
-    nfi_choices <- c(
-      'NFI v2' = 'nfi_2',
-      'NFI v3' = 'nfi_3',
-      'NFI v4' = 'nfi_4',
-      'NFI comp v2 - v3' = 'nfi_2_nfi_3',
-      'NFI comp v3 - v4' = 'nfi_3_nfi_4'
-    )
+    nfi_choices <- c('nfi_2', 'nfi_3', 'nfi_4', 'nfi_2_nfi_3', 'nfi_3_nfi_4') %>%
+      magrittr::set_names(c(
+        text_translate('nfi_2', lang(), texts_thes),
+        text_translate('nfi_3', lang(), texts_thes),
+        text_translate('nfi_4', lang(), texts_thes),
+        text_translate('nfi_2_nfi_3', lang(), texts_thes),
+        text_translate('nfi_3_nfi_4', lang(), texts_thes)
+      ))
 
-    viz_shape_choices <- c(
-      'Shapes' = 'polygon',
-      'Plots' = 'plot'
-    )
+    viz_shape_choices <- c('polygon', 'plot') %>%
+      magrittr::set_names(c(
+        text_translate('polygon', lang(), texts_thes),
+        text_translate('plot', lang(), texts_thes)
+      ))
 
     admin_div_choices <- c(
-      'Catalonia' = 'aut_community',
-      'Provinces' = 'province',
-      'Veguerias' = 'vegueria',
-      'Regions' = 'region',
-      'Municipalities' = 'municipality',
-      'Natural Interest Area' = 'natural_interest_area',
-      'Special Protection Natural Area' = 'special_protection_natural_area',
-      'Natura Network 2000' = 'natura_network_2000'
-    )
+      'aut_community', 'province', 'vegueria', 'region', 'municipality',
+      'natural_interest_area', 'special_protection_natural_area', 'natura_network_2000'
+    ) %>%
+      magrittr::set_names(c(
+        text_translate('aut_community', lang(), texts_thes),
+        text_translate('province', lang(), texts_thes),
+        text_translate('vegueria', lang(), texts_thes),
+        text_translate('region', lang(), texts_thes),
+        text_translate('municipality', lang(), texts_thes),
+        text_translate('natural_interest_area', lang(), texts_thes),
+        text_translate('special_protection_natural_area', lang(), texts_thes),
+        text_translate('natura_network_2000', lang(), texts_thes)
+      ))
 
-    functional_group_choices <- c(
-      'Total by plot' = 'plot',
-      'Breakdown by Species' = 'species',
-      'Breakdown by Simplified Species' = 'simpspecies',
-      'Breakdown by Genus' = 'genus',
-      'Breakdown by Decidious/Esclerophyl/Conifer' = 'dec',
-      'Breakdown by Broadleaf/Conifer' = 'bc'
-    )
+    functional_group_choices <- c('plot', 'species', 'simpspecies', 'genus', 'dec', 'bc') %>%
+      magrittr::set_names(c(
+        text_translate('fg_plot', lang(), texts_thes),
+        text_translate('fg_species', lang(), texts_thes),
+        text_translate('fg_simpspecies', lang(), texts_thes),
+        text_translate('fg_genus', lang(), texts_thes),
+        text_translate('fg_dec', lang(), texts_thes),
+        text_translate('fg_bc', lang(), texts_thes)
+      ))
 
     # absolute panel for all, later on we will be able to hide/show the different
     # parts of the panel
@@ -234,7 +242,7 @@ mod_data <- function(
       shiny::div(
         id = 'dataSel',
         shiny::fluidRow(
-          shiny::h4('Data selection'),
+          shiny::h4(text_translate('h4_data_selection', lang(), texts_thes)),
           shiny::column(
             6, offset = 3,
             shinyWidgets::radioGroupButtons(
@@ -253,7 +261,7 @@ mod_data <- function(
             6,
             shinyWidgets::pickerInput(
               ns('nfi'),
-              label = 'Data version',
+              label = text_translate('data_version', lang(), texts_thes),
               choices = nfi_choices,
               selected = 'nfi_4'
             )
@@ -261,37 +269,32 @@ mod_data <- function(
           shiny::column(
             6,
             shinyWidgets::pickerInput(
-              ns('admin_div'), 'Divisions',
+              ns('admin_div'), text_translate('divisions', lang(), texts_thes),
               admin_div_choices, selected = 'region'
             )
           )
         ),
         shiny::hr(),
         shiny::fluidRow(
-          # shiny::tags$head(
-          #   shiny::tags$style(HTML(
-          #     ".tabbable .nav-pills li:nth-child(4) { float: right; }"
-          #   ))
-          # ),
           shiny::h4('Additional controls'),
           shiny::tabsetPanel(
-            # selected = 'Visualization',
             type = 'pills',
             # 2. data aggregation level (div and id is for shinyjs later
             #    application)
             shiny::tabPanel(
-              title = '1. Breakdown level',
+              title = text_translate('data_tab_1', lang(), texts_thes),
               shiny::br(),
               shiny::column(
                 8, offset = 2,
                 shinyWidgets::pickerInput(
-                  ns('functional_group'), 'Select the breakdown level',
+                  ns('functional_group'),
+                  text_translate('functional_group_input', lang(), texts_thes),
                   choices = functional_group_choices,
                   selected = 'none', width = '100%'
                 ),
                 shinyWidgets::awesomeCheckbox(
                   ns('diameter_classes'),
-                  label = 'Extra breakdown by diameter classes?',
+                  label = text_translate('diameter_classes_input', lang(), texts_thes),
                   status = 'info'
                 )
               )
@@ -299,24 +302,24 @@ mod_data <- function(
             # 3. data filtering (this inputs are located in the mod_filter
             # module)
             shiny::tabPanel(
-              title = '2. Filters',
+              title = text_translate('data_tab_2', lang(), texts_thes),
               shiny::br(),
-              mod_filtersUI(ns('mod_filtersUI'), nfidb)
+              mod_filtersUI(ns('mod_filtersUI'), nfidb, lang(), texts_thes)
             ),
             # 4. Visualization controls (inputs in the mod_viz)
             shiny::tabPanel(
-              title = '3. Visualization controls',
+              title = text_translate('data_tab_3', lang(), texts_thes),
               shiny::column(
                 12, class = 'center',
                 shiny::br(),
-                mod_vizInput(ns('mod_vizInput'), nfidb)
+                mod_vizInput(ns('mod_vizInput'), nfidb, lang(), texts_thes)
               )
             ),
             # 5. Save (here we call the ui function, but the server function
             # of the module is called on the parent level, in the nfi_app.R
             # file)
             shiny::tabPanel(
-              title = '4. Save the map',
+              text_translate('data_tab_4', lang(), texts_thes),
               shiny::column(
                 8, offset = 2,
                 shiny::br(),
@@ -355,12 +358,12 @@ mod_data <- function(
 
   viz_reactives <- shiny::callModule(
     mod_viz, 'mod_vizInput',
-    data_inputs, nfidb, var_thes, texts_thes
+    data_inputs, nfidb, var_thes, texts_thes, lang
   )
 
   filters_reactives <- shiny::callModule(
     mod_filters, 'mod_filtersUI',
-    nfidb, data_inputs, var_thes, texts_thes
+    nfidb, data_inputs, var_thes, texts_thes, lang
   )
 
   # observer to get the filter expressions and the buttons actions
