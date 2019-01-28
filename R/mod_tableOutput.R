@@ -38,8 +38,8 @@ mod_tableOutput <- function(id) {
         ),
         shiny::column(
           2, offset = 2, align = 'center',
-          # shiny::br(),
-          shiny::p('Data info'),
+          shiny::br(),
+          # shiny::p('Data info'),
           shinyWidgets::actionBttn(
             ns('show_hri'),
             'Info',
@@ -90,7 +90,7 @@ mod_tableOutput <- function(id) {
 #' @rdname mod_tableOutput
 mod_table <- function(
   input, output, session,
-  data_inputs, map_inputs, nfidb, var_thes, texts_thes
+  data_inputs, map_inputs, nfidb, var_thes, texts_thes, lang
 ) {
 
   # table data from map_inputs, but only updated when apply button is pressed
@@ -108,30 +108,14 @@ mod_table <- function(
         if (is.null(map_inputs$main_data[['selected']])) {
           return()
         } else {
-          # start the progress
-          # shinyWidgets::progressSweetAlert(
-          #   session = session, id = 'table_build_progress',
-          #   title = 'Preparing table data', value = 75,
-          #   display_pct = TRUE
-          # )
-          res <- map_inputs$main_data[['selected']] #%>%
-          # dplyr::collect()
-          # shinyWidgets::closeSweetAlert(session = session)
+          res <- map_inputs$main_data[['selected']]
         }
       } else {
         if (is.null(map_inputs$main_data[['summarised']])) {
           return()
         } else {
-          # start the progress
-          # shinyWidgets::progressSweetAlert(
-          #   session = session, id = 'table_build_progress',
-          #   title = 'Preparing table data', value = 75,
-          #   display_pct = TRUE
-          # )
           res <- map_inputs$main_data[['summarised']] %>%
-            dplyr::ungroup() #%>%
-          # dplyr::collect()
-          # shinyWidgets::closeSweetAlert(session = session)
+            dplyr::ungroup()
         }
       }
       return(res)
@@ -152,9 +136,9 @@ mod_table <- function(
 
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
-        label = 'Choose the variables to show',
-        # choices = var_names_input_builder(col_vis_choices, 'eng', var_thes, texts_thes),
-        choices = var_names_input_builder(col_vis_choices, 'eng', var_thes, texts_thes, summ) %>% sort(),
+        label = text_translate('col_vis_selector_input', lang(), texts_thes),
+        # choices = var_names_input_builder(col_vis_choices, lang(), var_thes, texts_thes),
+        choices = var_names_input_builder(col_vis_choices, lang(), var_thes, texts_thes, summ) %>% sort(),
         selected = col_vis_choices[1:7]
       )
     }
@@ -187,7 +171,7 @@ mod_table <- function(
       # dplyr::mutate_if(is.character, forcats::as_factor) %>%
       DT::datatable(
         rownames = FALSE,
-        colnames = names(var_names_input_builder(names(.), 'eng', var_thes, texts_thes, summ)),
+        colnames = names(var_names_input_builder(names(.), lang(), var_thes, texts_thes, summ)),
         class = 'hover order-column stripe nowrap',
         filter = list(position = 'top', clear = FALSE, plain = FALSE),
         options = list(

@@ -162,7 +162,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # table
     shiny::callModule(
       mod_table, 'mod_tableOutput',
-      data_reactives, map_reactives, nfidb, var_thes, texts_thes
+      data_reactives, map_reactives, nfidb, var_thes, texts_thes, lang
     )
 
     shiny::observeEvent(
