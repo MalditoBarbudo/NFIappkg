@@ -72,58 +72,6 @@ mod_tableOutput <- function(id) {
     shiny::fluidRow(
       shinyWidgets::addSpinner(DT::DTOutput(ns('nfi_table')))
     )
-    # shiny::fluidPage(
-    #   shiny::sidebarLayout(
-    #     position = 'left',
-    #     sidebarPanel = shiny::sidebarPanel(
-    #       width = 3,
-    #       # inputs
-    #       # Column visibility
-    #       shiny::h4('Column visibility'),
-    #       shinyWidgets::pickerInput(
-    #         ns('col_vis_selector'),
-    #         # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
-    #         label = 'Choose the variables to show',
-    #         choices = '', multiple = TRUE,
-    #         width = '90%',
-    #         options = list(
-    #           `actions-box` = FALSE,
-    #           `deselect-all-text` = 'None selected...',
-    #           `select-all-text` = 'All selected',
-    #           `selected-text-format` = 'count',
-    #           `count-selected-text` = "{0} variables selected (of {1})",
-    #           `size` = 15,
-    #           `max-options` = 50,
-    #           `max-options-text` = 'Select limit reached (50)',
-    #           `live-search` = TRUE
-    #         )
-    #       ),
-    #       # mod_applyButtonInput(ns('mod_applyButtonInput_table')),
-    #
-    #       # Save buttons
-    #       shiny::h4('Save the table'),
-    #       shiny::fluidRow(
-    #         shinyWidgets::downloadBttn(
-    #           ns('dwl_csv_button'),
-    #           'Save as csv',
-    #           color = 'primary', size = 'sm', block = FALSE,
-    #           style = 'stretch'
-    #         ),
-    #         shinyWidgets::downloadBttn(
-    #           ns('dwl_xlsx_button'),
-    #           'Save as xlsx',
-    #           color = 'primary', size = 'sm', block = FALSE,
-    #           style = 'stretch'
-    #         )
-    #       )
-    #     ),
-    #     mainPanel = shiny::mainPanel(
-    #       width = 9,
-    #       # gt::gt_output(ns('nfi_table'))
-    #       shinyWidgets::addSpinner(DT::DTOutput(ns('nfi_table')))
-    #     )
-    #   )
-    # )
   )
 }
 
@@ -189,50 +137,6 @@ mod_table <- function(
       return(res)
     }
   )
-
-  # we need the data based on the viz shape selected (selected for plots,
-  # summarised for polygons). All of this with a dedupe function, as it is
-  # really expensive and we want to do it only when really necessary
-  # table_data <- dedupe(shiny::reactive({
-  #
-  #   viz_shape <- shiny::isolate({data_inputs$viz_shape})
-  #
-  #   if (any(is.null(viz_shape), is.null(map_inputs$main_data))) {
-  #     return()
-  #   }
-  #
-  #   if (viz_shape == 'plot') {
-  #     if (is.null(map_inputs$main_data[['selected']])) {
-  #       return()
-  #     } else {
-  #       # start the progress
-  #       # shinyWidgets::progressSweetAlert(
-  #       #   session = session, id = 'table_build_progress',
-  #       #   title = 'Preparing table data', value = 75,
-  #       #   display_pct = TRUE
-  #       # )
-  #       res <- map_inputs$main_data[['selected']] #%>%
-  #         # dplyr::collect()
-  #       # shinyWidgets::closeSweetAlert(session = session)
-  #     }
-  #   } else {
-  #     if (is.null(map_inputs$main_data[['summarised']])) {
-  #       return()
-  #     } else {
-  #       # start the progress
-  #       # shinyWidgets::progressSweetAlert(
-  #       #   session = session, id = 'table_build_progress',
-  #       #   title = 'Preparing table data', value = 75,
-  #       #   display_pct = TRUE
-  #       # )
-  #       res <- map_inputs$main_data[['summarised']] %>%
-  #         dplyr::ungroup() #%>%
-  #         # dplyr::collect()
-  #       # shinyWidgets::closeSweetAlert(session = session)
-  #     }
-  #   }
-  #   return(res)
-  # }))
 
   # update the column visibility input
   shiny::observeEvent(
