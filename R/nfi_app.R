@@ -150,7 +150,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # info panel
     info_reactives <- shiny::callModule(
       mod_info, 'mod_infoUI',
-      map_reactives, data_reactives, nfidb, var_thes, texts_thes
+      map_reactives, data_reactives, nfidb, var_thes, texts_thes, lang
     )
 
     # saveMap panel

@@ -181,7 +181,7 @@ mod_table <- function(
           initComplete = DT::JS(
             "function(settings, json) {",
             "$(this.api().table().header()).css({'font-family': 'Montserrat'});",
-            "$(this.api().table().body()).css({'font-family': 'Montserrat'});",
+            "$(this.api().table().body()).css({'font-family': 'Hacker'});",
             "}"
           )
         )
