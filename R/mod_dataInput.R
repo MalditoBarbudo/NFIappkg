@@ -330,7 +330,7 @@ mod_data <- function(
         ),
         # apply button
         shiny::hr(),
-        mod_applyButtonInput(ns('mod_applyButtonInput_data_panel'))
+        mod_applyButtonInput(ns('mod_applyButtonInput_data_panel'), lang(), texts_thes)
       )
     )
   })

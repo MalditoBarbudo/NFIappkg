@@ -144,7 +144,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # map
     map_reactives <- shiny::callModule(
       mod_map, 'mod_mapUI',
-      data_reactives, nfidb, var_thes, texts_thes
+      data_reactives, nfidb, var_thes, texts_thes, lang
     )
 
     # info panel

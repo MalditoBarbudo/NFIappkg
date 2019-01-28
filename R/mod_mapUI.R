@@ -34,7 +34,7 @@ mod_mapUI <- function(id, nfidb) {
 #' @rdname mod_mapUI
 mod_map <- function(
   input, output, session,
-  data_inputs, nfidb, var_thes, texts_thes
+  data_inputs, nfidb, var_thes, texts_thes, lang
 ) {
 
   # output map
@@ -509,7 +509,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = names(var_names_input_builder(viz_color, 'eng', var_thes, texts_thes, TRUE)),
+            title = names(var_names_input_builder(viz_color, lang(), var_thes, texts_thes, TRUE)),
             layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
 
@@ -630,7 +630,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = names(var_names_input_builder(data_inputs$viz_color, 'eng', var_thes, texts_thes)),
+            title = names(var_names_input_builder(data_inputs$viz_color, lang(), var_thes, texts_thes)),
             layerId = 'color_legend', opacity = 1,
             className = legend_class,
             na.label = ''

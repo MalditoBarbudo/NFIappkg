@@ -5,7 +5,7 @@
 #' @param id shiny id
 #'
 #' @export
-mod_applyButtonInput <- function(id) {
+mod_applyButtonInput <- function(id, lang, texts_thes) {
 
   # ns
   ns <- shiny::NS(id)
@@ -14,7 +14,7 @@ mod_applyButtonInput <- function(id) {
   shiny::fluidRow(
     shinyWidgets::actionBttn(
       ns('apply'),
-      'Apply',
+      text_translate('apply', lang, texts_thes),
       icon = shiny::icon('check-circle'), style = 'stretch', block = FALSE, size = 'sm'
     )
   )

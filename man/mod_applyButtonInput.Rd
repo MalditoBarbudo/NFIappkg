@@ -5,7 +5,7 @@
 \alias{mod_applyButton}
 \title{mod_applyButtonInput and mod_applyButton}
 \usage{
-mod_applyButtonInput(id)
+mod_applyButtonInput(id, lang, texts_thes)
 
 mod_applyButton(input, output, session)
 }
