@@ -167,6 +167,18 @@ mod_dataInput <- function(id, nfidb, lang) {
         shiny::hr(),
         mod_applyButtonInput(ns('mod_applyButtonInput_data_panel'), nfidb, lang)
       )
+    ),
+    shinyjs::hidden(
+      shiny::absolutePanel(
+        id = 'infoPanel', class = 'panel panel-default', fixed = TRUE,
+        draggable = FALSE, width = 'auto', height = 'auto',
+        top = '8%', left = '8%', right = '8%', bottom = '8%',
+
+        mod_infoUI('mod_infoUI', nfidb, lang)
+        # shiny::uiOutput(
+        #   'info_module_container'
+        # )
+      )
     )
   ) # end of tagList
 }
