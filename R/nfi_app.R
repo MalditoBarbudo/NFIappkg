@@ -93,18 +93,18 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
           ## mod_info ####
           # mod_infoPanel, it includes the map events info panel
-          shinyjs::hidden(
-            shiny::absolutePanel(
-              id = 'infoPanel', class = 'panel panel-default', fixed = TRUE,
-              draggable = FALSE, width = 'auto', height = 'auto',
-              top = 60, left = '5%', right = '5%', bottom = '5%',
-
-              # mod_infoUI('mod_infoUI')
-              shiny::uiOutput(
-                'info_module_container'
-              )
-            )
-          ),
+          # shinyjs::hidden(
+          #   shiny::absolutePanel(
+          #     id = 'infoPanel', class = 'panel panel-default', fixed = TRUE,
+          #     draggable = FALSE, width = 'auto', height = 'auto',
+          #     top = '8%', left = '8%', right = '8%', bottom = '8%',
+          #
+          #     # mod_infoUI('mod_infoUI')
+          #     shiny::uiOutput(
+          #       'info_module_container'
+          #     )
+          #   )
+          # ),
 
           ## cite div ####
           shiny::tags$div(
@@ -165,9 +165,9 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # map_reactives <- NULL
 
     # info panel
-    output$info_module_container <- shiny::renderUI({
-      mod_infoUI('mod_infoUI', nfidb, lang())
-    })
+    # output$info_module_container <- shiny::renderUI({
+    #   mod_infoUI('mod_infoUI', nfidb, lang())
+    # })
 
     info_reactives <- shiny::callModule(
       mod_info, 'mod_infoUI',

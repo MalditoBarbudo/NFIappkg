@@ -18,7 +18,7 @@ mod_infoUI <- function(id, nfidb, lang) {
         6,
         # plot column
         shiny::br(),
-        shiny::plotOutput(ns("info_plot"), height = "700px")
+        shiny::plotOutput(ns("info_plot"), height = "640px")
       ),
       shiny::column(
         6,
@@ -332,7 +332,7 @@ mod_info <- function(
                 {fg_id}~diamclass_id
               ) +
               ggplot2::labs(
-                subtitle = 'Facetted by {fg_id} and diamclass_id'
+                subtitle = glue::glue(text_translate('info_plot_subtitle_double_facetted', lang(), nfidb))
               )"
         )
       } else {
@@ -344,7 +344,7 @@ mod_info <- function(
                  .~diamclass_id
                ) +
                  ggplot2::labs(
-                   subtitle = 'Facetted by diamclass_id'
+                   subtitle = glue::glue(text_translate('info_plot_subtitle_dc_facetted', lang(), nfidb))
                  )"
           )
         } else {
@@ -355,7 +355,7 @@ mod_info <- function(
                    .~{fg_id}
                  ) +
                  ggplot2::labs(
-                   subtitle = 'Facetted by {fg_id}'
+                   subtitle = glue::glue(text_translate('info_plot_subtitle_fg_facetted', lang(), nfidb))
                  )"
             )
           }
@@ -380,7 +380,8 @@ mod_info <- function(
 
       info_plot <- rlang::eval_tidy(rlang::parse_expr(plot_expression)) +
         ggplot2::labs(
-          title = glue::glue(text_translate('info_plot_title', lang(), nfidb))
+          title = glue::glue(text_translate('info_plot_title', lang(), nfidb)),
+          y = title_viz_sel
         ) +
         ggplot2::theme_classic() +
         ggplot2::theme(
@@ -388,11 +389,13 @@ mod_info <- function(
           plot.background = ggplot2::element_rect(fill = "transparent", colour = NA),
           legend.background = ggplot2::element_rect(fill = "transparent", colour = NA),
           legend.box.background = ggplot2::element_rect(fill = "transparent", colour = NA),
-          axis.line.x = ggplot2::element_blank(),
-          axis.title = ggplot2::element_blank(),
-          # plot.title = ggplot2::element_blank(),
-          axis.text = ggplot2::element_blank(),
-          axis.ticks = ggplot2::element_blank()
+          # axis.line.x = ggplot2::element_blank(),
+          plot.title = ggplot2::element_text(size = ggplot2::rel(1.5)),
+          axis.title.x = ggplot2::element_blank(),
+          axis.title.y = ggplot2::element_text(size = ggplot2::rel(1.5)),
+          axis.text.x = ggplot2::element_blank(),
+          axis.text.y = ggplot2::element_text(size = ggplot2::rel(1.5)),
+          axis.ticks.x = ggplot2::element_blank()
         )
 
       # shinyWidgets::updateProgressBar(
