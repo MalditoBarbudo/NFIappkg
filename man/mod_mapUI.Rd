@@ -7,7 +7,7 @@
 \usage{
 mod_mapUI(id, nfidb)
 
-mod_map(input, output, session, data_inputs, nfidb, var_thes)
+mod_map(input, output, session, data_inputs, nfidb, var_thes, texts_thes)
 }
 \arguments{
 \item{id}{shiny id}

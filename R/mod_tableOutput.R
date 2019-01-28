@@ -142,7 +142,7 @@ mod_tableOutput <- function(id) {
 #' @rdname mod_tableOutput
 mod_table <- function(
   input, output, session,
-  data_inputs, map_inputs, nfidb, var_thes
+  data_inputs, map_inputs, nfidb, var_thes, texts_thes
 ) {
 
   # table data from map_inputs, but only updated when apply button is pressed
@@ -249,8 +249,8 @@ mod_table <- function(
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
         label = 'Choose the variables to show',
-        # choices = var_names_input_builder(col_vis_choices, 'eng', var_thes),
-        choices = var_names_input_builder(col_vis_choices, 'eng', var_thes, summ) %>% sort(),
+        # choices = var_names_input_builder(col_vis_choices, 'eng', var_thes, texts_thes),
+        choices = var_names_input_builder(col_vis_choices, 'eng', var_thes, texts_thes, summ) %>% sort(),
         selected = col_vis_choices[1:7]
       )
     }
@@ -283,7 +283,7 @@ mod_table <- function(
       # dplyr::mutate_if(is.character, forcats::as_factor) %>%
       DT::datatable(
         rownames = FALSE,
-        colnames = names(var_names_input_builder(names(.), 'eng', var_thes, summ)),
+        colnames = names(var_names_input_builder(names(.), 'eng', var_thes, texts_thes, summ)),
         class = 'hover order-column stripe nowrap',
         filter = list(position = 'top', clear = FALSE, plain = FALSE),
         options = list(

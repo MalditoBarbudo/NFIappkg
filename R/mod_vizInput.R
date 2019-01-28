@@ -115,10 +115,15 @@ mod_vizInput <- function(id, nfidb) {
 #' @rdname mod_vizUI
 mod_viz <- function(
   input, output, session,
-  data_inputs, nfidb, var_thes
+  data_inputs, nfidb, var_thes, texts_thes
 ) {
 
   tables_to_look_at <- shiny::reactive({
+
+    shiny::validate(
+      shiny::need(data_inputs$nfi, 'No NFI version selected')
+    )
+
     nfi <- data_inputs$nfi
 
     if (nfi == 'nfi_2_nfi_3') {
@@ -174,6 +179,10 @@ mod_viz <- function(
   shiny::observe({
     color_choices <- vars_to_viz_by()
 
+    shiny::validate(
+      shiny::need(color_choices, 'No variables to visualize')
+    )
+
     # let's make density (or density_balance) the selected var
     if ('density' %in% color_choices) {
       selected_col <- 'density'
@@ -186,7 +195,7 @@ mod_viz <- function(
     # update the pickerInput
     shinyWidgets::updatePickerInput(
       session, 'viz_color',
-      choices = var_names_input_builder(color_choices, 'eng', var_thes) %>% sort(),
+      choices = var_names_input_builder(color_choices, 'eng', var_thes, texts_thes) %>% sort(),
       label = 'Color:',
       selected = selected_col
     )
@@ -194,13 +203,18 @@ mod_viz <- function(
 
   # size input updater
   shiny::observe({
+
+    shiny::validate(
+      shiny::need(data_inputs$viz_shape, 'No visualization shape selected')
+    )
+
     if (data_inputs$viz_shape == 'plot') {
       size_choices <- vars_to_viz_by()
 
       # update the pickerInput
       shinyWidgets::updatePickerInput(
         session, 'viz_size',
-        choices = c('', var_names_input_builder(size_choices, 'eng', var_thes) %>% sort()),
+        choices = c('', var_names_input_builder(size_choices, 'eng', var_thes, texts_thes) %>% sort()),
         label = 'Size:'
       )
 
@@ -213,6 +227,11 @@ mod_viz <- function(
 
   # statistic input updater
   shiny::observe({
+
+    shiny::validate(
+      shiny::need(data_inputs$viz_shape, 'No visualization shape selected')
+    )
+
     if (data_inputs$viz_shape != 'plot') {
       shinyjs::show('viz_statistic')
     } else {
@@ -222,6 +241,11 @@ mod_viz <- function(
 
   # functional group value updater
   shiny::observe({
+
+    shiny::validate(
+      shiny::need(data_inputs$functional_group, 'No breakdown selected')
+    )
+
     if (data_inputs$functional_group != 'plot') {
 
       functional_group <- data_inputs$functional_group
@@ -252,6 +276,11 @@ mod_viz <- function(
 
   # diameter_classes
   shiny::observe({
+
+    shiny::validate(
+      shiny::need(data_inputs$diameter_classes, 'Diameter classes radio-button missing')
+    )
+
     if (isTRUE(data_inputs$diameter_classes)) {
 
       diameter_classes_choices <- seq(10, 70, 5) %>% as.character()

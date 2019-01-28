@@ -4,7 +4,8 @@
 \alias{mod_info}
 \title{mod_info server function}
 \usage{
-mod_info(input, output, session, map_inputs, data_inputs, nfidb, var_thes)
+mod_info(input, output, session, map_inputs, data_inputs, nfidb, var_thes,
+  texts_thes)
 }
 \arguments{
 \item{input}{internal}

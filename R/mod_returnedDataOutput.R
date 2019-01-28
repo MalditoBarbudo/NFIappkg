@@ -40,6 +40,10 @@ mod_returnedData <- function(
     eventExpr = data_inputs$apply_data,
     valueExpr = {
 
+      shiny::validate(
+        shiny::need(data_inputs$nfi, 'No NFI version selected')
+      )
+
       # browser()
       nfi <- data_inputs$nfi
       viz_shape <- data_inputs$viz_shape

@@ -52,7 +52,7 @@ mod_infoUI <- function(id) {
 #' @export
 mod_info <- function(
   input, output, session,
-  map_inputs, data_inputs, nfidb, var_thes
+  map_inputs, data_inputs, nfidb, var_thes, texts_thes
 ) {
 
   prep_data <- dedupe(shiny::reactive({
@@ -371,7 +371,7 @@ mod_info <- function(
         tidyr::gather('Characteristics', 'Value') %>%
         dplyr::mutate(
           Characteristics = names(var_names_input_builder(
-            stringr::str_remove(.$Characteristics, '_mean'), 'eng', var_thes)
+            stringr::str_remove(.$Characteristics, '_mean'), 'eng', var_thes, texts_thes)
           )
         ) %>%
         gt::gt(rowname_col = 'Characteristics') %>%

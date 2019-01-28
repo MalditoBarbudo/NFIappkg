@@ -7,7 +7,7 @@
 \usage{
 mod_filtersUI(id, nfidb)
 
-mod_filters(input, output, session, nfidb, data_inputs, var_thes)
+mod_filters(input, output, session, nfidb, data_inputs, var_thes, texts_thes)
 }
 \arguments{
 \item{id}{shiny id}

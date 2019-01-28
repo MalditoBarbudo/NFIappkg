@@ -7,7 +7,8 @@
 \usage{
 mod_tableOutput(id)
 
-mod_table(input, output, session, data_inputs, map_inputs, nfidb, var_thes)
+mod_table(input, output, session, data_inputs, map_inputs, nfidb, var_thes,
+  texts_thes)
 }
 \arguments{
 \item{id}{shiny id}

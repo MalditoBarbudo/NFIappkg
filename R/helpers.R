@@ -29,24 +29,50 @@ hri_builder <- function(data_inputs) {
   )
 }
 
-var_names_input_builder <- function(vars, lang, var_thes, summ = FALSE) {
+text_translate <- function(text, lang, texts_thes) {
+
+  text[is.na(text)] <- 'NA_'
+
+  text_df <- texts_thes %>%
+    dplyr::select(dplyr::one_of('text_id', glue::glue("text_{lang}"))) %>%
+    dplyr::filter(text_id %in% text) %>%
+    # dplyr::collect() %>%
+    as.data.frame()
+
+  text %>%
+    purrr::map_chr(
+      ~ text_df[text_df$text_id == .x, glue::glue('text_{lang}')]
+    )
+}
+
+var_names_input_builder <- function(vars, lang, var_thes, texts_thes, summ = FALSE) {
+
+  if (is.null(lang)) {
+    lang <- 'eng'
+  }
 
   if (summ) {
 
     vars_id <- stringr::str_remove(vars, '_mean$|_se$|_min$|_max$|_n$')
     vars_stat <- stringr::str_extract(vars, '_mean$|_se$|_min$|_max$|_n$') %>%
-      stringr::str_remove('_')
+      stringr::str_remove('_') %>%
+      text_translate(lang, texts_thes) %>%
+      tolower()
 
     vars_trans <- var_thes %>%
       dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%
       dplyr::filter(var_id %in% vars_id) %>%
       dplyr::distinct() %>%
-      dplyr::collect() %>%
+      # dplyr::collect() %>%
       as.data.frame()
 
     dummy_creator <- function(x, y) {
       name <- vars_trans[vars_trans$var_id == x, glue::glue('translation_{lang}')]
-      glue::glue("{name} {y}")
+      if (is.na(y)) {
+        name
+      } else {
+        glue::glue("{name} {y}")
+      }
     }
 
     vars_names <- vars_id %>%

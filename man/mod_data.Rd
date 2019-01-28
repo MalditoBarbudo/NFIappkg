@@ -4,7 +4,7 @@
 \alias{mod_data}
 \title{mod_data server function}
 \usage{
-mod_data(input, output, session, nfidb, var_thes)
+mod_data(input, output, session, nfidb, var_thes, texts_thes)
 }
 \arguments{
 \item{input}{internal}
