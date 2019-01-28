@@ -48,6 +48,13 @@ mod_returnedData <- function(
       diameter_classes <- data_inputs$diameter_classes
       filter_vars <- data_inputs$filter_vars
       filter_expressions <- data_inputs$filter_expressions
+
+      shinyWidgets::progressSweetAlert(
+        session = session, id = 'data_progress',
+        title = 'Retrieving data', value = 25,
+        display_pct = TRUE
+      )
+
       # custom_polygon_fil_expr needs some extra checking:
       if (is.null(map_inputs$custom_polygon)) {
         custom_polygon_fil_expr <- rlang::quos()
@@ -79,6 +86,11 @@ mod_returnedData <- function(
         }
       }
 
+      shinyWidgets::updateProgressBar(
+        session = session, id = 'data_progress',
+        value = 35
+      )
+
       selected_data <- tidyNFI::nfi_results_data(
         conn = nfidb,
         nfi = nfi,
@@ -93,18 +105,25 @@ mod_returnedData <- function(
           !!! filter_expressions,
           .collect = FALSE
         ) %>%
-        dplyr::left_join(dplyr::tbl(nfidb, 'PLOTS'), by = 'plot_id')
+        dplyr::left_join(dplyr::tbl(nfidb, 'PLOTS'), by = 'plot_id') %>%
+        dplyr::collect()
 
       if (nfi %in% c('nfi_2', 'nfi_3', 'nfi_4')) {
         selected_data <- selected_data %>%
           dplyr::left_join(
-            dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi)}_DYNAMIC_INFO")),
+            dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi)}_DYNAMIC_INFO")) %>%
+              dplyr::collect(),
             by = 'plot_id'
           )
       }
 
+      shinyWidgets::updateProgressBar(
+        session = session, id = 'data_progress',
+        value = 55
+      )
+
       # we must to check if the filters wiped out the data
-      if (length(selected_data %>% head(1) %>% dplyr::collect() %>% names()) < 1) {
+      if (length(names(selected_data)) < 1) {
         shinyWidgets::sendSweetAlert(
           session = session,
           title = 'No data can be retrieved with the actual filters',
@@ -132,9 +151,16 @@ mod_returnedData <- function(
             functional_group = functional_group,
             diameter_classes = diameter_classes,
             conn = nfidb,
-            .collect = FALSE
+            .collect = TRUE
           )
+
+        shinyWidgets::updateProgressBar(
+          session = session, id = 'data_progress',
+          value = 85
+        )
       }
+
+      shinyWidgets::closeSweetAlert(session = session)
 
       return(
         list(selected = selected_data, summarised = summarised_data)

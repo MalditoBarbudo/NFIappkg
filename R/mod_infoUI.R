@@ -80,8 +80,8 @@ mod_info <- function(
           'topo_altitude_asl', 'topo_fdm_slope_percentage',
           'topo_fdm_aspect_cardinal_8',
           'clim_tmean_year', 'clim_prec_year', 'clim_pet_year'
-        )) %>%
-        dplyr::collect()
+        )) #%>%
+        # dplyr::collect()
 
       # shinyWidgets::updateProgressBar(
       #   session = session, id = 'info_data_prep',
@@ -99,8 +99,8 @@ mod_info <- function(
           admin_sel, viz_sel, viz_size, 'diamclass_id', fg_id,
           'topo_altitude_asl_mean', 'topo_fdm_slope_percentage_mean',
           'clim_tmean_year_mean', 'clim_prec_year_mean', 'clim_pet_year_mean'
-        )) %>%
-        dplyr::collect()
+        )) #%>%
+        # dplyr::collect()
 
       # shinyWidgets::updateProgressBar(
       #   session = session, id = 'info_data_prep',

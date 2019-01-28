@@ -160,29 +160,29 @@ mod_table <- function(
         return()
       } else {
         # start the progress
-        shinyWidgets::progressSweetAlert(
-          session = session, id = 'table_build_progress',
-          title = 'Preparing table data', value = 75,
-          display_pct = TRUE
-        )
-        res <- map_inputs$main_data[['selected']] %>%
-          dplyr::collect()
-        shinyWidgets::closeSweetAlert(session = session)
+        # shinyWidgets::progressSweetAlert(
+        #   session = session, id = 'table_build_progress',
+        #   title = 'Preparing table data', value = 75,
+        #   display_pct = TRUE
+        # )
+        res <- map_inputs$main_data[['selected']] #%>%
+          # dplyr::collect()
+        # shinyWidgets::closeSweetAlert(session = session)
       }
     } else {
       if (is.null(map_inputs$main_data[['summarised']])) {
         return()
       } else {
         # start the progress
-        shinyWidgets::progressSweetAlert(
-          session = session, id = 'table_build_progress',
-          title = 'Preparing table data', value = 75,
-          display_pct = TRUE
-        )
+        # shinyWidgets::progressSweetAlert(
+        #   session = session, id = 'table_build_progress',
+        #   title = 'Preparing table data', value = 75,
+        #   display_pct = TRUE
+        # )
         res <- map_inputs$main_data[['summarised']] %>%
-          dplyr::ungroup() %>%
-          dplyr::collect()
-        shinyWidgets::closeSweetAlert(session = session)
+          dplyr::ungroup() #%>%
+          # dplyr::collect()
+        # shinyWidgets::closeSweetAlert(session = session)
       }
     }
     return(res)

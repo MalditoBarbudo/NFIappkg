@@ -215,11 +215,11 @@ mod_map <- function(
       )
 
       # start the progress
-      shinyWidgets::progressSweetAlert(
-        session = session, id = 'map_data_progress',
-        title = 'Map data carpentry', value = 25,
-        display_pct = TRUE
-      )
+      # shinyWidgets::progressSweetAlert(
+      #   session = session, id = 'map_data_progress',
+      #   title = 'Map data carpentry', value = 25,
+      #   display_pct = TRUE
+      # )
 
       # filter by functional group value
       if (data_inputs$functional_group != 'plot') {
@@ -275,10 +275,10 @@ mod_map <- function(
         'natura_network_2000' = 'natura_network_2000_polygons'
       )
 
-      shinyWidgets::updateProgressBar(
-        session = session, id = 'map_data_progress',
-        value = 35
-      )
+      # shinyWidgets::updateProgressBar(
+      #   session = session, id = 'map_data_progress',
+      #   value = 35
+      # )
 
       # polygons shape
       if (data_inputs$viz_shape == 'polygon') {
@@ -291,8 +291,8 @@ mod_map <- function(
           dplyr::select(dplyr::one_of(
             join_var, viz_color, glue::glue("{data_inputs$functional_group}_id"),
             'diamclass_id'
-          )) %>%
-          dplyr::collect()
+          )) #%>%
+          #dplyr::collect()
 
         shiny::validate(
           shiny::need(
@@ -301,10 +301,10 @@ mod_map <- function(
           )
         )
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'map_data_progress',
-          value = 45
-        )
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'map_data_progress',
+        #   value = 45
+        # )
 
         map_data <- map_data_pre %>%
           dplyr::full_join(
@@ -312,10 +312,10 @@ mod_map <- function(
           ) %>%
           sf::st_as_sf()
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'map_data_progress',
-          value = 50
-        )
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'map_data_progress',
+        #   value = 50
+        # )
 
       } else {
         # plots shape
@@ -329,8 +329,8 @@ mod_map <- function(
           ) %>%
           dplyr::select(dplyr::one_of(
             c('plot_id', 'coords_longitude', 'coords_latitude'), viz_color, viz_size
-          )) %>%
-          dplyr::collect()
+          )) #%>%
+          #dplyr::collect()
 
         shiny::validate(
           shiny::need(
@@ -339,10 +339,10 @@ mod_map <- function(
           )
         )
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'map_data_progress',
-          value = 45
-        )
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'map_data_progress',
+        #   value = 45
+        # )
 
         map_data <- map_data_pre %>%
           sf::st_as_sf(
@@ -350,12 +350,12 @@ mod_map <- function(
             crs = '+proj=longlat +datum=WGS84'
           )
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'map_data_progress',
-          value = 50
-        )
+        # shinyWidgets::updateProgressBar(
+        #   session = session, id = 'map_data_progress',
+        #   value = 50
+        # )
       }
-      shinyWidgets::closeSweetAlert(session = session)
+      # shinyWidgets::closeSweetAlert(session = session)
       return(map_data)
     }
   )
