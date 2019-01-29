@@ -3,9 +3,11 @@
 #' @description A shiny module to create and populate the buttons inputs
 #'
 #' @param id shiny id
+#' @param lang lang value
+#' @param texts_thes texts thesaurus df
 #'
 #' @export
-mod_saveMapInput <- function(id) {
+mod_saveMapInput <- function(id, lang, texts_thes) {
 
   # ns
   ns <- shiny::NS(id)
@@ -15,16 +17,16 @@ mod_saveMapInput <- function(id) {
     shiny::column(
       12,
       # title
-      shiny::tags$strong('Save the map'),
+      shiny::tags$strong(text_translate('save_the_map', lang, texts_thes)),
       shiny::br(),
       # buttons
       shinyWidgets::downloadBttn(
-        ns('save_shp'), label = 'Save as shapefile',
+        ns('save_shp'), label = text_translate('save_shp_button', lang, texts_thes),
         style = 'material-flat', color = 'success', size = 'sm', block = TRUE
       ),
       shiny::br(),
       shinyWidgets::downloadBttn(
-        ns('save_wkt'), label = 'Save as wkt',
+        ns('save_wkt'), label = text_translate('save_wkt_button', lang, texts_thes),
         style = 'material-flat', color = 'success', size = 'sm', block = TRUE
       )
     )
@@ -83,15 +85,4 @@ mod_saveMap <- function(
       )
     }
   )
-
-  # png
-  # here we have to work with the easyPrint leaflet plugin
-  # shiny::observeEvent(
-  #   eventExpr = input$save_png,
-  #   handlerExpr = {
-  #     session$sendCustomMessage(
-  #       'easyPrint_button', glue::glue("nfi_map_{Sys.Date()}")
-  #     )
-  #   }
-  # )
 }

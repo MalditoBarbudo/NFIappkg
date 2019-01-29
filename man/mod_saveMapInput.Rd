@@ -5,12 +5,16 @@
 \alias{mod_saveMap}
 \title{mod_saveMapInput and mod_saveMap}
 \usage{
-mod_saveMapInput(id)
+mod_saveMapInput(id, lang, texts_thes)
 
 mod_saveMap(input, output, session, map_inputs)
 }
 \arguments{
 \item{id}{shiny id}
+
+\item{lang}{lang value}
+
+\item{texts_thes}{texts thesaurus df}
 
 \item{input}{internal}
 
