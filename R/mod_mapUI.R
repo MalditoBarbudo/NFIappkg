@@ -58,27 +58,6 @@ mod_map <- function(
         ),
         singleFeature = TRUE
       )
-      # raw easy print plugin (js bundle loaded in the nfi_app function)
-      # htmlwidgets::onRender(
-      #   "function(el, x) {
-      #   L.easyPrint({
-      #   hidden: true,
-      #   sizeModes: ['A4Landscape'],
-      #   }).addTo(this);
-      #   }"
-      # )
-      # htmlwidgets::onRender(
-      #   "function(el, x) {
-      #   var myMap = this;
-      #   var printPlugin = L.easyPrint({
-      #   sizeModes: ['A4Portrait'],
-      #   hidden: true
-      #   }).addTo(myMap);
-      #   Shiny.addCustomMessageHandler('easyPrint_button', function(message) {
-      #     printPlugin.printMap('A4Portrait', message);
-      #   });
-      #   }"
-      # )
   })
 
   # observer for admin divs polygons. We use this instead of add polygons
@@ -378,13 +357,6 @@ mod_map <- function(
         )
       )
 
-      # start the progress
-      # shinyWidgets::progressSweetAlert(
-      #   session = session, id = 'map_build_progress',
-      #   title = 'Building the map', value = 60,
-      #   display_pct = TRUE
-      # )
-
       # switches (polygons objects, labels and groups)
       polygon_group <- switch(
         data_inputs$admin_div,
@@ -421,11 +393,6 @@ mod_map <- function(
         'special_protection_natural_area' = 'special_protection_natural_area_polygons',
         'natura_network_2000' = 'natura_network_2000_polygons'
       )
-
-      # shinyWidgets::updateProgressBar(
-      #   session = session, id = 'map_build_progress',
-      #   value = 70
-      # )
 
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
@@ -475,11 +442,6 @@ mod_map <- function(
           )
         }
 
-        # shinyWidgets::updateProgressBar(
-        #   session = session, id = 'map_build_progress',
-        #   value = 85
-        # )
-
         leaflet::leafletProxy('map') %>%
           leaflet::clearGroup('veguerias') %>%
           leaflet::clearGroup('regions') %>%
@@ -512,11 +474,6 @@ mod_map <- function(
             title = names(var_names_input_builder(viz_color, lang(), var_thes, texts_thes, TRUE)),
             layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
-
-        # shinyWidgets::updateProgressBar(
-        #   session = session, id = 'map_build_progress',
-        #   value = 90
-        # )
 
       } else {
         # plots
@@ -587,11 +544,6 @@ mod_map <- function(
 
         # reduce the size of the nas
         size_vector[is.na(color_vector)] <- 500
-
-        # shinyWidgets::updateProgressBar(
-        #   session = session, id = 'map_build_progress',
-        #   value = 85
-        # )
 
         # build the map
         leaflet::leafletProxy('map') %>%
