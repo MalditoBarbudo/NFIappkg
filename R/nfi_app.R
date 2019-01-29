@@ -116,11 +116,6 @@ nfi_app <- function(user = 'guest', password = 'guest') {
           class = 'inner',
           mod_tableOutput('mod_tableOutput')
         )
-      ),
-
-      # Alometrias tab
-      shiny::tabPanel(
-        'Allometries'
       )
     )
   )
