@@ -114,6 +114,9 @@ mod_info <- function(
         plot_data_sel <- plot_data_all %>%
           dplyr::filter(plot_id == click$id)
 
+        plot_data_unsel <- plot_data_all %>%
+          dplyr::filter(plot_id != click$id)
+
         table_data <- plot_data_sel %>%
           dplyr::select(dplyr::one_of(
             'plot_id', 'admin_province',
@@ -123,6 +126,8 @@ mod_info <- function(
           )) %>%
           head(1) %>%
           dplyr::mutate_if(is.numeric, round)
+
+        summ_title <- FALSE
       # end if plots, start of != plots
       } else {
 
@@ -137,6 +142,9 @@ mod_info <- function(
         plot_data_sel <- plot_data_all %>%
           dplyr::filter(!! rlang::sym(admin_sel) == click$id)
 
+        plot_data_unsel <- plot_data_all %>%
+          dplyr::filter(!! rlang::sym(admin_sel) != click$id)
+
         table_data <-  plot_data_sel %>%
           dplyr::ungroup() %>%
           dplyr::select(dplyr::one_of(
@@ -146,6 +154,8 @@ mod_info <- function(
           )) %>%
           head(1) %>%
           dplyr::mutate_if(is.numeric, round)
+
+        summ_title <- TRUE
       }
 
       # validate if we have data
@@ -198,6 +208,9 @@ mod_info <- function(
           plot_data_sel <- plot_data_sel %>%
             dplyr::filter(!! rlang::sym(fg_id) %in% fg_list)
 
+          plot_data_unsel <- plot_data_unsel %>%
+            dplyr::filter(!! rlang::sym(fg_id) %in% fg_list)
+
           plot_expression <- glue::glue(
             "plot_data_all %>%
             dplyr::filter({fg_id} %in% fg_list) %>%
@@ -221,24 +234,26 @@ mod_info <- function(
         plot_expression <- glue::glue(
           "{plot_expression}
             ggplot2::geom_jitter(
+              data = plot_data_unsel,
               ggplot2::aes(size = {viz_size}), width = 0.1, height = 0,
-              alpha = 0.3, color = 'grey66', show.legend = FALSE
+              alpha = 0.3, color = 'grey88', show.legend = FALSE
             ) +
             ggplot2::geom_jitter(
               data = plot_data_sel, ggplot2::aes(size = {viz_size}), width = 0.1,
-              height = 0, alpha = 0.8, color = 'red', show.legend = FALSE
+              height = 0, alpha = 1, color = 'red', show.legend = FALSE
             )"
         )
       } else {
         plot_expression <- glue::glue(
           "{plot_expression}
             ggplot2::geom_jitter(
+              data = plot_data_unsel,
               width = 0.1, height = 0, alpha = 0.3, size = 4,
-              color = 'grey66', show.legend = FALSE
+              color = 'grey88', show.legend = FALSE
             ) +
             ggplot2::geom_jitter(
               data = plot_data_sel, width = 0.1, size = 4,
-              height = 0, alpha = 0.8, color = 'red', show.legend = FALSE
+              height = 0, alpha = 1, color = 'red', show.legend = FALSE
             )"
         )
       }
@@ -252,7 +267,7 @@ mod_info <- function(
           ggplot2::geom_violin(
             # draw_quantiles = c(0.05, 0.25, 0.5, 0.75, 0.95),
             adjust = 0.5,
-            fill = 'transparent'
+            fill = 'transparent', colour = 'grey88'
           )"
         )
       }
@@ -265,7 +280,7 @@ mod_info <- function(
                 {fg_id}~diamclass_id
               ) +
               ggplot2::labs(
-                subtitle = 'Facetted by {fg_id} and diamclass_id'
+                subtitle = glue::glue(text_translate('info_plot_subtitle_double_facetted', lang(), texts_thes))
               )"
         )
       }
@@ -278,7 +293,7 @@ mod_info <- function(
                  .~diamclass_id
                ) +
                  ggplot2::labs(
-                   subtitle = 'Facetted by diamclass_id'
+                   subtitle = glue::glue(text_translate('info_plot_subtitle_dc_facetted', lang(), texts_thes))
                  )"
           )
         } else {
@@ -289,18 +304,37 @@ mod_info <- function(
                    .~{fg_id}
                  ) +
                  ggplot2::labs(
-                   subtitle = 'Facetted by {fg_id}'
+                   subtitle = glue::glue(text_translate('info_plot_subtitle_fg_facetted', lang(), texts_thes))
                  )"
             )
           }
         }
       }
 
+      title_viz_sel <- names(
+        var_names_input_builder(viz_sel, lang(), var_thes, texts_thes, summ_title)
+      )
+      title_click_group <- text_translate(click$group, lang(), texts_thes) %>%
+        tolower()
+
       info_plot <- rlang::eval_tidy(rlang::parse_expr(plot_expression)) +
         ggplot2::labs(
-          title = glue::glue("{viz_sel} from {click$id} compared to other {click$group}")
+          title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
+          y = title_viz_sel,
+          x = ''
         ) +
-        ggplot2::theme_minimal()
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          text = ggplot2::element_text(size = 14, color = 'gray88'),
+          axis.text = ggplot2::element_text(color = 'gray88'),
+          strip.text = ggplot2::element_text(color = 'gray88'),
+          panel.background = ggplot2::element_rect(fill = "gray12", colour = NA),
+          plot.background = ggplot2::element_rect(fill = "gray12", colour = NA),
+          strip.background = ggplot2::element_rect(fill = "gray12", colour = NA),
+          panel.grid = ggplot2::element_line(colour = 'gray58'),
+          panel.grid.minor.y = ggplot2::element_blank(),
+          panel.grid.major.y = ggplot2::element_line(size = ggplot2::rel(0.5), colour = 'gray25')
+        )
 
       # info_table
       info_table <- table_data %>%
@@ -312,7 +346,7 @@ mod_info <- function(
         ) %>%
         gt::gt(rowname_col = 'Characteristics') %>%
         gt::tab_header(
-          title = glue::glue(text_translate("info_tab_header", lang(), nfidb))
+          title = glue::glue(text_translate("info_tab_header", lang(), texts_thes))
         ) %>%
         gt::tab_options(
           table.background.color = 'transparent',
