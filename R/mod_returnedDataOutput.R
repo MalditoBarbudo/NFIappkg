@@ -25,7 +25,7 @@ mod_returnedDataOutput <- function(id) {
 #' @rdname mod_returnedDataOuput
 mod_returnedData <- function(
   input, output, session,
-  data_inputs, map_inputs = NULL, nfidb
+  data_inputs, map_inputs = NULL, nfidb, lang, texts_thes
 ) {
 
   # apply_reactives <- shiny::reactive({
@@ -54,7 +54,7 @@ mod_returnedData <- function(
 
       shinyWidgets::progressSweetAlert(
         session = session, id = 'data_progress',
-        title = 'Retrieving data. When diameter classes are selected this can take a while',
+        title = text_translate('data_progress', lang(), texts_thes),
         value = 25, display_pct = TRUE, striped = TRUE
       )
 

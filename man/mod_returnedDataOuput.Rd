@@ -5,7 +5,7 @@
 \title{mod_returnedData server function}
 \usage{
 mod_returnedData(input, output, session, data_inputs, map_inputs = NULL,
-  nfidb)
+  nfidb, lang, texts_thes)
 }
 \arguments{
 \item{input}{internal}

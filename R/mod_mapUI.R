@@ -172,7 +172,7 @@ mod_map <- function(
   # returned data (NON COLLECTED!!!)
   returned_data_inputs <- shiny::callModule(
     mod_returnedData, 'mod_returnedDataOutput',
-    data_inputs, map_inputs, nfidb
+    data_inputs, map_inputs, nfidb, lang, texts_thes
   )
 
   # apply_reactives <- shiny::reactive({
