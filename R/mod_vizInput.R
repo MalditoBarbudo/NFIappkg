@@ -287,7 +287,9 @@ mod_viz <- function(
   shiny::observe({
 
     shiny::validate(
-      shiny::need(data_inputs$diameter_classes, 'Diameter classes radio-button missing')
+      shiny::need(
+        !is.null(data_inputs$diameter_classes), 'Diameter classes radio-button missing'
+      )
     )
 
     if (isTRUE(data_inputs$diameter_classes)) {

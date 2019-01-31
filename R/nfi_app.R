@@ -175,7 +175,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
 
     ## debug #####
     # output$debug1 <- shiny::renderPrint({
-    #   map_reactives$map_center
+    #   data_reactives$diameter_classes
     # })
     # output$debug2 <- shiny::renderPrint({
     #   map_reactives$map_click
