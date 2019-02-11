@@ -73,7 +73,9 @@ mod_vizInput <- function(id, nfidb, lang, texts_thes) {
             ns('viz_functional_group_value'), '',
             choices = '',
             options = list(
-              `size` = 10
+              `size` = 10,
+              `live-search` = TRUE,
+              `action-box` = FALSE
             )
           )
         ),
@@ -272,6 +274,7 @@ mod_viz <- function(
 
       viz_functional_group_value_choices <- dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL') %>%
         dplyr::filter(var_id == funct_group_var, var_table %in% table_names) %>%
+        dplyr::arrange(var_values) %>%
         dplyr::pull(var_values)
 
       if (!is.null(fg_filter_vals)) {
