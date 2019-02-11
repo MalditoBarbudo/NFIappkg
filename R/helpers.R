@@ -110,6 +110,8 @@ var_names_input_builder <- function(
     names(vars) <- vars_names
   }
 
+  # we need the variables ordered with sense, first the admin and id variables, later the
+  # proper table variables, the clim/topo/feat variables... So, let's order them
   vars_trans %>%
     dplyr::arrange(var_order_app) %>%
     dplyr::pull(var_id) %>%
