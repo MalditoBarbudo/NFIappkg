@@ -45,7 +45,9 @@ text_translate <- function(text, lang, texts_thes) {
     )
 }
 
-var_names_input_builder <- function(vars, lang, var_thes, texts_thes, summ = FALSE) {
+var_names_input_builder <- function(
+  vars, lang, var_thes, texts_thes, tables_names, summ = FALSE
+) {
 
   if (is.null(lang)) {
     lang <- 'eng'
@@ -60,10 +62,13 @@ var_names_input_builder <- function(vars, lang, var_thes, texts_thes, summ = FAL
       tolower()
 
     vars_trans <- var_thes %>%
-      dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%
-      dplyr::filter(var_id %in% vars_id) %>%
+      dplyr::select(
+        dplyr::one_of(
+          'var_id', glue::glue('translation_{lang}'), 'var_order_app', 'var_table'
+        )
+      ) %>%
+      dplyr::filter(var_id %in% vars_id, var_table %in% tables_names) %>%
       dplyr::distinct() %>%
-      # dplyr::collect() %>%
       as.data.frame()
 
     dummy_creator <- function(x, y) {
@@ -85,10 +90,16 @@ var_names_input_builder <- function(vars, lang, var_thes, texts_thes, summ = FAL
 
   } else {
     vars_trans <- var_thes %>%
-      dplyr::select(dplyr::one_of('var_id', glue::glue('translation_{lang}'))) %>%
-      dplyr::filter(var_id %in% vars) %>%
+      dplyr::select(
+        dplyr::one_of(
+          'var_id', glue::glue('translation_{lang}'), 'var_order_app', 'var_table'
+        )
+      ) %>%
+      dplyr::filter(var_id %in% vars, var_table %in% tables_names) %>%
+      dplyr::select(-dplyr::one_of(
+          'var_table'
+      )) %>%
       dplyr::distinct() %>%
-      dplyr::collect() %>%
       as.data.frame()
 
     vars_names <- vars %>%
@@ -99,7 +110,15 @@ var_names_input_builder <- function(vars, lang, var_thes, texts_thes, summ = FAL
     names(vars) <- vars_names
   }
 
-  return(vars[!is.na(names(vars))])
+  vars_trans %>%
+    dplyr::arrange(var_order_app) %>%
+    dplyr::pull(var_id) %>%
+    match(vars, .) %>%
+    order() -> order_of_vars
+
+  ordered_res <- vars[order_of_vars]
+
+  return(ordered_res)
 }
 
 # Call this function with an input (such as `textInput("text", NULL, "Search")`) if you

@@ -37,6 +37,41 @@ mod_map <- function(
   data_inputs, nfidb, var_thes, texts_thes, lang
 ) {
 
+  tables_to_look_at <- shiny::reactive({
+
+    shiny::validate(
+      shiny::need(data_inputs$nfi, 'No NFI version selected')
+    )
+
+    nfi <- data_inputs$nfi
+
+    if (nfi == 'nfi_2_nfi_3') {
+      nfi <- 'COMP_NFI2_NFI3'
+    } else {
+      if (nfi == 'nfi_3_nfi_4') {
+        nfi <- 'COMP_NFI3_NFI4'
+      } else {
+        nfi <- toupper(nfi)
+      }
+    }
+
+    functional_group <- data_inputs$functional_group %>% toupper()
+    diameter_classes <- data_inputs$diameter_classes
+
+    if (isTRUE(diameter_classes)) {
+      dc <- 'DIAMCLASS_'
+    } else {
+      dc <- ''
+    }
+
+    table_names <- c(
+      glue::glue("{functional_group}_{nfi}_{dc}RESULTS"),
+      'PLOTS',
+      glue::glue("PLOTS_{nfi}_DYNAMIC_INFO")
+    )
+    return(table_names)
+  })
+
   # output map
   output$map <- leaflet::renderLeaflet({
     leaflet::leaflet() %>%
@@ -471,7 +506,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = names(var_names_input_builder(viz_color, lang(), var_thes, texts_thes, TRUE)),
+            title = names(var_names_input_builder(viz_color, lang(), var_thes, texts_thes, tables_to_look_at(), TRUE)),
             layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
 
@@ -582,7 +617,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = names(var_names_input_builder(data_inputs$viz_color, lang(), var_thes, texts_thes)),
+            title = names(var_names_input_builder(data_inputs$viz_color, lang(), var_thes, texts_thes, tables_to_look_at())),
             layerId = 'color_legend', opacity = 1,
             className = legend_class,
             na.label = ''

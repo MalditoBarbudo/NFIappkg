@@ -168,7 +168,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_res_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$res_vars, lang(), var_thes, texts_thes) %>% sort(),
+        choices = var_names_input_builder(vars_to_filter_by()$res_vars, lang(), var_thes, texts_thes, tables_to_look_at()),
         label = text_translate('fil_res_vars_input', lang(), texts_thes)
       )
     }
@@ -178,7 +178,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_clim_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$climatic_vars, lang(), var_thes, texts_thes) %>% sort(),
+        choices = var_names_input_builder(vars_to_filter_by()$climatic_vars, lang(), var_thes, texts_thes, tables_to_look_at()),
         label = text_translate('fil_clim_vars_input', lang(), texts_thes)
       )
     }
@@ -188,7 +188,7 @@ mod_filters <- function(
     handlerExpr = {
       shinyWidgets::updatePickerInput(
         session, 'fil_plot_vars',
-        choices = var_names_input_builder(vars_to_filter_by()$plot_vars, lang(), var_thes, texts_thes) %>% sort(),
+        choices = var_names_input_builder(vars_to_filter_by()$plot_vars, lang(), var_thes, texts_thes, tables_to_look_at()),
         label = text_translate('fil_plot_vars_input', lang(), texts_thes)
       )
     }
@@ -235,7 +235,7 @@ mod_filters <- function(
                 dplyr::pull(var_values)
 
               shinyWidgets::pickerInput(
-                ns(var), label = names(var_names_input_builder(var, lang(), var_thes, texts_thes)),
+                ns(var), label = names(var_names_input_builder(var, lang(), var_thes, texts_thes, tables_to_look_at())),
                 choices = var_values,
                 selected = var_values[1], multiple = TRUE,
                 options = list(
@@ -257,7 +257,7 @@ mod_filters <- function(
                   dplyr::collect()
 
                 shiny::sliderInput(
-                  ns(var), label = names(var_names_input_builder(var, lang(), var_thes, texts_thes)),
+                  ns(var), label = names(var_names_input_builder(var, lang(), var_thes, texts_thes, tables_to_look_at())),
                   min = var_values[['var_min']],
                   max = var_values[['var_max']],
                   value = c(var_values[['var_min']], var_values[['var_max']]),

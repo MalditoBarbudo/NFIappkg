@@ -95,6 +95,41 @@ mod_info <- function(
     return(prep_data)
   }))
 
+  tables_to_look_at <- shiny::reactive({
+
+    shiny::validate(
+      shiny::need(data_inputs$nfi, 'No NFI version selected')
+    )
+
+    nfi <- data_inputs$nfi
+
+    if (nfi == 'nfi_2_nfi_3') {
+      nfi <- 'COMP_NFI2_NFI3'
+    } else {
+      if (nfi == 'nfi_3_nfi_4') {
+        nfi <- 'COMP_NFI3_NFI4'
+      } else {
+        nfi <- toupper(nfi)
+      }
+    }
+
+    functional_group <- data_inputs$functional_group %>% toupper()
+    diameter_classes <- data_inputs$diameter_classes
+
+    if (isTRUE(diameter_classes)) {
+      dc <- 'DIAMCLASS_'
+    } else {
+      dc <- ''
+    }
+
+    table_names <- c(
+      glue::glue("{functional_group}_{nfi}_{dc}RESULTS"),
+      'PLOTS',
+      glue::glue("PLOTS_{nfi}_DYNAMIC_INFO")
+    )
+    return(table_names)
+  })
+
   # reactive to prepare the plot and the table and return them as a list
   plot_and_table <- shiny::eventReactive(
     eventExpr = map_inputs$map_shape_click,
@@ -312,7 +347,7 @@ mod_info <- function(
       }
 
       title_viz_sel <- names(
-        var_names_input_builder(viz_sel, lang(), var_thes, texts_thes, summ_title)
+        var_names_input_builder(viz_sel, lang(), var_thes, texts_thes, tables_to_look_at(), summ_title)
       )
       title_click_group <- text_translate(click$group, lang(), texts_thes) %>%
         tolower()
@@ -341,7 +376,7 @@ mod_info <- function(
         tidyr::gather('Characteristics', 'Value') %>%
         dplyr::mutate(
           Characteristics = names(var_names_input_builder(
-            stringr::str_remove(.$Characteristics, '_mean'), lang(), var_thes, texts_thes)
+            stringr::str_remove(.$Characteristics, '_mean'), lang(), var_thes, texts_thes, tables_to_look_at())
           )
         ) %>%
         gt::gt(rowname_col = 'Characteristics') %>%

@@ -122,6 +122,41 @@ mod_table <- function(
     }
   )
 
+  tables_to_look_at <- shiny::reactive({
+
+    shiny::validate(
+      shiny::need(data_inputs$nfi, 'No NFI version selected')
+    )
+
+    nfi <- data_inputs$nfi
+
+    if (nfi == 'nfi_2_nfi_3') {
+      nfi <- 'COMP_NFI2_NFI3'
+    } else {
+      if (nfi == 'nfi_3_nfi_4') {
+        nfi <- 'COMP_NFI3_NFI4'
+      } else {
+        nfi <- toupper(nfi)
+      }
+    }
+
+    functional_group <- data_inputs$functional_group %>% toupper()
+    diameter_classes <- data_inputs$diameter_classes
+
+    if (isTRUE(diameter_classes)) {
+      dc <- 'DIAMCLASS_'
+    } else {
+      dc <- ''
+    }
+
+    table_names <- c(
+      glue::glue("{functional_group}_{nfi}_{dc}RESULTS"),
+      'PLOTS',
+      glue::glue("PLOTS_{nfi}_DYNAMIC_INFO")
+    )
+    return(table_names)
+  })
+
   # update the column visibility input
   shiny::observeEvent(
     eventExpr = table_data(),
@@ -138,7 +173,9 @@ mod_table <- function(
         session = session, 'col_vis_selector',
         label = text_translate('col_vis_selector_input', lang(), texts_thes),
         # choices = var_names_input_builder(col_vis_choices, lang(), var_thes, texts_thes),
-        choices = var_names_input_builder(col_vis_choices, lang(), var_thes, texts_thes, summ) %>% sort(),
+        choices = var_names_input_builder(
+          col_vis_choices, lang(), var_thes, texts_thes, tables_to_look_at(), summ
+        ),
         selected = col_vis_choices[1:7]
       )
     }
@@ -171,7 +208,9 @@ mod_table <- function(
       # dplyr::mutate_if(is.character, forcats::as_factor) %>%
       DT::datatable(
         rownames = FALSE,
-        colnames = names(var_names_input_builder(names(.), lang(), var_thes, texts_thes, summ)),
+        colnames = names(var_names_input_builder(
+          names(.), lang(), var_thes, texts_thes, tables_to_look_at(), summ
+        )),
         class = 'hover order-column stripe nowrap',
         filter = list(position = 'top', clear = FALSE, plain = FALSE),
         options = list(
