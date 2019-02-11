@@ -32,7 +32,8 @@ mod_tableOutput <- function(id) {
               `size` = 15,
               `max-options` = 50,
               `max-options-text` = 'Select limit reached (50)',
-              `live-search` = TRUE
+              `live-search` = TRUE,
+              `tick-icon` = 'glyphicon-tree-deciduous'
             )
           )
         ),
@@ -175,7 +176,8 @@ mod_table <- function(
         # choices = var_names_input_builder(col_vis_choices, lang(), var_thes, texts_thes),
         choices = var_names_input_builder(
           col_vis_choices, lang(), var_thes, texts_thes, tables_to_look_at(), summ
-        ),
+        ) %>%
+          var_inputs_aggregator(lang(), texts_thes),
         selected = col_vis_choices[1:7]
       )
     }

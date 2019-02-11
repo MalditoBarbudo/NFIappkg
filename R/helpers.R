@@ -123,6 +123,40 @@ var_names_input_builder <- function(
   return(ordered_res)
 }
 
+# Aggregator of inputs
+var_inputs_aggregator <- function(ready_vars, lang, texts_thes) {
+
+  list(
+    admin = ready_vars[stringr::str_detect(ready_vars, 'admin_')],
+    id = ready_vars[stringr::str_detect(ready_vars, '_id')],
+    proper_table = ready_vars[
+      !stringr::str_detect(ready_vars, 'admin_') &
+      !stringr::str_detect(ready_vars, '_id') &
+      !stringr::str_detect(ready_vars, 'clim_') &
+      !stringr::str_detect(ready_vars, 'topo_') &
+      !stringr::str_detect(ready_vars, 'feat_') &
+      !stringr::str_detect(ready_vars, 'coord_') &
+      !stringr::str_detect(ready_vars, 'old_')
+    ],
+    clim = ready_vars[stringr::str_detect(ready_vars, 'clim_')],
+    topo = ready_vars[stringr::str_detect(ready_vars, 'topo_')],
+    feat = ready_vars[stringr::str_detect(ready_vars, 'feat_')],
+    coord = ready_vars[stringr::str_detect(ready_vars, 'coord_')],
+    old = ready_vars[stringr::str_detect(ready_vars, 'old_')]
+  ) %>%
+    magrittr::set_names(c(
+      text_translate('admin', lang, texts_thes),
+      text_translate('id', lang, texts_thes),
+      text_translate('proper_table', lang, texts_thes),
+      text_translate('clim', lang, texts_thes),
+      text_translate('topo', lang, texts_thes),
+      text_translate('feat', lang, texts_thes),
+      text_translate('coord', lang, texts_thes),
+      text_translate('old', lang, texts_thes)
+    ))
+
+}
+
 # Call this function with an input (such as `textInput("text", NULL, "Search")`) if you
 # want to add an input to the navbar (from dean attali,
 # https://github.com/daattali/advanced-shiny)
