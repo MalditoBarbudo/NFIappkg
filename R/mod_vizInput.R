@@ -36,7 +36,9 @@ mod_vizInput <- function(id, nfidb, lang, texts_thes) {
           text_translate('viz_color_input', lang, texts_thes),
           choices = 'density',
           options = list(
-            `size` = 10
+            `size` = 10,
+            `live-search` = TRUE,
+            `action-box` = FALSE
           )
         ),
 
@@ -46,7 +48,9 @@ mod_vizInput <- function(id, nfidb, lang, texts_thes) {
             ns('viz_size'), text_translate('viz_size_input', lang, texts_thes),
             choices = '',
             options = list(
-              `size` = 10
+              `size` = 10,
+              `live-search` = TRUE,
+              `action-box` = FALSE
             )
           )
         ),
