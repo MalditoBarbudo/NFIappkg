@@ -5,7 +5,7 @@
 \title{mod_info server function}
 \usage{
 mod_info(input, output, session, map_inputs, data_inputs, nfidb, var_thes,
-  texts_thes, lang)
+  texts_thes, numerical_thes, lang)
 }
 \arguments{
 \item{input}{internal}

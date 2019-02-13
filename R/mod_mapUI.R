@@ -34,7 +34,7 @@ mod_mapUI <- function(id, nfidb) {
 #' @rdname mod_mapUI
 mod_map <- function(
   input, output, session,
-  data_inputs, nfidb, var_thes, texts_thes, lang
+  data_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang
 ) {
 
   tables_to_look_at <- shiny::reactive({
@@ -506,7 +506,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = names(var_names_input_builder(viz_color, lang(), var_thes, texts_thes, tables_to_look_at(), TRUE)),
+            title = names(var_names_input_builder(viz_color, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes, TRUE)),
             layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
 
@@ -617,7 +617,7 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = names(var_names_input_builder(data_inputs$viz_color, lang(), var_thes, texts_thes, tables_to_look_at())),
+            title = names(var_names_input_builder(data_inputs$viz_color, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes)),
             layerId = 'color_legend', opacity = 1,
             className = legend_class,
             na.label = ''

@@ -52,7 +52,7 @@ mod_infoUI <- function(id) {
 #' @export
 mod_info <- function(
   input, output, session,
-  map_inputs, data_inputs, nfidb, var_thes, texts_thes, lang
+  map_inputs, data_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang
 ) {
 
   prep_data <- dedupe(shiny::reactive({
@@ -347,7 +347,7 @@ mod_info <- function(
       }
 
       title_viz_sel <- names(
-        var_names_input_builder(viz_sel, lang(), var_thes, texts_thes, tables_to_look_at(), summ_title)
+        var_names_input_builder(viz_sel, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes, summ_title)
       )
       title_click_group <- text_translate(click$group, lang(), texts_thes) %>%
         tolower()
@@ -375,9 +375,11 @@ mod_info <- function(
       info_table <- table_data %>%
         tidyr::gather('Characteristics', 'Value') %>%
         dplyr::mutate(
+          Characteristics = stringr::str_remove(Characteristics, '_mean'),
           Characteristics = names(var_names_input_builder(
-            stringr::str_remove(.$Characteristics, '_mean'), lang(), var_thes, texts_thes, tables_to_look_at())
-          )
+            Characteristics, lang(), var_thes, texts_thes, tables_to_look_at(),
+            numerical_thes, ordered = FALSE
+          ))
         ) %>%
         gt::gt(rowname_col = 'Characteristics') %>%
         gt::tab_header(

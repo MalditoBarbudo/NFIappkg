@@ -4,7 +4,8 @@
 \alias{mod_viz}
 \title{mod_viz server function}
 \usage{
-mod_viz(input, output, session, data_inputs, nfidb, var_thes, texts_thes, lang)
+mod_viz(input, output, session, data_inputs, nfidb, var_thes, texts_thes,
+  numerical_thes, lang)
 }
 \arguments{
 \item{input}{internal}

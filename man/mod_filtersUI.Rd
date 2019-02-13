@@ -8,7 +8,7 @@
 mod_filtersUI(id, nfidb, lang, texts_thes)
 
 mod_filters(input, output, session, nfidb, data_inputs, var_thes, texts_thes,
-  lang)
+  numerical_thes, lang)
 }
 \arguments{
 \item{id}{shiny id}

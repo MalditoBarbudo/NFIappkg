@@ -11,6 +11,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
   ### Variables names inter ####################################################
   var_thes <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>% dplyr::collect()
   texts_thes <- dplyr::tbl(nfidb, 'TEXTS_THESAURUS') %>% dplyr::collect()
+  numerical_thes <- dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL') %>% dplyr::collect()
 
   ### Language input ###########################################################
   shiny::addResourcePath(
@@ -133,19 +134,19 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # data inputs
     data_reactives <- shiny::callModule(
       mod_data, 'mod_dataInput',
-      nfidb, var_thes, texts_thes, lang
+      nfidb, var_thes, texts_thes, numerical_thes, lang
     )
 
     # map
     map_reactives <- shiny::callModule(
       mod_map, 'mod_mapUI',
-      data_reactives, nfidb, var_thes, texts_thes, lang
+      data_reactives, nfidb, var_thes, texts_thes, numerical_thes, lang
     )
 
     # info panel
     info_reactives <- shiny::callModule(
       mod_info, 'mod_infoUI',
-      map_reactives, data_reactives, nfidb, var_thes, texts_thes, lang
+      map_reactives, data_reactives, nfidb, var_thes, texts_thes, numerical_thes, lang
     )
 
     # saveMap panel
@@ -157,7 +158,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
     # table
     shiny::callModule(
       mod_table, 'mod_tableOutput',
-      data_reactives, map_reactives, nfidb, var_thes, texts_thes, lang
+      data_reactives, map_reactives, nfidb, var_thes, texts_thes, numerical_thes, lang
     )
 
     shiny::observeEvent(

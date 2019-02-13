@@ -31,7 +31,7 @@ mod_dataInput <- function(id, nfidb) {
 #' @export
 mod_data <- function(
   input, output, session,
-  nfidb, var_thes, texts_thes, lang
+  nfidb, var_thes, texts_thes, numerical_thes, lang
 ) {
 
   # renderUI
@@ -211,12 +211,12 @@ mod_data <- function(
 
   viz_reactives <- shiny::callModule(
     mod_viz, 'mod_vizInput',
-    data_inputs, nfidb, var_thes, texts_thes, lang
+    data_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang
   )
 
   filters_reactives <- shiny::callModule(
     mod_filters, 'mod_filtersUI',
-    nfidb, data_inputs, var_thes, texts_thes, lang
+    nfidb, data_inputs, var_thes, texts_thes, numerical_thes, lang
   )
 
   # observer to get the filter expressions and the buttons actions

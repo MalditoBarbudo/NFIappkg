@@ -130,7 +130,7 @@ mod_vizInput <- function(id, nfidb, lang, texts_thes) {
 #' @rdname mod_vizUI
 mod_viz <- function(
   input, output, session,
-  data_inputs, nfidb, var_thes, texts_thes, lang
+  data_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang
 ) {
 
   tables_to_look_at <- shiny::reactive({
@@ -209,7 +209,7 @@ mod_viz <- function(
     shinyWidgets::updatePickerInput(
       session, 'viz_color',
       choices = var_names_input_builder(
-        color_choices, lang(), var_thes, texts_thes, tables_to_look_at()
+        color_choices, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes
       ) %>%
         var_inputs_aggregator(lang(), texts_thes),
       label = text_translate('viz_color_input', lang(), texts_thes),
@@ -231,7 +231,7 @@ mod_viz <- function(
       shinyWidgets::updatePickerInput(
         session, 'viz_size',
         choices = c('', var_names_input_builder(
-          size_choices, lang(), var_thes, texts_thes, tables_to_look_at()
+          size_choices, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes
         ) %>%
           var_inputs_aggregator(lang(), texts_thes)),
         label = text_translate('viz_size_input', lang(), texts_thes)

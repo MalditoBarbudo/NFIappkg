@@ -46,12 +46,14 @@ text_translate <- function(text, lang, texts_thes) {
 }
 
 var_names_input_builder <- function(
-  vars, lang, var_thes, texts_thes, tables_names, summ = FALSE
+  vars, lang, var_thes, texts_thes, tables_names, numerical_thes, summ = FALSE, ordered = TRUE
 ) {
 
   if (is.null(lang)) {
     lang <- 'eng'
   }
+
+  # browser()
 
   if (summ) {
 
@@ -68,22 +70,37 @@ var_names_input_builder <- function(
         )
       ) %>%
       dplyr::filter(var_id %in% vars_id, var_table %in% tables_names) %>%
+      dplyr::left_join(
+        numerical_thes %>%
+          dplyr::select(var_id, var_table, var_units), by = c('var_id', 'var_table')
+      ) %>%
+      dplyr::mutate(var_units = glue::glue("[{var_units}]")) %>%
+      # tidyr::unite(
+      #   col = var_name,
+      #   !!rlang::sym(glue::glue("translation_{lang}")), var_units,
+      #   sep = ' '
+      # ) %>%
       dplyr::distinct() %>%
       as.data.frame()
 
     dummy_creator <- function(x, y) {
       name <- vars_trans[vars_trans$var_id == x, glue::glue('translation_{lang}')]
+      units <- vars_trans[vars_trans$var_id == x, glue::glue('var_units')]
       if (is.na(y)) {
         name
       } else {
-        glue::glue("{name} {y}")
+        if (stringr::str_detect(y, 'number')) {
+          glue::glue("{name} {y} [n]")
+        } else {
+          glue::glue("{name} {y} {units}")
+        }
       }
     }
 
     vars_names <- vars_id %>%
       purrr::map2_chr(
         vars_stat,
-        ~ dummy_creator(.x, .y)
+        .f = dummy_creator
       )
 
     names(vars) <- vars_names
@@ -96,6 +113,21 @@ var_names_input_builder <- function(
         )
       ) %>%
       dplyr::filter(var_id %in% vars, var_table %in% tables_names) %>%
+      dplyr::left_join(
+        numerical_thes %>%
+          dplyr::select(var_id, var_table, var_units), by = c('var_id', 'var_table')
+      ) %>%
+      dplyr::mutate(
+        var_units = dplyr::if_else(
+          is.na(var_units), NA_character_, as.character(glue::glue("[{var_units}]"))
+        )
+      ) %>%
+      tidyr::unite(
+        col = var_name,
+        !!rlang::sym(glue::glue("translation_{lang}")), var_units,
+        sep = ' '
+      ) %>%
+      dplyr::mutate(var_name = stringr::str_remove(var_name, ' NA')) %>%
       dplyr::select(-dplyr::one_of(
           'var_table'
       )) %>%
@@ -104,23 +136,27 @@ var_names_input_builder <- function(
 
     vars_names <- vars %>%
       purrr::map_chr(
-        ~ vars_trans[vars_trans$var_id == .x, glue::glue('translation_{lang}')]
+        ~ vars_trans[vars_trans$var_id == .x, 'var_name']
       )
 
     names(vars) <- vars_names
   }
 
-  # we need the variables ordered with sense, first the admin and id variables, later the
-  # proper table variables, the clim/topo/feat variables... So, let's order them
-  vars_trans %>%
-    dplyr::arrange(var_order_app) %>%
-    dplyr::pull(var_id) %>%
-    match(vars, .) %>%
-    order() -> order_of_vars
+  if (isTRUE(ordered)) {
+    # we need the variables ordered with sense, first the admin and id variables, later the
+    # proper table variables, the clim/topo/feat variables... So, let's order them
+    vars_trans %>%
+      dplyr::arrange(var_order_app) %>%
+      dplyr::pull(var_id) %>%
+      match(vars, .) %>%
+      order() -> order_of_vars
 
-  ordered_res <- vars[order_of_vars]
+    ordered_res <- vars[order_of_vars]
 
-  return(ordered_res)
+    return(ordered_res)
+  } else {
+    vars
+  }
 }
 
 # Aggregator of inputs

@@ -91,7 +91,7 @@ mod_tableOutput <- function(id) {
 #' @rdname mod_tableOutput
 mod_table <- function(
   input, output, session,
-  data_inputs, map_inputs, nfidb, var_thes, texts_thes, lang
+  data_inputs, map_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang
 ) {
 
   # table data from map_inputs, but only updated when apply button is pressed
@@ -175,7 +175,7 @@ mod_table <- function(
         label = text_translate('col_vis_selector_input', lang(), texts_thes),
         # choices = var_names_input_builder(col_vis_choices, lang(), var_thes, texts_thes),
         choices = var_names_input_builder(
-          col_vis_choices, lang(), var_thes, texts_thes, tables_to_look_at(), summ
+          col_vis_choices, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes, summ
         ) %>%
           var_inputs_aggregator(lang(), texts_thes),
         selected = col_vis_choices[1:7]
@@ -211,7 +211,7 @@ mod_table <- function(
       DT::datatable(
         rownames = FALSE,
         colnames = names(var_names_input_builder(
-          names(.), lang(), var_thes, texts_thes, tables_to_look_at(), summ
+          names(.), lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes, summ
         )),
         class = 'hover order-column stripe nowrap',
         filter = list(position = 'top', clear = FALSE, plain = FALSE),
