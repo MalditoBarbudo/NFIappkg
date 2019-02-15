@@ -40,13 +40,28 @@ mod_data <- function(
     ns <- session$ns
 
     ## preacalculated choices ####
-    nfi_choices <- c('nfi_2', 'nfi_3', 'nfi_4', 'nfi_2_nfi_3', 'nfi_3_nfi_4') %>%
+    nfi_choices <- c(
+      # base_data
+      'nfi_2', 'nfi_3', 'nfi_4',
+      # comparisions
+      'nfi_2_nfi_3', 'nfi_3_nfi_4',
+      # shrub
+      'nfi_2_shrub', 'nfi_3_shrub', 'nfi_4_shrub',
+      # regeneration
+      'nfi_2_regen', 'nfi_3_regen', 'nfi_4_regen'
+    ) %>%
       magrittr::set_names(c(
         text_translate('nfi_2', lang(), texts_thes),
         text_translate('nfi_3', lang(), texts_thes),
         text_translate('nfi_4', lang(), texts_thes),
         text_translate('nfi_2_nfi_3', lang(), texts_thes),
-        text_translate('nfi_3_nfi_4', lang(), texts_thes)
+        text_translate('nfi_3_nfi_4', lang(), texts_thes),
+        text_translate('nfi_2_shrub', lang(), texts_thes),
+        text_translate('nfi_3_shrub', lang(), texts_thes),
+        text_translate('nfi_4_shrub', lang(), texts_thes),
+        text_translate('nfi_2_regen', lang(), texts_thes),
+        text_translate('nfi_3_regen', lang(), texts_thes),
+        text_translate('nfi_4_regen', lang(), texts_thes)
       ))
 
     viz_shape_choices <- c('polygon', 'plot') %>%
@@ -149,6 +164,13 @@ mod_data <- function(
                   ns('diameter_classes'),
                   label = text_translate('diameter_classes_input', lang(), texts_thes),
                   status = 'info'
+                ),
+                shinyjs::hidden(
+                  shiny::div(
+                    id = ns('shrub_regen_warn'),
+                    'When shrub or regeneration tables are selected,
+                     breakdown and diameter classes are inactive'
+                  )
                 )
               )
             ),
@@ -198,6 +220,28 @@ mod_data <- function(
     # data_inputs$protected_areas <- input$protected_areas
     data_inputs$functional_group <- input$functional_group
     data_inputs$diameter_classes <- input$diameter_classes
+  })
+
+  # observer to disable the breakdown and diamclass inputs when shrub or regeneration
+  # tables are selected
+  shiny::observe({
+
+    # validation
+    shiny::validate(
+      shiny::need(input$nfi, 'no nfi selected')
+    )
+
+    # disabling and enabling
+    nfi <- input$nfi
+    if (stringr::str_detect(nfi, 'shrub|regen')) {
+      shinyjs::hide('functional_group')
+      shinyjs::hide('diameter_classes')
+      shinyjs::showElement('shrub_regen_warn')
+    } else {
+      shinyjs::show('functional_group')
+      shinyjs::show('diameter_classes')
+      shinyjs::hideElement('shrub_regen_warn')
+    }
   })
 
   # calling the modules used

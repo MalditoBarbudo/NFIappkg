@@ -94,6 +94,8 @@ mod_returnedData <- function(
         value = 35
       )
 
+      # browser()
+
       selected_data <- tidyNFI::nfi_results_data(
         conn = nfidb,
         nfi = nfi,
@@ -118,6 +120,19 @@ mod_returnedData <- function(
               dplyr::collect(),
             by = 'plot_id'
           )
+      } else {
+        if (nfi %in% c(
+          'nfi_2_shrub', 'nfi_3_shrub', 'nfi_4_shrub',
+          'nfi_2_regen', 'nfi_3_regen', 'nfi_4_regen'
+        )) {
+          nfi_stripped <- stringr::str_extract(nfi, "nfi_[2-4]")
+          selected_data <- selected_data %>%
+            dplyr::left_join(
+              dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi_stripped)}_DYNAMIC_INFO")) %>%
+                dplyr::collect(),
+              by = 'plot_id'
+            )
+        }
       }
 
       shinyWidgets::updateProgressBar(

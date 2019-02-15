@@ -39,6 +39,10 @@ text_translate <- function(text, lang, texts_thes) {
     # dplyr::collect() %>%
     as.data.frame()
 
+  if (nrow(text_df) < 1) {
+    stop(glue::glue("{text} not found in thesaurus"))
+  }
+
   text %>%
     purrr::map_chr(
       ~ text_df[text_df$text_id == .x, glue::glue('text_{lang}')]
