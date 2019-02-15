@@ -169,7 +169,7 @@ mod_data <- function(
                   shiny::div(
                     id = ns('shrub_regen_warn'),
                     'When shrub or regeneration tables are selected,
-                     breakdown and diameter classes are inactive'
+                     breakdown is fixed to species and diameter classes are inactive'
                   )
                 )
               )
@@ -234,11 +234,18 @@ mod_data <- function(
     # disabling and enabling
     nfi <- input$nfi
     if (stringr::str_detect(nfi, 'shrub|regen')) {
-      shinyjs::hide('functional_group')
+      # shinyjs::hide('functional_group')
+      shinyWidgets::updatePickerInput(
+        session, 'functional_group',
+        text_translate('functional_group_input', lang(), texts_thes),
+        choices = 'species' %>%
+          magrittr::set_names(text_translate('fg_species', lang(), texts_thes)),
+        selected = 'species'
+      )
       shinyjs::hide('diameter_classes')
       shinyjs::showElement('shrub_regen_warn')
     } else {
-      shinyjs::show('functional_group')
+      # shinyjs::show('functional_group')
       shinyjs::show('diameter_classes')
       shinyjs::hideElement('shrub_regen_warn')
     }

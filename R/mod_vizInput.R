@@ -288,7 +288,8 @@ mod_viz <- function(
   shiny::observe({
 
     shiny::validate(
-      shiny::need(data_inputs$functional_group, 'No breakdown selected')
+      shiny::need(data_inputs$functional_group, 'No breakdown selected'),
+      shiny::need(data_inputs$nfi, 'No nfi selected')
     )
 
     if (data_inputs$functional_group != 'plot') {
@@ -306,7 +307,7 @@ mod_viz <- function(
       if (!is.null(fg_filter_vals)) {
         viz_functional_group_value_choices <- viz_functional_group_value_choices[
           viz_functional_group_value_choices %in% fg_filter_vals
-        ]
+          ]
       }
 
       shinyWidgets::updatePickerInput(
@@ -318,6 +319,36 @@ mod_viz <- function(
     } else {
       shinyjs::hide('viz_functional_group_value')
     }
+
+    # if (data_inputs$nfi %in% c(
+    #   'nfi_2_shrub', 'nfi_3_shrub', 'nfi_4_shrub',
+    #   'nfi_2_regen', 'nfi_3_regen', 'nfi_4_regen'
+    # )) {
+    #   functional_group <- 'species'
+    #   funct_group_var <- glue::glue('{functional_group}_id')
+    #   table_names <- tables_to_look_at()
+    #   fg_filter_vals <- data_inputs$otf_filter_inputs[[funct_group_var]]
+    #
+    #   viz_functional_group_value_choices <- dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL') %>%
+    #     dplyr::filter(var_id == funct_group_var, var_table %in% table_names) %>%
+    #     dplyr::arrange(var_values) %>%
+    #     dplyr::pull(var_values)
+    #
+    #   if (!is.null(fg_filter_vals)) {
+    #     viz_functional_group_value_choices <- viz_functional_group_value_choices[
+    #       viz_functional_group_value_choices %in% fg_filter_vals
+    #       ]
+    #   }
+    #
+    #   shinyWidgets::updatePickerInput(
+    #     session, 'viz_functional_group_value',
+    #     choices = viz_functional_group_value_choices,
+    #     label = glue::glue(text_translate('viz_functional_group_value_input', lang(), texts_thes))
+    #   )
+    #   shinyjs::show('viz_functional_group_value')
+    # } else {
+    #
+    # }
   })
 
   # diameter_classes
