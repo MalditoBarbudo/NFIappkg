@@ -239,7 +239,8 @@ mod_table <- function(
       DT::datatable(
         rownames = FALSE,
         colnames = names(var_names_input_builder(
-          names(.), lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes, summ
+          names(.), lang(), var_thes, texts_thes, tables_to_look_at(),
+          numerical_thes, summ, ordered = FALSE
         )),
         class = 'hover order-column stripe nowrap',
         filter = list(position = 'top', clear = FALSE, plain = FALSE),

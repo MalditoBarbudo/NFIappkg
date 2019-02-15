@@ -167,26 +167,28 @@ var_names_input_builder <- function(
 var_inputs_aggregator <- function(ready_vars, lang, texts_thes) {
 
   list(
-    admin = ready_vars[stringr::str_detect(ready_vars, 'admin_')],
-    id = ready_vars[stringr::str_detect(ready_vars, '_id')],
+    id = ready_vars[stringr::str_detect(ready_vars, '_id')] %>%
+      magrittr::extract(!stringr::str_detect(., 'admin_|old_')),
+    admin = ready_vars[stringr::str_detect(ready_vars, 'admin_')] %>%
+      magrittr::extract(!stringr::str_detect(., '_id')),
     proper_table = ready_vars[
       !stringr::str_detect(ready_vars, 'admin_') &
       !stringr::str_detect(ready_vars, '_id') &
       !stringr::str_detect(ready_vars, 'clim_') &
       !stringr::str_detect(ready_vars, 'topo_') &
       !stringr::str_detect(ready_vars, 'feat_') &
-      !stringr::str_detect(ready_vars, 'coord_') &
+      !stringr::str_detect(ready_vars, 'coords_') &
       !stringr::str_detect(ready_vars, 'old_')
     ],
     clim = ready_vars[stringr::str_detect(ready_vars, 'clim_')],
     topo = ready_vars[stringr::str_detect(ready_vars, 'topo_')],
     feat = ready_vars[stringr::str_detect(ready_vars, 'feat_')],
-    coord = ready_vars[stringr::str_detect(ready_vars, 'coord_')],
+    coord = ready_vars[stringr::str_detect(ready_vars, 'coords_')],
     old = ready_vars[stringr::str_detect(ready_vars, 'old_')]
   ) %>%
     magrittr::set_names(c(
-      text_translate('admin', lang, texts_thes),
       text_translate('id', lang, texts_thes),
+      text_translate('admin', lang, texts_thes),
       text_translate('proper_table', lang, texts_thes),
       text_translate('clim', lang, texts_thes),
       text_translate('topo', lang, texts_thes),
