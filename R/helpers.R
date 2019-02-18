@@ -222,6 +222,17 @@ infoplot_builder <- function(
   numerical_thes, summ_title, click, session
 ) {
 
+  # title viz_sel and title click group (needed by text_translate to build
+  # the plot title)
+  title_viz_sel <- names(
+    var_names_input_builder(
+      viz_sel, lang(), var_thes, texts_thes, tables_to_look_at(),
+      numerical_thes, summ_title
+    )
+  )
+  title_click_group <- text_translate(click$group, lang(), texts_thes) %>%
+    tolower()
+
   # build the plot expression, with glue but before, reduce the functional_group
   # if many
   if (fg_id %in% names(plot_data_all)) {
@@ -267,23 +278,20 @@ infoplot_builder <- function(
 
       plot_data_all <- plot_data_all %>%
         dplyr::filter(!! rlang::sym(fg_id) %in% fg_list)
-
-      plot_expression <- glue::glue(
-        "plot_data_all %>%
-            ggplot2::ggplot(ggplot2::aes(x = ' ', y = {viz_sel}))"
-      )
     }
   }
 
-  plot_expression <- glue::glue(
-    "plot_data_all %>%
-            ggplot2::ggplot(ggplot2::aes(x = ' ', y = {viz_sel}))"
-  )
-
-  # geom_jiter, different if we have viz_size
-  if (viz_size %in% names(plot_data_all)) {
+  ## If the variable is numerical, lets do some violin and jitter plots:
+  if (data_inputs$viz_color %in% (numerical_thes %>% dplyr::pull(var_id))) {
     plot_expression <- glue::glue(
-      "{plot_expression} +
+      "plot_data_all %>%
+        ggplot2::ggplot(ggplot2::aes(x = ' ', y = {viz_sel}))"
+    )
+
+    # geom_jiter, different if we have viz_size
+    if (viz_size %in% names(plot_data_all)) {
+      plot_expression <- glue::glue(
+        "{plot_expression} +
             ggplot2::geom_jitter(
               data = plot_data_unsel,
               ggplot2::aes(size = {viz_size}), width = 0.1, height = 0,
@@ -293,10 +301,10 @@ infoplot_builder <- function(
               data = plot_data_sel, ggplot2::aes(size = {viz_size}), width = 0.1,
               height = 0, alpha = 1, color = 'red', show.legend = FALSE
             )"
-    )
-  } else {
-    plot_expression <- glue::glue(
-      "{plot_expression} +
+      )
+    } else {
+      plot_expression <- glue::glue(
+        "{plot_expression} +
             ggplot2::geom_jitter(
               data = plot_data_unsel,
               width = 0.1, height = 0, alpha = 0.3, size = 4,
@@ -306,78 +314,115 @@ infoplot_builder <- function(
               data = plot_data_sel, width = 0.1, size = 4,
               height = 0, alpha = 1, color = 'red', show.legend = FALSE
             )"
-    )
-  }
+      )
+    }
 
-  # geom_violin, we can't use quantiles because when we breakdown by diamclass
-  # there is errors. Also we have to check for one or two rows data, in which case we
-  # don't use geom violin
-  if (nrow(plot_data_all) > 2) {
-    plot_expression <- glue::glue(
-      "{plot_expression} +
+    # geom_violin, we can't use quantiles because when we breakdown by diamclass
+    # there is errors. Also we have to check for one or two rows data, in which case we
+    # don't use geom violin
+    if (nrow(plot_data_all) > 2) {
+      plot_expression <- glue::glue(
+        "{plot_expression} +
         ggplot2::geom_violin(
           adjust = 0.5,
           fill = 'transparent', colour = 'grey88'
         )"
-    )
-  }
+      )
+    }
 
-  # facet_grid based on the existence of diamclass_id and fg_id
-  if (all(c('diamclass_id', fg_id) %in% names(plot_data_all))) {
-    plot_expression <- glue::glue(
-      "{plot_expression} +
+    # facet_grid based on the existence of diamclass_id and fg_id
+    if (all(c('diamclass_id', fg_id) %in% names(plot_data_all))) {
+      plot_expression <- glue::glue(
+        "{plot_expression} +
         ggplot2::facet_grid(
           {fg_id}~diamclass_id
         ) +
         ggplot2::labs(
+          y = title_viz_sel,
+          x = '',
+          title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
           subtitle = glue::glue(text_translate('info_plot_subtitle_double_facetted', lang(), texts_thes))
         )"
-    )
-  } else {
-    if('diamclass_id' %in% names(plot_data_all)) {
-      # browser()
-      plot_expression <- glue::glue(
-        "{plot_expression} +
+      )
+    } else {
+      if('diamclass_id' %in% names(plot_data_all)) {
+        # browser()
+        plot_expression <- glue::glue(
+          "{plot_expression} +
           ggplot2::facet_grid(
             .~diamclass_id
           ) +
           ggplot2::labs(
+            y = title_viz_sel,
+            x = '',
+            title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
             subtitle = glue::glue(text_translate('info_plot_subtitle_dc_facetted', lang(), texts_thes))
           )"
-      )
-    } else {
-      if (fg_id %in% names(plot_data_all)) {
-        plot_expression <- glue::glue(
-          "{plot_expression} +
+        )
+      } else {
+        if (fg_id %in% names(plot_data_all)) {
+          plot_expression <- glue::glue(
+            "{plot_expression} +
             ggplot2::facet_grid(
               .~{fg_id}
             ) +
             ggplot2::labs(
+              y = title_viz_sel,
+              x = '',
+              title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
               subtitle = glue::glue(text_translate('info_plot_subtitle_fg_facetted', lang(), texts_thes))
             )"
-        )
+          )
+        } else {
+          plot_expression <- glue::glue(
+            "{plot_expression} +
+              ggplot2::labs(
+                y = title_viz_sel,
+                x = '',
+                title = glue::glue(text_translate('info_plot_title', lang(), texts_thes))
+              )"
+          )
+        }
       }
+    }
+  } else {
+    ## if viz_sel is not numeric, then the plot changes
+    plot_expression <- glue::glue(
+      "plot_data_all %>%
+        ggplot2::ggplot(ggplot2::aes(x = {viz_sel})) +
+        ggplot2::geom_bar()"
+    )
+
+    # if functional group different from plot, then facet. In this case there is
+    # no need to facet by diameter class as is the same data for all dc's
+    if (fg_id %in% names(plot_data_all)) {
+      plot_expression <- glue::glue(
+        "{plot_expression} +
+            ggplot2::facet_grid(
+              .~{fg_id}
+            ) +
+            ggplot2::labs(
+              x = title_viz_sel,
+              y = 'n',
+              title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
+              subtitle = glue::glue(text_translate('info_plot_subtitle_fg_facetted', lang(), texts_thes))
+            )"
+      )
+    } else {
+      plot_expression <- glue::glue(
+        "{plot_expression} +
+            ggplot2::labs(
+              x = title_viz_sel,
+              y = 'n',
+              title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
+              subtitle = glue::glue(text_translate('info_plot_subtitle_fg_facetted', lang(), texts_thes))
+            )"
+      )
     }
   }
 
-  # title viz_sel and title click group (needed by text_translate to build
-  # the plot title)
-  title_viz_sel <- names(
-    var_names_input_builder(
-      viz_sel, lang(), var_thes, texts_thes, tables_to_look_at(),
-      numerical_thes, summ_title
-    )
-  )
-  title_click_group <- text_translate(click$group, lang(), texts_thes) %>%
-    tolower()
-
   plot_expression <- glue::glue(
     "{plot_expression} +
-      ggplot2::labs(
-        title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
-        y = title_viz_sel,
-        x = ''
-      ) +
       ggplot2::theme_minimal() +
       ggplot2::theme(
         text = ggplot2::element_text(size = 14, color = 'gray88'),

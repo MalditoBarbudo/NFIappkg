@@ -101,18 +101,6 @@ mod_info <- function(
       shiny::need(data_inputs$nfi, 'No NFI version selected')
     )
 
-    # nfi <- data_inputs$nfi
-    #
-    # if (nfi == 'nfi_2_nfi_3') {
-    #   nfi <- 'COMP_NFI2_NFI3'
-    # } else {
-    #   if (nfi == 'nfi_3_nfi_4') {
-    #     nfi <- 'COMP_NFI3_NFI4'
-    #   } else {
-    #     nfi <- toupper(nfi)
-    #   }
-    # }
-
     nfi <- switch(
       data_inputs$nfi,
       'nfi_2' = 'NFI_2',
