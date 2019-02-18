@@ -246,6 +246,22 @@ mod_data <- function(
       shinyjs::showElement('shrub_regen_warn')
     } else {
       # shinyjs::show('functional_group')
+      functional_group_choices <- c('plot', 'species', 'simpspecies', 'genus', 'dec', 'bc') %>%
+        magrittr::set_names(c(
+          text_translate('fg_plot', lang(), texts_thes),
+          text_translate('fg_species', lang(), texts_thes),
+          text_translate('fg_simpspecies', lang(), texts_thes),
+          text_translate('fg_genus', lang(), texts_thes),
+          text_translate('fg_dec', lang(), texts_thes),
+          text_translate('fg_bc', lang(), texts_thes)
+        ))
+
+      shinyWidgets::updatePickerInput(
+        session, 'functional_group',
+        text_translate('functional_group_input', lang(), texts_thes),
+        choices = functional_group_choices,
+        selected = 'plots'
+      )
       shinyjs::show('diameter_classes')
       shinyjs::hideElement('shrub_regen_warn')
     }

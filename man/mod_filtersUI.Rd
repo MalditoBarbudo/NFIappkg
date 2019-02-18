@@ -7,8 +7,8 @@
 \usage{
 mod_filtersUI(id, nfidb, lang, texts_thes)
 
-mod_filters(input, output, session, nfidb, data_inputs, var_thes, texts_thes,
-  numerical_thes, lang)
+mod_filters(input, output, session, nfidb, data_inputs, var_thes,
+  texts_thes, numerical_thes, lang)
 }
 \arguments{
 \item{id}{shiny id}
@@ -30,6 +30,4 @@ we are}
 }
 \description{
 A shiny module to generate and process the filters
-
-mod_filters server function
 }

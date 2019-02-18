@@ -4,8 +4,8 @@
 \alias{mod_data}
 \title{mod_data server function}
 \usage{
-mod_data(input, output, session, nfidb, var_thes, texts_thes, numerical_thes,
-  lang)
+mod_data(input, output, session, nfidb, var_thes, texts_thes,
+  numerical_thes, lang)
 }
 \arguments{
 \item{input}{internal}

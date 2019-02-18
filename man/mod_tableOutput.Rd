@@ -29,6 +29,4 @@ mod_table(input, output, session, data_inputs, map_inputs, nfidb, var_thes,
 }
 \description{
 A shiny module to generate the base IFN plots table
-
-mod_table server function
 }
