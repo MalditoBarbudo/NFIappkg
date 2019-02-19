@@ -170,7 +170,7 @@ mod_info <- function(
 
         table_data <- plot_data_sel %>%
           dplyr::select(dplyr::one_of(
-            'plot_id', 'admin_province',
+            'plot_id', 'admin_province', viz_sel, viz_size,
             'topo_altitude_asl', 'topo_fdm_slope_percentage',
             'topo_fdm_aspect_cardinal_8',
             'clim_tmean_year', 'clim_prec_year', 'clim_pet_year'
@@ -199,7 +199,7 @@ mod_info <- function(
         table_data <-  plot_data_sel %>%
           dplyr::ungroup() %>%
           dplyr::select(dplyr::one_of(
-            admin_sel,
+            admin_sel, viz_sel,
             'topo_altitude_asl_mean', 'topo_fdm_slope_percentage_mean',
             'clim_tmean_year_mean', 'clim_prec_year_mean', 'clim_pet_year_mean'
           )) %>%
