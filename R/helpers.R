@@ -451,7 +451,7 @@ infoplot_builder <- function(
             ) +
             ggplot2::labs(
               x = title_viz_sel,
-              y = 'n',
+              y = glue::glue(text_translate('n_y_axis_infoplot', lang(), texts_thes)),
               title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
               subtitle = glue::glue(text_translate('info_plot_subtitle_fg_facetted', lang(), texts_thes))
             )"
@@ -461,7 +461,7 @@ infoplot_builder <- function(
         "{plot_expression} +
             ggplot2::labs(
               x = title_viz_sel,
-              y = 'n',
+              y = glue::glue(text_translate('n_y_axis_infoplot', lang(), texts_thes)),
               title = glue::glue(text_translate('info_plot_title', lang(), texts_thes))
             )"
       )
