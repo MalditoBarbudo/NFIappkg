@@ -78,18 +78,15 @@ var_names_input_builder <- function(
         numerical_thes %>%
           dplyr::select(var_id, var_table, var_units), by = c('var_id', 'var_table')
       ) %>%
-      dplyr::mutate(var_units = glue::glue("[{var_units}]")) %>%
-      # tidyr::unite(
-      #   col = var_name,
-      #   !!rlang::sym(glue::glue("translation_{lang}")), var_units,
-      #   sep = ' '
-      # ) %>%
+      dplyr::mutate(var_units = dplyr::if_else(
+        is.na(var_units), glue::glue(''), glue::glue("[{var_units}]")
+      )) %>%
       dplyr::distinct() %>%
       as.data.frame()
 
     dummy_creator <- function(x, y) {
-      name <- vars_trans[vars_trans$var_id == x, glue::glue('translation_{lang}')]
-      units <- vars_trans[vars_trans$var_id == x, glue::glue('var_units')]
+      name <- vars_trans[vars_trans$var_id == x, glue::glue('translation_{lang}')][1]
+      units <- vars_trans[vars_trans$var_id == x, 'var_units'][1]
       if (is.na(y)) {
         name
       } else {
@@ -145,6 +142,11 @@ var_names_input_builder <- function(
 
     names(vars) <- vars_names
   }
+
+  # browser()
+
+  # get rid of the duplicated vars (plot_id)
+  vars <- vars[!duplicated(vars)]
 
   if (isTRUE(ordered)) {
     # we need the variables ordered with sense, first the admin and id variables, later the
@@ -217,7 +219,7 @@ navbarPageWithInputs <- function(..., inputs) {
 # info plot builder
 infoplot_builder <- function(
   plot_data_all, plot_data_sel, plot_data_unsel,
-  fg_id, data_inputs, viz_sel, viz_size, admin_sel,
+  fg_id, data_inputs, map_inputs, viz_sel, viz_size, admin_sel,
   lang, var_thes, texts_thes, tables_to_look_at,
   numerical_thes, summ_title, click, session
 ) {
@@ -387,11 +389,44 @@ infoplot_builder <- function(
     }
   } else {
     ## if viz_sel is not numeric, then the plot changes
-    plot_expression <- glue::glue(
-      "plot_data_all %>%
-        ggplot2::ggplot(ggplot2::aes(x = {viz_sel})) +
-        ggplot2::geom_bar()"
-    )
+    # also if the shape clicked is a polygon, we need the plot data instead
+    # (because in the summarised data there is no categorical data)
+    if (click$group != 'plots') {
+      viz_sel <- data_inputs$viz_color
+      plot_data_all <- map_inputs$main_data[['selected']] %>%
+        dplyr::select(dplyr::one_of(admin_sel, viz_sel, fg_id)) %>%
+        {
+          if (exists('fg_list')) {
+            dplyr::filter(., !! rlang::sym(fg_id) %in% fg_list)
+          } else {.}
+        } %>%
+        dplyr::mutate(fill = dplyr::if_else(
+          !!rlang::sym(admin_sel) == click$id, 'fill', 'nofill'
+        ))
+
+      plot_expression <- glue::glue(
+        "plot_data_all %>%
+          ggplot2::ggplot(ggplot2::aes(x = {viz_sel})) +
+          ggplot2::geom_bar(ggplot2::aes(fill = fill), show.legend = FALSE) +
+          ggplot2::scale_fill_manual(values = c('red', 'grey88'))"
+      )
+    } else {
+      pal_ref <- plot_data_all %>%
+        dplyr::pull(!!rlang::sym(viz_sel)) %>% unique() %>% sort()
+      click_value <- plot_data_all %>%
+        dplyr::filter(plot_id == click$id) %>%
+        dplyr::pull(!!rlang::sym(viz_sel))
+
+      pal_vals <- rep('grey88', length(pal_ref))
+      pal_vals[which(pal_ref == click_value)] <- 'red'
+
+      plot_expression <- glue::glue(
+        "plot_data_all %>%
+          ggplot2::ggplot(ggplot2::aes(x = {viz_sel})) +
+          ggplot2::geom_bar(ggplot2::aes(fill = {viz_sel}), show.legend = FALSE) +
+          ggplot2::scale_fill_manual(values = pal_vals)"
+      )
+    }
 
     # if functional group different from plot, then facet. In this case there is
     # no need to facet by diameter class as is the same data for all dc's
@@ -414,11 +449,11 @@ infoplot_builder <- function(
             ggplot2::labs(
               x = title_viz_sel,
               y = 'n',
-              title = glue::glue(text_translate('info_plot_title', lang(), texts_thes)),
-              subtitle = glue::glue(text_translate('info_plot_subtitle_fg_facetted', lang(), texts_thes))
+              title = glue::glue(text_translate('info_plot_title', lang(), texts_thes))
             )"
       )
     }
+
   }
 
   plot_expression <- glue::glue(

@@ -153,6 +153,8 @@ mod_info <- function(
 
       click <- map_inputs$map_shape_click
 
+      # browser()
+
       if (click$group == 'plots') {
 
         viz_sel <- data_inputs$viz_color
@@ -221,7 +223,7 @@ mod_info <- function(
 
       info_plot <- infoplot_builder(
         plot_data_all, plot_data_sel, plot_data_unsel,
-        fg_id, data_inputs, viz_sel, viz_size, admin_sel,
+        fg_id, data_inputs, map_inputs, viz_sel, viz_size, admin_sel,
         lang, var_thes, texts_thes, tables_to_look_at,
         numerical_thes, summ_title, click, session
       )
