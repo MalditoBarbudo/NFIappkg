@@ -410,7 +410,18 @@ infoplot_builder <- function(
           ggplot2::geom_bar(ggplot2::aes(fill = fill), show.legend = FALSE) +
           ggplot2::scale_fill_manual(values = c('red', 'grey88'))"
       )
+
+      # dont forget to change the title_viz_sel object, as it is not summ and
+      # is not viz_sel, but data_inputs$viz_color
+      title_viz_sel <- names(
+        var_names_input_builder(
+          data_inputs$viz_color, lang(), var_thes, texts_thes, tables_to_look_at(),
+          numerical_thes, FALSE
+        )
+      )
     } else {
+
+      # create the needed info to fill only the plot clicked value for viz sel
       pal_ref <- plot_data_all %>%
         dplyr::pull(!!rlang::sym(viz_sel)) %>% unique() %>% sort()
       click_value <- plot_data_all %>%
@@ -419,6 +430,8 @@ infoplot_builder <- function(
 
       pal_vals <- rep('grey88', length(pal_ref))
       pal_vals[which(pal_ref == click_value)] <- 'red'
+
+
 
       plot_expression <- glue::glue(
         "plot_data_all %>%
