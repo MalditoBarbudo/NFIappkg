@@ -22,12 +22,14 @@ mod_filtersUI <- function(id, nfidb, lang, texts_thes) {
           choices = '',
           multiple = TRUE,
           options = list(
-            `actions-box` = TRUE,
+            `actions-box` = FALSE,
             `deselect-all-text` = text_translate('deselect-all-text', lang, texts_thes),
             `select-all-text` = text_translate('select-all-text', lang, texts_thes),
             `selected-text-format` = 'count > 3',
             `count-selected-text` = text_translate('count-selected-text-var', lang, texts_thes),
-            `size` = 10
+            `size` = 10,
+            `live-search` = TRUE,
+            `tick-icon` = 'glyphicon-tree-deciduous'
           )
         )
       ),
@@ -39,12 +41,14 @@ mod_filtersUI <- function(id, nfidb, lang, texts_thes) {
           choices = '',
           multiple = TRUE,
           options = list(
-            `actions-box` = TRUE,
+            `actions-box` = FALSE,
             `deselect-all-text` = text_translate('deselect-all-text', lang, texts_thes),
             `select-all-text` = text_translate('select-all-text', lang, texts_thes),
             `selected-text-format` = 'count > 3',
             `count-selected-text` = text_translate('count-selected-text-var', lang, texts_thes),
-            `size` = 10
+            `size` = 10,
+            `live-search` = TRUE,
+            `tick-icon` = 'glyphicon-tree-deciduous'
           )
         )
       ),
@@ -56,12 +60,14 @@ mod_filtersUI <- function(id, nfidb, lang, texts_thes) {
           choices = '',
           multiple = TRUE,
           options = list(
-            `actions-box` = TRUE,
+            `actions-box` = FALSE,
             `deselect-all-text` = text_translate('deselect-all-text', lang, texts_thes),
             `select-all-text` = text_translate('select-all-text', lang, texts_thes),
             `selected-text-format` = 'count > 3',
             `count-selected-text` = text_translate('count-selected-text-var', lang, texts_thes),
-            `size` = 10
+            `size` = 10,
+            `live-search` = TRUE,
+            `tick-icon` = 'glyphicon-tree-deciduous'
           )
         )
       )
@@ -260,19 +266,22 @@ mod_filters <- function(
                 dplyr::left_join(
                   dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL'), by = c('var_id', 'var_table')
                 ) %>%
-                dplyr::pull(var_values)
+                dplyr::pull(var_values) %>%
+                sort()
 
               shinyWidgets::pickerInput(
                 ns(var), label = names(var_names_input_builder(var, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes)),
                 choices = var_values,
                 selected = var_values[1], multiple = TRUE,
                 options = list(
-                  `actions-box` = TRUE,
+                  `actions-box` = FALSE,
                   `deselect-all-text` = text_translate('deselect-all-text', lang(), texts_thes),
                   `select-all-text` = text_translate('select-all-text', lang(), texts_thes),
                   `selected-text-format` = 'count',
                   `count-selected-text` = text_translate('count-selected-text-value', lang(), texts_thes),
-                  `size` = 10
+                  `size` = 10,
+                  `live-search` = TRUE,
+                  `tick-icon` = 'glyphicon-tree-deciduous'
                 )
               )
             } else {
