@@ -20,3 +20,6 @@ mod_returnedData(input, output, session, data_inputs, map_inputs = NULL,
 
 \item{nfidb}{pool object to access the nfi db}
 }
+\description{
+mod_returnedData server function
+}
