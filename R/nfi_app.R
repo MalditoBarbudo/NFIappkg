@@ -41,7 +41,7 @@ nfi_app <- function(user = 'guest', password = 'guest') {
       inputs = shinyWidgets::pickerInput(
         'lang', NULL,
         choices = c('spa', 'eng'),
-        selected = 'eng',
+        selected = 'spa',
         width = '100px',
         choicesOpt = list(
           content = c(
