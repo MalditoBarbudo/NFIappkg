@@ -272,7 +272,8 @@ mod_filters <- function(
               shinyWidgets::pickerInput(
                 ns(var), label = names(var_names_input_builder(var, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes)),
                 choices = var_values,
-                selected = var_values[1], multiple = TRUE,
+                # selected = var_values[1],
+                multiple = TRUE,
                 options = list(
                   `actions-box` = FALSE,
                   `deselect-all-text` = text_translate('deselect-all-text', lang(), texts_thes),
