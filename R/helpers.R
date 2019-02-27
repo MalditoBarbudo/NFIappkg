@@ -224,6 +224,8 @@ infoplot_builder <- function(
   numerical_thes, summ_title, click, session
 ) {
 
+  browser()
+
   # title viz_sel and title click group (needed by text_translate to build
   # the plot title)
   title_viz_sel <- names(
@@ -290,10 +292,31 @@ infoplot_builder <- function(
         ggplot2::ggplot(ggplot2::aes(x = ' ', y = {viz_sel}))"
     )
 
-    # geom_jiter, different if we have viz_size
-    if (viz_size %in% names(plot_data_all)) {
-      plot_expression <- glue::glue(
-        "{plot_expression} +
+    # if there is filters in play, sometimes the plot_data_unsel is empty, check for that
+    if (nrow(plot_data_unsel) < 1) {
+      # geom_jiter, different if we have viz_size
+      if (viz_size %in% names(plot_data_all)) {
+        plot_expression <- glue::glue(
+          "{plot_expression} +
+            ggplot2::geom_jitter(
+              data = plot_data_sel, ggplot2::aes(size = {viz_size}), width = 0.1,
+              height = 0, alpha = 1, color = 'red', show.legend = FALSE
+            )"
+        )
+      } else {
+        plot_expression <- glue::glue(
+          "{plot_expression} +
+            ggplot2::geom_jitter(
+              data = plot_data_sel, width = 0.1, size = 4,
+              height = 0, alpha = 1, color = 'red', show.legend = FALSE
+            )"
+        )
+      }
+    } else {
+      # geom_jiter, different if we have viz_size
+      if (viz_size %in% names(plot_data_all)) {
+        plot_expression <- glue::glue(
+          "{plot_expression} +
             ggplot2::geom_jitter(
               data = plot_data_unsel,
               ggplot2::aes(size = {viz_size}), width = 0.1, height = 0,
@@ -303,10 +326,10 @@ infoplot_builder <- function(
               data = plot_data_sel, ggplot2::aes(size = {viz_size}), width = 0.1,
               height = 0, alpha = 1, color = 'red', show.legend = FALSE
             )"
-      )
-    } else {
-      plot_expression <- glue::glue(
-        "{plot_expression} +
+        )
+      } else {
+        plot_expression <- glue::glue(
+          "{plot_expression} +
             ggplot2::geom_jitter(
               data = plot_data_unsel,
               width = 0.1, height = 0, alpha = 0.3, size = 4,
@@ -316,7 +339,8 @@ infoplot_builder <- function(
               data = plot_data_sel, width = 0.1, size = 4,
               height = 0, alpha = 1, color = 'red', show.legend = FALSE
             )"
-      )
+        )
+      }
     }
 
     # geom_violin, we can't use quantiles because when we breakdown by diamclass
@@ -347,7 +371,7 @@ infoplot_builder <- function(
         )"
       )
     } else {
-      if('diamclass_id' %in% names(plot_data_all)) {
+      if ('diamclass_id' %in% names(plot_data_all)) {
         # browser()
         plot_expression <- glue::glue(
           "{plot_expression} +

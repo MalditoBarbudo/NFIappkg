@@ -372,8 +372,17 @@ mod_map <- function(
           ) %>%
           dplyr::select(dplyr::one_of(
             c('plot_id', 'coords_longitude', 'coords_latitude'), viz_color, viz_size
-          )) #%>%
-          #dplyr::collect()
+          ))
+
+        if (nrow(map_data_pre) < 1) {
+          shinyWidgets::sendSweetAlert(
+            session,
+            title = 'Ooops',
+            text = 'the functional group selected in the visualization menu is not present
+            in the data, please select another one',
+            type = 'warning'
+          )
+        }
 
         shiny::validate(
           shiny::need(

@@ -310,6 +310,13 @@ mod_viz <- function(
           ]
       }
 
+      # # we need to remove not only if there is a filter (as above), also when other filters
+      # # reduce the final available functional groups
+      #
+      # viz_functional_group_value_choices <- viz_functional_group_value_choices[
+      #   viz_functional_group_value_choices %in% fg_filter_vals
+      #   ]
+
       shinyWidgets::updatePickerInput(
         session, 'viz_functional_group_value',
         choices = viz_functional_group_value_choices,
