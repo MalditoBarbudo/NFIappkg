@@ -224,8 +224,6 @@ infoplot_builder <- function(
   numerical_thes, summ_title, click, session
 ) {
 
-  browser()
-
   # title viz_sel and title click group (needed by text_translate to build
   # the plot title)
   title_viz_sel <- names(
@@ -245,26 +243,27 @@ infoplot_builder <- function(
       dplyr::select(dplyr::one_of('plot_id', viz_sel)) %>%
       dplyr::summarise(n = dplyr::n()) %>%
       dplyr::arrange(dplyr::desc(n)) %>%
+      # dplyr::filter(n > 2) %>% # this is due to problems with the violin plot
       dplyr::pull(!! rlang::sym(fg_id)) -> fg_list
 
     if (length(fg_list) > 5) {
 
       # is there a fuctional group value already selected
-      if (
-        data_inputs$viz_functional_group_value != '' &
-        !(data_inputs$viz_functional_group_value %in% fg_list[1:5])
-      ) {
-        fg_list <- c(data_inputs$viz_functional_group_value, fg_list[1:5])
-        # warning the user about the trimming
-        shinyWidgets::sendSweetAlert(
-          session,
-          title = 'Too much functional group levels to safely plot them all',
-          text = glue::glue(
-            "Showing only the 5 levels more abundant",
-            " as well as {data_inputs$viz_functional_group_value}"
-          )
-        )
-      } else {
+      # if (
+      #   data_inputs$viz_functional_group_value != '' &
+      #   !(data_inputs$viz_functional_group_value %in% fg_list[1:5])
+      # ) {
+      #   fg_list <- c(data_inputs$viz_functional_group_value, fg_list[1:5])
+      #   # warning the user about the trimming
+      #   shinyWidgets::sendSweetAlert(
+      #     session,
+      #     title = 'Too much functional group levels to safely plot them all',
+      #     text = glue::glue(
+      #       "Showing only the 5 levels more abundant",
+      #       " as well as {data_inputs$viz_functional_group_value}"
+      #     )
+      #   )
+      # } else {
         fg_list <- fg_list[1:5]
         # warning the user about the trimming
         shinyWidgets::sendSweetAlert(
@@ -272,7 +271,7 @@ infoplot_builder <- function(
           title = 'Too much functional group levels to safely plot them all',
           text = glue::glue("Showing only the 5 levels more abundant")
         )
-      }
+      # }
 
       plot_data_sel <- plot_data_sel %>%
         dplyr::filter(!! rlang::sym(fg_id) %in% fg_list)
@@ -345,8 +344,31 @@ infoplot_builder <- function(
 
     # geom_violin, we can't use quantiles because when we breakdown by diamclass
     # there is errors. Also we have to check for one or two rows data, in which case we
-    # don't use geom violin
-    if (nrow(plot_data_all) > 2) {
+    # don't use geom violin. Also, if any of the fg_id or diamclass groups has less than
+    # three rows and we need them to facet, it will throw an error, so avoid the violin
+    if (fg_id %in% names(plot_data_all)) {
+      enough_fg_id_n <- plot_data_all %>%
+        split(.[[fg_id]]) %>%
+        purrr::map_dbl(nrow) %>%
+        magrittr::is_greater_than(2) %>%
+        all()
+    } else {
+      enough_fg_id_n <- TRUE
+    }
+
+    if ('diamclass_id' %in% names(plot_data_all)) {
+      enough_dc_id_n <- plot_data_all %>%
+        split(.[['diamclass_id']]) %>%
+        purrr::map_dbl(nrow) %>%
+        magrittr::is_greater_than(2) %>%
+        all()
+    } else {
+      enough_dc_id_n <- TRUE
+    }
+
+    browser()
+
+    if (nrow(plot_data_all) > 2 && enough_fg_id_n && enough_dc_id_n) {
       plot_expression <- glue::glue(
         "{plot_expression} +
         ggplot2::geom_violin(
