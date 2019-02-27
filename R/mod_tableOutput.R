@@ -198,15 +198,28 @@ mod_table <- function(
         summ <- FALSE
       }
 
+      selected_choices <- col_vis_choices %>%
+        magrittr::extract(. %in% c(
+          # plot
+          "plot_id",
+          # admin
+          "admin_aut_community", "admin_municipality", "admin_natura_network_2000",
+          "admin_natural_interest_area", "admin_province", "admin_region",
+          "admin_special_protection_natural_area", "admin_vegueria",
+          # fg and dc id
+          "species_id", "simpspecies_id", "genus_id", "dec_id", "bc_id", "diamclass_id",
+          data_inputs$viz_color,
+          glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
+        ))
+
       shinyWidgets::updatePickerInput(
         session = session, 'col_vis_selector',
         label = text_translate('col_vis_selector_input', lang(), texts_thes),
-        # choices = var_names_input_builder(col_vis_choices, lang(), var_thes, texts_thes),
         choices = var_names_input_builder(
           col_vis_choices, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes, summ
         ) %>%
           var_inputs_aggregator(lang(), texts_thes),
-        selected = col_vis_choices[1:7]
+        selected = selected_choices
       )
     }
   )
