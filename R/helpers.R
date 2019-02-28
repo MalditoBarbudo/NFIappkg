@@ -29,6 +29,53 @@ hri_builder <- function(data_inputs) {
   )
 }
 
+tables_to_look_at_helper <- function(data_inputs) {
+
+  nfi <- switch(
+    data_inputs$nfi,
+    'nfi_2' = 'NFI_2',
+    'nfi_3' = 'NFI_3',
+    'nfi_4' = 'NFI_4',
+    'nfi_2_nfi_3' = 'COMP_NFI2_NFI3',
+    'nfi_3_nfi_4' = 'COMP_NFI3_NFI4',
+    'nfi_2_shrub' = 'SHRUB_NFI_2_INFO',
+    'nfi_3_shrub' = 'SHRUB_NFI_3_INFO',
+    'nfi_4_shrub' = 'SHRUB_NFI_4_INFO',
+    'nfi_2_regen' = 'REGENERATION_NFI_2',
+    'nfi_3_regen' = 'REGENERATION_NFI_3',
+    'nfi_4_regen' = 'REGENERATION_NFI_4'
+  )
+
+  if (nfi %in% c(
+    'SHRUB_NFI_2_INFO', 'SHRUB_NFI_3_INFO', 'SHRUB_NFI_4_INFO',
+    'REGENERATION_NFI_2', 'REGENERATION_NFI_3', 'REGENERATION_NFI_4'
+  )) {
+    nfi_strip <- stringr::str_extract(nfi, 'NFI_[2-4]')
+    table_names <- c(
+      nfi,
+      'PLOTS',
+      glue::glue("PLOTS_{nfi_strip}_DYNAMIC_INFO")
+    )
+  } else {
+    functional_group <- data_inputs$functional_group %>% toupper()
+    diameter_classes <- data_inputs$diameter_classes
+
+    if (isTRUE(diameter_classes)) {
+      dc <- 'DIAMCLASS_'
+    } else {
+      dc <- ''
+    }
+
+    table_names <- c(
+      glue::glue("{functional_group}_{nfi}_{dc}RESULTS"),
+      'PLOTS',
+      glue::glue("PLOTS_{nfi}_DYNAMIC_INFO")
+    )
+  }
+
+  return(table_names)
+}
+
 text_translate <- function(text, lang, texts_thes) {
 
   text[is.na(text)] <- 'NA_'
