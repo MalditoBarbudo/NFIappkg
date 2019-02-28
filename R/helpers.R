@@ -413,8 +413,6 @@ infoplot_builder <- function(
       enough_dc_id_n <- TRUE
     }
 
-    browser()
-
     if (nrow(plot_data_all) > 2 && enough_fg_id_n && enough_dc_id_n) {
       plot_expression <- glue::glue(
         "{plot_expression} +
