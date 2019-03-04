@@ -52,21 +52,36 @@ mod_tableOutput <- function(id) {
         shiny::column(
           2, offset = 3,
           # shiny::br(),
-          shinyWidgets::downloadBttn(
+          shiny::downloadButton(
             ns('dwl_csv_button'),
             'csv',
-            style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+            class = 'success'
           ),
-          shinyWidgets::downloadBttn(
+          shiny::downloadButton(
             ns('dwl_xlsx_button'),
             'xlsx',
-            style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+            class = 'success'
           ),
-          shinyWidgets::downloadBttn(
+          shiny::downloadButton(
             ns('dwl_sql_query'),
             'SQL query',
-            style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+            class = 'success'
           )
+          # shinyWidgets::downloadBttn(
+          #   ns('dwl_csv_button'),
+          #   'csv',
+          #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+          # ),
+          # shinyWidgets::downloadBttn(
+          #   ns('dwl_xlsx_button'),
+          #   'xlsx',
+          #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+          # ),
+          # shinyWidgets::downloadBttn(
+          #   ns('dwl_sql_query'),
+          #   'SQL query',
+          #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+          # )
         )
       )
     ),

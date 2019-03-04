@@ -20,15 +20,21 @@ mod_saveMapInput <- function(id, lang, texts_thes) {
       shiny::tags$strong(text_translate('save_the_map', lang, texts_thes)),
       shiny::br(),
       # buttons
-      shinyWidgets::downloadBttn(
-        ns('save_shp'), label = text_translate('save_shp_button', lang, texts_thes),
-        style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+      shiny::downloadButton(
+        ns('save_shp'), label = text_translate('save_shp_button', lang, texts_thes)
       ),
+      # shinyWidgets::downloadBttn(
+      #   ns('save_shp'), label = text_translate('save_shp_button', lang, texts_thes),
+      #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+      # ),
       shiny::br(),
-      shinyWidgets::downloadBttn(
-        ns('save_wkt'), label = text_translate('save_wkt_button', lang, texts_thes),
-        style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+      shiny::downloadButton(
+        ns('save_wkt'), label = text_translate('save_wkt_button', lang, texts_thes)
       )
+      # shinyWidgets::downloadBttn(
+      #   ns('save_wkt'), label = text_translate('save_wkt_button', lang, texts_thes),
+      #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+      # )
     )
   )
 }
