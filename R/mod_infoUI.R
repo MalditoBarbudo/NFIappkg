@@ -234,7 +234,7 @@ mod_info <- function(
       info_table <- table_data %>%
         tidyr::gather('Characteristics', 'Value') %>%
         dplyr::mutate(
-          Characteristics = stringr::str_remove(Characteristics, '_mean'),
+          Characteristics = stringr::str_remove(Characteristics, '_mean|_se|_max|_min|_n'),
           Characteristics = names(var_names_input_builder(
             Characteristics, lang(), var_thes, texts_thes, tables_to_look_at(),
             numerical_thes, ordered = FALSE
