@@ -3,10 +3,10 @@
 #' @importFrom magrittr %>%
 #'
 #' @export
-nfi_app <- function(user = 'guest', password = 'guest') {
+nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL, dbname = NULL) {
 
   ### DB access ################################################################
-  nfidb <- tidyNFI::nfi_connect(user = user, password = password)
+  nfidb <- tidyNFI::nfi_connect(user = user, password = password, host = host, port = port, dbname = dbname)
 
   ### Variables names inter ####################################################
   var_thes <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>% dplyr::collect()
