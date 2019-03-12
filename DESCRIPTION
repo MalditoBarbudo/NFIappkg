@@ -23,4 +23,5 @@ Imports: shiny,
     ggplot2,
     stringr,
     tidyr,
-    gt
+    gt,
+    shinyjs
