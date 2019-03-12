@@ -10,18 +10,22 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
-Imports: shiny,
-    shinyWidgets,
-    magrittr,
-    tidyNFI,
-    pool,
+Imports: 
+    dplyr,
+    DT,
+    ggplot2,
     glue,
-    sf,
+    gt,
+    htmlwidgets,
     leaflet,
     leaflet.extras,
-    htmlwidgets,
-    ggplot2,
+    magrittr,
+    pool,
+    purrr,
+    sf,
+    shiny,
+    shinyjs,
+    shinyWidgets,
     stringr,
-    tidyr,
-    gt,
-    shinyjs
+    tidyNFI,
+    tidyr
