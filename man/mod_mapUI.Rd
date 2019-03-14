@@ -29,6 +29,4 @@ mod_map(input, output, session, data_inputs, nfidb, var_thes, texts_thes,
 }
 \description{
 Shiny module to generate the map
-
-mod_map server function
 }

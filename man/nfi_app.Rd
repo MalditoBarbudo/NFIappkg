@@ -4,8 +4,8 @@
 \alias{nfi_app}
 \title{function to launch the nfi app}
 \usage{
-nfi_app(user = "guest", password = "guest", host = NULL, port = NULL,
-  dbname = NULL)
+nfi_app(user = "guest", password = "guest", host = NULL,
+  port = NULL, dbname = NULL)
 }
 \description{
 function to launch the nfi app

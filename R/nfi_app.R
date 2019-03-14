@@ -56,7 +56,7 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
         title = 'Map',
 
         shiny::div(
-          class = "outer",
+          class = "mapouter",
           shiny::tags$head(
             # custom css
             shiny::includeCSS(
@@ -114,7 +114,7 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
         'Data',
 
         shiny::div(
-          class = 'inner',
+          class = 'tableinner',
           mod_tableOutput('mod_tableOutput')
         )
       )
