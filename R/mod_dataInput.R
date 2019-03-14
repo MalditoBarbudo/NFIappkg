@@ -158,7 +158,7 @@ mod_data <- function(
                   ns('functional_group'),
                   text_translate('functional_group_input', lang(), texts_thes),
                   choices = functional_group_choices,
-                  selected = 'none', width = '100%'
+                  selected = 'plot', width = '100%'
                 ),
                 shinyWidgets::awesomeCheckbox(
                   ns('diameter_classes'),
@@ -260,7 +260,7 @@ mod_data <- function(
         session, 'functional_group',
         text_translate('functional_group_input', lang(), texts_thes),
         choices = functional_group_choices,
-        selected = 'plots'
+        selected = 'plot'
       )
       shinyjs::show('diameter_classes')
       shinyjs::hideElement('shrub_regen_warn')
