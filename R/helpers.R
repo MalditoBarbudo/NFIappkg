@@ -582,3 +582,153 @@ infoplot_builder <- function(
 
   return(plot_res)
 }
+
+is_chached <- function(
+  nfi, nficached,
+  admin_div, admindivcached,
+  functional_group, functionalgroupcached,
+  diameter_classes, diameterclassescached,
+  filter_vars, filtervarscached,
+  filter_expressions, filterexpressionscached,
+  custom_polygon, custompolygoncached
+) {
+
+  all(
+    identical(nfi, nficached),
+    identical(admin_div, admindivcached),
+    identical(functional_group, functionalgroupcached),
+    identical(diameter_classes, diameterclassescached),
+    identical(filter_vars, filtervarscached),
+    identical(filter_expressions, filterexpressionscached),
+    identical(custom_polygon, custompolygoncached)
+  )
+
+}
+
+# returned data memoised
+returned_data <- function(
+  nfidb, session,
+  nfi,
+  admin_div,
+  functional_group,
+  diameter_classes,
+  filter_vars,
+  filter_expressions,
+  custom_polygon,
+  lang,
+  texts_thes
+) {
+
+  shinyWidgets::progressSweetAlert(
+    session = session, id = 'data_progress',
+    title = text_translate('data_progress', lang(), texts_thes),
+    value = 35, display_pct = TRUE, striped = TRUE
+  )
+
+  # custom_polygon_fil_expr needs some extra checking:
+  if (is.null(custom_polygon)) {
+    custom_polygon_fil_expr <- rlang::quos()
+  } else {
+    # check if plot_id is already in the filter_vars
+    if ('plot_id' %in% filter_vars) {
+      # then we need to replace the filter expression adding the one created
+      # by the custom_polygon_filter_expr function
+      orig_expr <- rlang::quo_text(
+        filter_expressions[[which(filter_vars == 'plot_id')]]
+      )
+      expr_to_add <- rlang::quo_text(
+        tidyNFI:::custom_polygon_filter_expr(
+          custom_polygon, nfidb
+        )
+      )
+      filter_expressions[[which(filter_vars == 'plot_id')]] <- rlang::quo_set_expr(
+        filter_expressions[[which(filter_vars == 'plot_id')]],
+        rlang::expr(!!rlang::parse_expr(glue::glue(
+          "{orig_expr} || {expr_to_add}"
+        )))
+      )
+      custom_polygon_fil_expr <- rlang::quos()
+    } else {
+      filter_vars <- c('plot_id', filter_vars)
+      custom_polygon_fil_expr <- tidyNFI:::custom_polygon_filter_expr(
+        custom_polygon, nfidb
+      )
+    }
+  }
+
+  selected_data <- nfi_results_data(
+    conn = nfidb,
+    nfi = nfi,
+    functional_group = functional_group,
+    diameter_classes = diameter_classes,
+    .collect = FALSE
+  ) %>%
+    nfi_results_filter(
+      variables = filter_vars,
+      conn = nfidb,
+      !!! custom_polygon_fil_expr,
+      !!! filter_expressions,
+      .collect = FALSE
+    ) %>%
+    dplyr::left_join(dplyr::tbl(nfidb, 'PLOTS'), by = 'plot_id') %>%
+    dplyr::collect()
+
+  if (nfi %in% c('nfi_2', 'nfi_3', 'nfi_4')) {
+    selected_data <- selected_data %>%
+      dplyr::left_join(
+        dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi)}_DYNAMIC_INFO")) %>%
+          dplyr::collect(),
+        by = 'plot_id'
+      )
+  } else {
+    if (nfi %in% c(
+      'nfi_2_shrub', 'nfi_3_shrub', 'nfi_4_shrub',
+      'nfi_2_regen', 'nfi_3_regen', 'nfi_4_regen'
+    )) {
+      nfi_stripped <- stringr::str_extract(nfi, "nfi_[2-4]")
+      selected_data <- selected_data %>%
+        dplyr::left_join(
+          dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi_stripped)}_DYNAMIC_INFO")) %>%
+            dplyr::collect(),
+          by = 'plot_id'
+        )
+    }
+  }
+
+  shinyWidgets::updateProgressBar(
+    session = session, id = 'data_progress',
+    value = 55
+  )
+
+  # we must to check if the filters wiped out the data
+  if (length(names(selected_data)) < 1) {
+    shinyWidgets::sendSweetAlert(
+      session = session,
+      title = 'No data can be retrieved with the actual filters',
+      text = 'Please choose another filter values'
+    )
+
+    selected_data <- NULL
+    summarised_data <- NULL
+  } else {
+    summarised_data <- selected_data %>%
+      nfi_results_summarise(
+        polygon_group = admin_div,
+        functional_group = functional_group,
+        diameter_classes = diameter_classes,
+        conn = nfidb,
+        .collect = TRUE
+      )
+
+    shinyWidgets::updateProgressBar(
+      session = session, id = 'data_progress',
+      value = 85
+    )
+  }
+
+  shinyWidgets::closeSweetAlert(session = session)
+
+  return(
+    list(selected = selected_data, summarised = summarised_data)
+  )
+}

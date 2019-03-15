@@ -5,7 +5,7 @@
 \title{mod_returnedData server function}
 \usage{
 mod_returnedData(input, output, session, data_inputs, map_inputs = NULL,
-  nfidb, lang, texts_thes)
+  nfidb, lang, texts_thes, cache_list)
 }
 \arguments{
 \item{input}{internal}
@@ -19,6 +19,8 @@ mod_returnedData(input, output, session, data_inputs, map_inputs = NULL,
 \item{map_inputs}{map input with custom_polygon sf object, if any}
 
 \item{nfidb}{pool object to access the nfi db}
+
+\item{cache_list}{inMemory cache}
 }
 \description{
 mod_returnedData server function

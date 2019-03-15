@@ -29,12 +29,15 @@ mod_mapUI <- function(id, nfidb) {
 #' @param nfidb pool with database connection object
 #' @param var_thes variables thesaurus df
 #'
+#' @param cache_list inmemory cache
+#'
 #' @export
 #'
 #' @rdname mod_mapUI
 mod_map <- function(
   input, output, session,
-  data_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang
+  data_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang,
+  cache_list
 ) {
 
   tables_to_look_at <- shiny::reactive({
@@ -237,7 +240,8 @@ mod_map <- function(
   # returned data (NON COLLECTED!!!)
   returned_data_inputs <- shiny::callModule(
     mod_returnedData, 'mod_returnedDataOutput',
-    data_inputs, map_inputs, nfidb, lang, texts_thes
+    data_inputs, map_inputs, nfidb, lang, texts_thes,
+    cache_list
   )
 
   # apply_reactives <- shiny::reactive({
@@ -672,7 +676,6 @@ mod_map <- function(
     }
   )
 
-  # collect all the inputs and the data to return them
   shiny::observe({
     map_inputs$main_data <- returned_data_inputs$main_data
     map_inputs$map_data <- map_data()

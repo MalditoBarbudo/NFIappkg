@@ -28,10 +28,13 @@ mod_dataInput <- function(id, nfidb) {
 #' @param var_thes variables thesaurus df
 #' @param lang lang value
 #'
+#' @param cache_list inMemory cache
+#'
 #' @export
 mod_data <- function(
   input, output, session,
-  nfidb, var_thes, texts_thes, numerical_thes, lang
+  nfidb, var_thes, texts_thes, numerical_thes, lang,
+  cache_list
 ) {
 
   # renderUI
@@ -288,7 +291,6 @@ mod_data <- function(
 
   # observer to get the filter expressions and the buttons actions
   shiny::observe({
-    # browser()
     # filters
     data_inputs$filter_expressions <- filters_reactives$filter_expressions
     data_inputs$filter_vars <- filters_reactives$filter_vars

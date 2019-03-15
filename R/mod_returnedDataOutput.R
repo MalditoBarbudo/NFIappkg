@@ -20,12 +20,18 @@ mod_returnedDataOutput <- function(id) {
 #' @param map_inputs map input with custom_polygon sf object, if any
 #' @param nfidb pool object to access the nfi db
 #'
+#' @param cache_list inMemory cache
+#'
+#' @import tidyNFI
+#' @importFrom dplyr n
+#'
 #' @export
 #'
 #' @rdname mod_returnedDataOuput
 mod_returnedData <- function(
   input, output, session,
-  data_inputs, map_inputs = NULL, nfidb, lang, texts_thes
+  data_inputs, map_inputs = NULL, nfidb, lang, texts_thes,
+  cache_list
 ) {
 
   # apply_reactives <- shiny::reactive({
@@ -51,126 +57,46 @@ mod_returnedData <- function(
       diameter_classes <- data_inputs$diameter_classes
       filter_vars <- data_inputs$filter_vars
       filter_expressions <- data_inputs$filter_expressions
+      custom_polygon <- map_inputs$custom_polygon
 
-      shinyWidgets::progressSweetAlert(
-        session = session, id = 'data_progress',
-        title = text_translate('data_progress', lang(), texts_thes),
-        value = 25, display_pct = TRUE, striped = TRUE
-      )
+      # let's check if we can use the cache data:
 
-      # custom_polygon_fil_expr needs some extra checking:
-      if (is.null(map_inputs$custom_polygon)) {
-        custom_polygon_fil_expr <- rlang::quos()
-      } else {
-        # check if plot_id is already in the filter_vars
-        if ('plot_id' %in% filter_vars) {
-          # then we need to replace the filter expression adding the one created
-          # by the custom_polygon_filter_expr function
-          orig_expr <- rlang::quo_text(
-            filter_expressions[[which(filter_vars == 'plot_id')]]
-          )
-          expr_to_add <- rlang::quo_text(
-            tidyNFI:::custom_polygon_filter_expr(
-              map_inputs$custom_polygon, nfidb
-            )
-          )
-          filter_expressions[[which(filter_vars == 'plot_id')]] <- rlang::quo_set_expr(
-            filter_expressions[[which(filter_vars == 'plot_id')]],
-            rlang::expr(!!rlang::parse_expr(glue::glue(
-              "{orig_expr} || {expr_to_add}"
-            )))
-          )
-          custom_polygon_fil_expr <- rlang::quos()
-        } else {
-          filter_vars <- c('plot_id', filter_vars)
-          custom_polygon_fil_expr <- tidyNFI:::custom_polygon_filter_expr(
-            map_inputs$custom_polygon, nfidb
-          )
+      if (is_chached(
+        nfi, cache_list$get("nficached"),
+        admin_div, cache_list$get("admindivcached"),
+        functional_group, cache_list$get("functionalgroupcached"),
+        diameter_classes, cache_list$get("diameterclassescached"),
+        filter_vars, cache_list$get("filtervarscached"),
+        filter_expressions, cache_list$get("filterexpressionscached"),
+        custom_polygon, cache_list$get("custompolygoncached")
+      )) {
+        if (!is.null(cache_list$get("datacached"))) {
+          res <- cache_list$get("datacached")
         }
-      }
-
-      shinyWidgets::updateProgressBar(
-        session = session, id = 'data_progress',
-        value = 35
-      )
-
-      # browser()
-
-      selected_data <- tidyNFI::nfi_results_data(
-        conn = nfidb,
-        nfi = nfi,
-        functional_group = functional_group,
-        diameter_classes = diameter_classes,
-        .collect = FALSE
-      ) %>%
-        tidyNFI::nfi_results_filter(
-          variables = filter_vars,
-          conn = nfidb,
-          !!! custom_polygon_fil_expr,
-          !!! filter_expressions,
-          .collect = FALSE
-        ) %>%
-        dplyr::left_join(dplyr::tbl(nfidb, 'PLOTS'), by = 'plot_id') %>%
-        dplyr::collect()
-
-      if (nfi %in% c('nfi_2', 'nfi_3', 'nfi_4')) {
-        selected_data <- selected_data %>%
-          dplyr::left_join(
-            dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi)}_DYNAMIC_INFO")) %>%
-              dplyr::collect(),
-            by = 'plot_id'
-          )
       } else {
-        if (nfi %in% c(
-          'nfi_2_shrub', 'nfi_3_shrub', 'nfi_4_shrub',
-          'nfi_2_regen', 'nfi_3_regen', 'nfi_4_regen'
-        )) {
-          nfi_stripped <- stringr::str_extract(nfi, "nfi_[2-4]")
-          selected_data <- selected_data %>%
-            dplyr::left_join(
-              dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi_stripped)}_DYNAMIC_INFO")) %>%
-                dplyr::collect(),
-              by = 'plot_id'
-            )
-        }
-      }
-
-      shinyWidgets::updateProgressBar(
-        session = session, id = 'data_progress',
-        value = 55
-      )
-
-      # we must to check if the filters wiped out the data
-      if (length(names(selected_data)) < 1) {
-        shinyWidgets::sendSweetAlert(
-          session = session,
-          title = 'No data can be retrieved with the actual filters',
-          text = 'Please choose another filter values'
+        res <- returned_data(
+          nfidb, session,
+          nfi,
+          admin_div,
+          functional_group,
+          diameter_classes,
+          filter_vars,
+          filter_expressions,
+          custom_polygon, lang, texts_thes
         )
 
-        selected_data <- NULL
-        summarised_data <- NULL
-      } else {
-        summarised_data <- selected_data %>%
-          tidyNFI::nfi_results_summarise(
-            polygon_group = admin_div,
-            functional_group = functional_group,
-            diameter_classes = diameter_classes,
-            conn = nfidb,
-            .collect = TRUE
-          )
+        cache_list$set('datacached', res)
+        cache_list$set("nficached", data_inputs$nfi)
+        cache_list$set("admindivcached", data_inputs$admin_div)
+        cache_list$set("functionalgroupcached", data_inputs$functional_group)
+        cache_list$set("diameterclassescached", data_inputs$diameter_classes)
+        cache_list$set("filtervarscached", data_inputs$filter_vars)
+        cache_list$set("filterexpressionscached", data_inputs$filter_expressions)
+        cache_list$set("custompolygoncached", map_inputs$custom_polygon)
 
-        shinyWidgets::updateProgressBar(
-          session = session, id = 'data_progress',
-          value = 85
-        )
       }
 
-      shinyWidgets::closeSweetAlert(session = session)
-
-      return(
-        list(selected = selected_data, summarised = summarised_data)
-      )
+      return(res)
     }
   )
 

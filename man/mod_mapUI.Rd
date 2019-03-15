@@ -8,7 +8,7 @@
 mod_mapUI(id, nfidb)
 
 mod_map(input, output, session, data_inputs, nfidb, var_thes, texts_thes,
-  numerical_thes, lang)
+  numerical_thes, lang, cache_list)
 }
 \arguments{
 \item{id}{shiny id}
@@ -24,6 +24,8 @@ mod_map(input, output, session, data_inputs, nfidb, var_thes, texts_thes,
 \item{data_inputs}{reactive with the reactive data and the data inputs}
 
 \item{var_thes}{variables thesaurus df}
+
+\item{cache_list}{inmemory cache}
 
 \item{nfidb}{pool with database connection object}
 }

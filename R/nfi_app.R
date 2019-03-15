@@ -23,6 +23,21 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
     glue::glue("<img class='flag-image' src='images/eng.png' width=20px><div class='flag-lang'>%s</div></img>")
   )
 
+  ## Cache ####
+  cache_list <- shiny::memoryCache(
+    max_size = 2000 * 1024^2,
+    evict = 'fifo'
+  )
+
+  cache_list$set("datacached", NULL)
+  cache_list$set("nficached", NULL)
+  cache_list$set("admindivcached", NULL)
+  cache_list$set("functionalgroupcached", NULL)
+  cache_list$set("diameterclassescached", NULL)
+  cache_list$set("filtervarscached", NULL)
+  cache_list$set("filterexpressionscached", NULL)
+  cache_list$set("custompolygoncached", NULL)
+
   ## UI ####
   ui <- shiny::tagList(
 
@@ -134,13 +149,15 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
     # data inputs
     data_reactives <- shiny::callModule(
       mod_data, 'mod_dataInput',
-      nfidb, var_thes, texts_thes, numerical_thes, lang
+      nfidb, var_thes, texts_thes, numerical_thes, lang,
+      cache_list
     )
 
     # map
     map_reactives <- shiny::callModule(
       mod_map, 'mod_mapUI',
-      data_reactives, nfidb, var_thes, texts_thes, numerical_thes, lang
+      data_reactives, nfidb, var_thes, texts_thes, numerical_thes, lang,
+      cache_list
     )
 
     # info panel
