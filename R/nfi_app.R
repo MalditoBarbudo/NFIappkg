@@ -23,21 +23,6 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
     glue::glue("<img class='flag-image' src='images/eng.png' width=20px><div class='flag-lang'>%s</div></img>")
   )
 
-  ## Cache ####
-  cache_list <- shiny::memoryCache(
-    max_size = 2000 * 1024^2,
-    evict = 'fifo'
-  )
-
-  cache_list$set("datacached", NULL)
-  cache_list$set("nficached", NULL)
-  cache_list$set("admindivcached", NULL)
-  cache_list$set("functionalgroupcached", NULL)
-  cache_list$set("diameterclassescached", NULL)
-  cache_list$set("filtervarscached", NULL)
-  cache_list$set("filterexpressionscached", NULL)
-  cache_list$set("custompolygoncached", NULL)
-
   ## UI ####
   ui <- shiny::tagList(
 
@@ -138,6 +123,21 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
 
   ## SERVER ####
   server <- function(input, output, session) {
+
+    ## Cache ####
+    cache_list <- shiny::memoryCache(
+      max_size = 2000 * 1024^2,
+      evict = 'fifo'
+    )
+
+    cache_list$set("datacached", NULL)
+    cache_list$set("nficached", NULL)
+    cache_list$set("admindivcached", NULL)
+    cache_list$set("functionalgroupcached", NULL)
+    cache_list$set("diameterclassescached", NULL)
+    cache_list$set("filtervarscached", NULL)
+    cache_list$set("filterexpressionscached", NULL)
+    cache_list$set("custompolygoncached", NULL)
 
     # lang reactive
     lang <- shiny::reactive({
