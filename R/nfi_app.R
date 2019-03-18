@@ -17,8 +17,9 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
   shiny::addResourcePath(
     'images', system.file('resources', 'images', package = 'NFIappkg')
   )
-  lang_choices <- c('spa', 'eng')
+  lang_choices <- c('cat', 'spa', 'eng')
   lang_flags <- c(
+    glue::glue("<img class='flag-image' src='images/cat.png' width=20px><div class='flag-lang'>%s</div></img>"),
     glue::glue("<img class='flag-image' src='images/spa.png' width=20px><div class='flag-lang'>%s</div></img>"),
     glue::glue("<img class='flag-image' src='images/eng.png' width=20px><div class='flag-lang'>%s</div></img>")
   )
@@ -40,13 +41,14 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
       # selector
       inputs = shinyWidgets::pickerInput(
         'lang', NULL,
-        choices = c('spa', 'eng'),
-        selected = 'spa',
+        choices = lang_choices,
+        selected = 'cat',
         width = '100px',
         choicesOpt = list(
           content = c(
             sprintf(lang_flags[1], lang_choices[1]),
-            sprintf(lang_flags[2], lang_choices[2])
+            sprintf(lang_flags[2], lang_choices[2]),
+            sprintf(lang_flags[3], lang_choices[3])
           )
         )
       ),
