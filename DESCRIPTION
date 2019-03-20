@@ -32,5 +32,5 @@ Imports:
     tidyr,
     writexl
 Remotes: 
-    rstudio/gt
+    rstudio/gt,
     MalditoBarbudo/tidyNFI
