@@ -28,4 +28,5 @@ Imports:
     shinyWidgets,
     stringr,
     tidyNFI,
-    tidyr
+    tidyr,
+    writexl
