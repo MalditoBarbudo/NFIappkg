@@ -16,7 +16,7 @@ Imports:
     DT,
     ggplot2,
     glue,
-    gt,
+    gt (>= 0.1.0),
     htmlwidgets,
     leaflet,
     leaflet.extras,
@@ -31,3 +31,5 @@ Imports:
     tidyNFI,
     tidyr,
     writexl
+Remotes:  
+    rstudio/gt

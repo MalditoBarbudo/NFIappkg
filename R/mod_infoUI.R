@@ -249,10 +249,10 @@ mod_info <- function(
           heading.title.font.size = 22,
           table.font.size = 16,
           table.border.top.width = 0,
-          stub_group.border.top.width = 0,
-          stub_group.border.bottom.width = 0,
-          field.border.top.width = 0,
-          field.border.bottom.width = 0,
+        #   stub_group.border.top.width = 0,
+        #   stub_group.border.bottom.width = 0,
+        #   field.border.top.width = 0,
+        #   field.border.bottom.width = 0,
           heading.border.bottom.width = 2,
           heading.border.bottom.color = 'black'
         ) %>%
