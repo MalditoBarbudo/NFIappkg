@@ -28,8 +28,9 @@ Imports:
     shinyjs,
     shinyWidgets,
     stringr,
-    tidyNFI,
+    tidyNFI (>= 0.0.0.9000),
     tidyr,
     writexl
-Remotes:  
+Remotes: 
     rstudio/gt
+    MalditoBarbudo/tidyNFI
