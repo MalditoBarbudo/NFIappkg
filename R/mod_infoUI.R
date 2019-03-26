@@ -55,7 +55,7 @@ mod_info <- function(
   map_inputs, data_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang
 ) {
 
-  prep_data <- dedupe(shiny::reactive({
+  prep_data <- shiny::reactive({
     click <- map_inputs$map_shape_click
 
     if (is.null(click)) {
@@ -65,7 +65,16 @@ mod_info <- function(
     if (click$group == 'plots') {
       viz_sel <- data_inputs$viz_color
       fg_id <- glue::glue("{data_inputs$functional_group}_id")
-      if (fg_id == 'plot_id') {fg_id <- ''}
+      if (fg_id == 'plot_id') {
+        # check if dominant group is present
+        if (data_inputs$dominant_group == 'none') {
+          fg_id <- ''
+        } else {
+          fg_id <- glue::glue(
+            "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+          )
+        }
+      }
       viz_size <- data_inputs$viz_size
 
       prep_data <- map_inputs$main_data[['selected']] %>%
@@ -80,7 +89,16 @@ mod_info <- function(
     } else {
       viz_sel <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
       fg_id <- glue::glue("{data_inputs$functional_group}_id")
-      if (fg_id == 'plot_id') {fg_id <- ''}
+      if (fg_id == 'plot_id') {
+        # check if dominant group is present
+        if (data_inputs$dominant_group == 'none') {
+          fg_id <- ''
+        } else {
+          fg_id <- glue::glue(
+            "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+          )
+        }
+      }
       viz_size <- ''
       admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
 
@@ -93,7 +111,7 @@ mod_info <- function(
     }
 
     return(prep_data)
-  }))
+  })
 
   tables_to_look_at <- shiny::reactive({
 
@@ -102,50 +120,6 @@ mod_info <- function(
     )
 
     tables_to_look_at_helper(data_inputs)
-
-    # nfi <- switch(
-    #   data_inputs$nfi,
-    #   'nfi_2' = 'NFI_2',
-    #   'nfi_3' = 'NFI_3',
-    #   'nfi_4' = 'NFI_4',
-    #   'nfi_2_nfi_3' = 'COMP_NFI2_NFI3',
-    #   'nfi_3_nfi_4' = 'COMP_NFI3_NFI4',
-    #   'nfi_2_shrub' = 'SHRUB_NFI_2_INFO',
-    #   'nfi_3_shrub' = 'SHRUB_NFI_3_INFO',
-    #   'nfi_4_shrub' = 'SHRUB_NFI_4_INFO',
-    #   'nfi_2_regen' = 'REGENERATION_NFI_2',
-    #   'nfi_3_regen' = 'REGENERATION_NFI_3',
-    #   'nfi_4_regen' = 'REGENERATION_NFI_4'
-    # )
-    #
-    # if (nfi %in% c(
-    #   'SHRUB_NFI_2_INFO', 'SHRUB_NFI_3_INFO', 'SHRUB_NFI_4_INFO',
-    #   'REGENERATION_NFI_2', 'REGENERATION_NFI_3', 'REGENERATION_NFI_4'
-    # )) {
-    #   nfi_strip <- stringr::str_extract(nfi, 'NFI_[2-4]')
-    #   table_names <- c(
-    #     nfi,
-    #     'PLOTS',
-    #     glue::glue("PLOTS_{nfi_strip}_DYNAMIC_INFO")
-    #   )
-    # } else {
-    #   functional_group <- data_inputs$functional_group %>% toupper()
-    #   diameter_classes <- data_inputs$diameter_classes
-    #
-    #   if (isTRUE(diameter_classes)) {
-    #     dc <- 'DIAMCLASS_'
-    #   } else {
-    #     dc <- ''
-    #   }
-    #
-    #   table_names <- c(
-    #     glue::glue("{functional_group}_{nfi}_{dc}RESULTS"),
-    #     'PLOTS',
-    #     glue::glue("PLOTS_{nfi}_DYNAMIC_INFO")
-    #   )
-    # }
-    #
-    # return(table_names)
   })
 
   # reactive to prepare the plot and the table and return them as a list
@@ -161,7 +135,16 @@ mod_info <- function(
 
         viz_sel <- data_inputs$viz_color
         fg_id <- glue::glue("{data_inputs$functional_group}_id")
-        if (fg_id == 'plot_id') {fg_id <- ''}
+        if (fg_id == 'plot_id') {
+          # check if dominant group is present
+          if (data_inputs$dominant_group == 'none') {
+            fg_id <- ''
+          } else {
+            fg_id <- glue::glue(
+              "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+            )
+          }
+        }
         viz_size <- data_inputs$viz_size
 
         plot_data_all <- prep_data()
@@ -188,7 +171,16 @@ mod_info <- function(
 
         viz_sel <- glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
         fg_id <- glue::glue("{data_inputs$functional_group}_id")
-        if (fg_id == 'plot_id') {fg_id <- ''}
+        if (fg_id == 'plot_id') {
+          # check if dominant group is present
+          if (data_inputs$dominant_group == 'none') {
+            fg_id <- ''
+          } else {
+            fg_id <- glue::glue(
+              "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+            )
+          }
+        }
         viz_size <- ''
         admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
 
