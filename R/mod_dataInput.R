@@ -155,24 +155,66 @@ mod_data <- function(
             shiny::tabPanel(
               title = text_translate('data_tab_1', lang(), texts_thes),
               shiny::br(),
-              shiny::column(
-                8, offset = 2,
-                shinyWidgets::pickerInput(
-                  ns('functional_group'),
-                  text_translate('functional_group_input', lang(), texts_thes),
-                  choices = functional_group_choices,
-                  selected = 'plot', width = '100%'
-                ),
-                shinyWidgets::awesomeCheckbox(
-                  ns('diameter_classes'),
-                  label = text_translate('diameter_classes_input', lang(), texts_thes),
-                  status = 'info'
-                ),
-                shinyjs::hidden(
-                  shiny::div(
-                    id = ns('shrub_regen_warn'),
-                    'When shrub or regeneration tables are selected,
-                     breakdown is fixed to species and diameter classes are inactive'
+              shiny::fluidRow(
+                shiny::column(
+                  8, offset = 2,
+                  shinyWidgets::pickerInput(
+                    ns('functional_group'),
+                    text_translate('functional_group_input', lang(), texts_thes),
+                    choices = functional_group_choices,
+                    selected = 'plot', width = '100%'
+                  ),
+                  shiny::actionButton(
+                    ns('advanced_fg_options'), 'Show/Hide advanced options',
+                    class = 'btn-info'
+                  )
+                )
+              ),
+              shinyjs::hidden(
+                shiny::div(
+                  id = ns('advanced_fg_options_container'),
+                  shiny::fluidRow(
+                    shiny::column(
+                      6,
+                      shinyWidgets::awesomeCheckbox(
+                        ns('diameter_classes'),
+                        label = text_translate(
+                          'diameter_classes_input', lang(), texts_thes
+                        ),
+                        status = 'info'
+                      ),
+                      shinyjs::hidden(
+                        shiny::div(
+                          id = ns('shrub_regen_warn'),
+                          'When shrub or regeneration tables are selected,
+              breakdown is fixed to species and diameter classes are inactive'
+                        )
+                      )
+                    ),
+                    shiny::column(
+                      6,
+                      # inputs
+                      shiny::radioButtons(
+                        ns('dominant_group'), label = 'Dominant group to group by',
+                        choices = c('none', 'species', 'simpspecies', 'genus', 'dec', 'bc'),
+                        selected = 'none'
+                      ),
+                      shiny::radioButtons(
+                        ns('dominant_criteria'),
+                        label = 'Dominant criteria to group by',
+                        choices = c('density', 'basal_area'),
+                        selected = 'density'
+                      ),
+                      # hidden message
+                      shinyjs::hidden(
+                        shiny::div(
+                          id = ns('dominant_warn'),
+                          'When other than total by plot break down is selected,
+                          or diameter classes breakown is active,
+                          dominant functional group grouping is not available'
+                        )
+                      )
+                    )
                   )
                 )
               )
@@ -225,6 +267,42 @@ mod_data <- function(
     data_inputs$diameter_classes <- input$diameter_classes
   })
 
+  # observer to show the advanced options in the aggregation tab
+  shiny::observeEvent(
+    ignoreInit = TRUE,
+    eventExpr = input$advanced_fg_options,
+    handlerExpr = {
+      shinyjs::toggle('advanced_fg_options_container')
+    }
+  )
+
+  # observer to disable the dominant grouping when other than plot is the
+  # functional group
+  shiny::observe({
+
+    browser()
+    # validation
+    shiny::validate(
+      shiny::need(input$functional_group, 'no inputs yet'),
+      shiny::need(!is.null(input$diameter_classes), 'no inputs yet')
+    )
+
+    # disabling and enabling
+    fg <- input$functional_group
+    dc <- input$diameter_classes
+
+    # remove if plot
+    if (fg != 'plot' | isTRUE(dc)) {
+      shinyjs::hide('dominant_group')
+      shinyjs::hide('dominant_criteria')
+      shinyjs::showElement('dominant_warn')
+    } else {
+      shinyjs::show('dominant_group')
+      shinyjs::show('dominant_criteria')
+      shinyjs::hideElement('dominant_warn')
+    }
+  })
+
   # observer to disable the breakdown and diamclass inputs when shrub or regeneration
   # tables are selected
   shiny::observe({
@@ -270,6 +348,12 @@ mod_data <- function(
     }
   })
 
+  # updating the data inputs
+  shiny::observe({
+    data_inputs$dominant_group <- input$dominant_group
+    data_inputs$dominant_criteria <- input$dominant_criteria
+  })
+
   # calling the modules used
   # buttons_reactives <- shiny::callModule(
   #   mod_buttons, 'mod_buttonsInput'
@@ -291,6 +375,7 @@ mod_data <- function(
 
   # observer to get the filter expressions and the buttons actions
   shiny::observe({
+
     # filters
     data_inputs$filter_expressions <- filters_reactives$filter_expressions
     data_inputs$filter_vars <- filters_reactives$filter_vars
