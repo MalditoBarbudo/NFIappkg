@@ -34,12 +34,6 @@ mod_returnedData <- function(
   cache_list
 ) {
 
-  # apply_reactives <- shiny::reactive({
-  #   apply_reactives <- list()
-  #   apply_reactives$apply_data <- data_inputs$apply_data
-  #   apply_reactives$apply_viz <- data_inputs$apply_viz
-  # })
-
   # main data generator
   main_data <- shiny::eventReactive(
     ignoreNULL = FALSE, ignoreInit = FALSE,
@@ -58,9 +52,12 @@ mod_returnedData <- function(
       filter_vars <- data_inputs$filter_vars
       filter_expressions <- data_inputs$filter_expressions
       custom_polygon <- map_inputs$custom_polygon
+      dominant_group <- data_inputs$dominant_group
+      dominant_criteria <- data_inputs$dominant_criteria
 
       # let's check if we can use the cache data:
 
+      browser()
       if (is_chached(
         nfi, cache_list$get("nficached"),
         admin_div, cache_list$get("admindivcached"),
@@ -68,7 +65,9 @@ mod_returnedData <- function(
         diameter_classes, cache_list$get("diameterclassescached"),
         filter_vars, cache_list$get("filtervarscached"),
         filter_expressions, cache_list$get("filterexpressionscached"),
-        custom_polygon, cache_list$get("custompolygoncached")
+        custom_polygon, cache_list$get("custompolygoncached"),
+        dominant_group, cache_list$get("dominantgroupcached"),
+        dominant_criteria, cache_list$get("dominantcriteriacached")
       )) {
         if (!is.null(cache_list$get("datacached"))) {
           res <- cache_list$get("datacached")
@@ -80,6 +79,8 @@ mod_returnedData <- function(
           admin_div,
           functional_group,
           diameter_classes,
+          dominant_group,
+          dominant_criteria,
           filter_vars,
           filter_expressions,
           custom_polygon, lang, texts_thes
@@ -93,6 +94,8 @@ mod_returnedData <- function(
         cache_list$set("filtervarscached", data_inputs$filter_vars)
         cache_list$set("filterexpressionscached", data_inputs$filter_expressions)
         cache_list$set("custompolygoncached", map_inputs$custom_polygon)
+        cache_list$set("dominantgroupcached", data_inputs$dominant_group)
+        cache_list$set("dominantcriteriacached", data_inputs$dominant_criteria)
 
       }
 

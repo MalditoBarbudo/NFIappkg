@@ -590,7 +590,9 @@ is_chached <- function(
   diameter_classes, diameterclassescached,
   filter_vars, filtervarscached,
   filter_expressions, filterexpressionscached,
-  custom_polygon, custompolygoncached
+  custom_polygon, custompolygoncached,
+  dominant_group, dominantgroupcached,
+  dominant_criteria, dominantcriteriacached
 ) {
 
   all(
@@ -600,7 +602,9 @@ is_chached <- function(
     identical(diameter_classes, diameterclassescached),
     identical(filter_vars, filtervarscached),
     identical(filter_expressions, filterexpressionscached),
-    identical(custom_polygon, custompolygoncached)
+    identical(custom_polygon, custompolygoncached),
+    identical(dominant_group, dominantgroupcached),
+    identical(dominant_criteria, dominantcriteriacached)
   )
 
 }
@@ -612,6 +616,8 @@ returned_data <- function(
   admin_div,
   functional_group,
   diameter_classes,
+  dominant_group,
+  dominant_criteria,
   filter_vars,
   filter_expressions,
   custom_polygon,
@@ -716,6 +722,8 @@ returned_data <- function(
         polygon_group = admin_div,
         functional_group = functional_group,
         diameter_classes = diameter_classes,
+        dominant_group = dominant_group,
+        dominant_criteria = dominant_criteria,
         conn = nfidb,
         .collect = TRUE
       )
