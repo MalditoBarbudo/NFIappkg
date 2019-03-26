@@ -61,26 +61,11 @@ mod_tableOutput <- function(id) {
             ns('dwl_xlsx_button'),
             'xlsx',
             class = 'success'
-          ),
-          shiny::downloadButton(
-            ns('dwl_sql_query'),
-            'SQL query',
-            class = 'success'
-          )
-          # shinyWidgets::downloadBttn(
-          #   ns('dwl_csv_button'),
-          #   'csv',
-          #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
-          # ),
-          # shinyWidgets::downloadBttn(
-          #   ns('dwl_xlsx_button'),
-          #   'xlsx',
-          #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
-          # ),
-          # shinyWidgets::downloadBttn(
+          )#,
+          # shiny::downloadButton(
           #   ns('dwl_sql_query'),
           #   'SQL query',
-          #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
+          #   class = 'success'
           # )
         )
       )
@@ -125,7 +110,20 @@ mod_table <- function(
         if (is.null(map_inputs$main_data[['selected']])) {
           return()
         } else {
-          res <- map_inputs$main_data[['selected']]
+          # check for dominant
+          if (data_inputs$dominant_group == 'none') {
+            res <- map_inputs$main_data[['selected']]
+          } else {
+            res <- map_inputs$main_data[['selected']] %>%
+              tidyNFI::nfi_results_summarise(
+                polygon_group = 'none', functional_group = 'none',
+                diameter_classes = FALSE,
+                dominant_group = data_inputs$dominant_group,
+                dominant_criteria = data_inputs$dominant_criteria,
+                nfidb
+              )
+          }
+
         }
       } else {
         if (is.null(map_inputs$main_data[['summarised']])) {
@@ -154,22 +152,28 @@ mod_table <- function(
     handlerExpr = {
       col_vis_choices <- names(table_data())
 
-      if (data_inputs$viz_shape == 'polygon') {
+      if (data_inputs$viz_shape == 'polygon' | shiny::isolate(data_inputs$dominant_group) != 'none') {
         summ <- TRUE
       } else {
         summ <- FALSE
       }
+
+      # selected_choices_sources
+      admin_div_sel <- glue::glue("admin_{data_inputs$admin_div}")
+      fg_sel <- glue::glue("{data_inputs$functional_group}_id")
+      dominant_sel <- glue::glue("{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant")
 
       selected_choices <- col_vis_choices %>%
         magrittr::extract(. %in% c(
           # plot
           "plot_id",
           # admin
-          "admin_aut_community", "admin_municipality", "admin_natura_network_2000",
-          "admin_natural_interest_area", "admin_province", "admin_region",
-          "admin_special_protection_natural_area", "admin_vegueria",
+          admin_div_sel,
           # fg and dc id
-          "species_id", "simpspecies_id", "genus_id", "dec_id", "bc_id", "diamclass_id",
+          fg_sel, "diamclass_id",
+          # dominant
+          dominant_sel,
+          # viz_color
           data_inputs$viz_color,
           glue::glue("{data_inputs$viz_color}{data_inputs$viz_statistic}")
         ))
@@ -197,7 +201,7 @@ mod_table <- function(
       shiny::need(length(input$col_vis_selector) > 0, 'No data to show')
     )
 
-    if (shiny::isolate(data_inputs$viz_shape) == 'polygon') {
+    if (shiny::isolate(data_inputs$viz_shape) == 'polygon' | shiny::isolate(data_inputs$dominant_group) != 'none') {
       summ <- TRUE
     } else {
       summ <- FALSE
