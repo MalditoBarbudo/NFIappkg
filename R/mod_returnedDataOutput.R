@@ -57,7 +57,6 @@ mod_returnedData <- function(
 
       # let's check if we can use the cache data:
 
-      browser()
       if (is_chached(
         nfi, cache_list$get("nficached"),
         admin_div, cache_list$get("admindivcached"),
