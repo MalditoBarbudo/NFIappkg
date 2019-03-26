@@ -157,7 +157,7 @@ mod_data <- function(
               shiny::br(),
               shiny::fluidRow(
                 shiny::column(
-                  8, offset = 2,
+                  8, offset = 2, align = 'center',
                   shinyWidgets::pickerInput(
                     ns('functional_group'),
                     text_translate('functional_group_input', lang(), texts_thes),
@@ -175,7 +175,8 @@ mod_data <- function(
                   id = ns('advanced_fg_options_container'),
                   shiny::fluidRow(
                     shiny::column(
-                      6,
+                      12, align = 'center',
+                      shiny::br(),
                       shinyWidgets::awesomeCheckbox(
                         ns('diameter_classes'),
                         label = text_translate(
@@ -186,33 +187,42 @@ mod_data <- function(
                       shinyjs::hidden(
                         shiny::div(
                           id = ns('shrub_regen_warn'),
+                          shiny::br(),
                           'When shrub or regeneration tables are selected,
               breakdown is fixed to species and diameter classes are inactive'
                         )
-                      )
-                    ),
-                    shiny::column(
-                      6,
-                      # inputs
-                      shiny::radioButtons(
-                        ns('dominant_group'), label = 'Dominant group to group by',
-                        choices = c('none', 'species', 'simpspecies', 'genus', 'dec', 'bc'),
-                        selected = 'none'
-                      ),
-                      shiny::radioButtons(
-                        ns('dominant_criteria'),
-                        label = 'Dominant criteria to group by',
-                        choices = c('density', 'basal_area'),
-                        selected = 'density'
                       ),
                       # hidden message
                       shinyjs::hidden(
                         shiny::div(
                           id = ns('dominant_warn'),
+                          shiny::br(),
                           'When other than total by plot break down is selected,
                           or diameter classes breakown is active,
                           dominant functional group grouping is not available'
                         )
+                      )
+                    )
+                  ),
+                  shiny::fluidRow(
+                    shiny::column(
+                      5, offset = 1,
+                      # inputs
+                      shinyWidgets::awesomeRadio(
+                        ns('dominant_group'), label = 'Dominant group to group by',
+                        choices = c('none', 'species', 'simpspecies', 'genus', 'dec', 'bc'),
+                        selected = 'none',
+                        status = 'info', checkbox = FALSE
+                      )
+                    ),
+                    shiny::column(
+                      5, offset = 1,
+                      shinyWidgets::awesomeRadio(
+                        ns('dominant_criteria'),
+                        label = 'Dominant criteria to group by',
+                        choices = c('density', 'basal_area'),
+                        selected = 'density',
+                        status = 'info', checkbox = FALSE
                       )
                     )
                   )
