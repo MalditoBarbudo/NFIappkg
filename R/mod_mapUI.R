@@ -438,6 +438,8 @@ mod_map <- function(
           )
         }
 
+        # browser()
+
         leaflet::leafletProxy('map') %>%
           leaflet::clearGroup('veguerias') %>%
           leaflet::clearGroup('regions') %>%
@@ -467,7 +469,12 @@ mod_map <- function(
           ) %>%
           leaflet::addLegend(
             position = 'bottomright', pal = pal, values = color_vector,
-            title = names(var_names_input_builder(viz_color, lang(), var_thes, texts_thes, tables_to_look_at(), numerical_thes, TRUE)),
+            title = names(
+              var_names_input_builder(
+                viz_color, lang(), var_thes,
+                texts_thes, tables_to_look_at(), numerical_thes, TRUE
+              )
+            ),
             layerId = 'color_legend', opacity = 1, na.label = '', className = legend_class
           )
 
@@ -512,12 +519,6 @@ mod_map <- function(
               )
             }
           }
-          # pal <- leaflet::colorNumeric(
-          #   scales::gradient_n_pal(
-          #     viridis::plasma(9), c(0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.55, 1)
-          #   ),
-          #   color_vector, 9, reverse = data_inputs$viz_reverse_pal, na.color = 'black'
-          # )
         } else {
           legend_class <- 'info legend circles'
           pal <- leaflet::colorFactor(
@@ -583,14 +584,7 @@ mod_map <- function(
             className = legend_class,
             na.label = ''
           )
-
-        # shinyWidgets::updateProgressBar(
-        #   session = session, id = 'map_build_progress',
-        #   value = 90
-        # )
       }
-
-      # shinyWidgets::closeSweetAlert(session = session)
     }
   )
 

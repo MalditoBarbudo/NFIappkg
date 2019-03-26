@@ -174,7 +174,18 @@ mod_viz <- function(
     if ('density' %in% color_choices) {
       selected_col <- 'density'
     } else {
-      selected_col <- 'density_balance'
+      if ('density_balance' %in% color_choices) {
+        selected_col <- 'density_balance'
+      } else {
+        if ('regeneration_small_trees' %in% color_choices) {
+          selected_col <- 'regeneration_small_trees'
+        } else {
+          selected_col <- 'shrub_canopy_cover'
+        }
+      }
+
+
+      # TODO add the rest of defaults (shrubs and regeneration)
     }
 
     # update the pickerInput
