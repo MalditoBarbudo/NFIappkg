@@ -277,7 +277,8 @@ mod_data <- function(
   )
 
   # observer to disable the dominant grouping when other than plot is the
-  # functional group
+  # functional group, or diameter classes are selected, or other than nfi static
+  # versions are selected
   shiny::observe({
 
     # validation
@@ -289,9 +290,11 @@ mod_data <- function(
     # disabling and enabling
     fg <- input$functional_group
     dc <- input$diameter_classes
+    nfi <- input$nfi
+
 
     # remove if plot
-    if (fg != 'plot' | isTRUE(dc)) {
+    if (fg != 'plot' | isTRUE(dc) | !(nfi %in% c('nfi_2', 'nfi_3', 'nfi_4'))) {
       shinyjs::reset('dominant_group')
       shinyjs::hide('dominant_group')
       shinyjs::hide('dominant_criteria')

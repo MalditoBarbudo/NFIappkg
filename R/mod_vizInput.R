@@ -271,7 +271,8 @@ mod_viz <- function(
       # what happens when fg is not plots, but dominant group is selected. We need
       # to do the same, but with the new funct_group_var.
       # Don't do it when diameter classes are selected
-      if (data_inputs$dominant_group != 'none' & !isTRUE(data_inputs$diameter_classes)) {
+      if (data_inputs$dominant_group != 'none' & !isTRUE(data_inputs$diameter_classes) &
+          data_inputs$nfi %in% c('nfi_2', 'nfi_3', 'nfi_4')) {
         functional_group <- data_inputs$dominant_group
         functional_criteria <- data_inputs$dominant_criteria
         funct_group_var <- glue::glue('{functional_criteria}_{functional_group}_dominant')
