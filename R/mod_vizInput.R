@@ -140,62 +140,6 @@ mod_viz <- function(
     )
 
     tables_to_look_at_helper(data_inputs)
-
-    # nfi <- data_inputs$nfi
-    #
-    # if (nfi == 'nfi_2_nfi_3') {
-    #   nfi <- 'COMP_NFI2_NFI3'
-    # } else {
-    #   if (nfi == 'nfi_3_nfi_4') {
-    #     nfi <- 'COMP_NFI3_NFI4'
-    #   } else {
-    #     nfi <- toupper(nfi)
-    #   }
-    # }
-
-    # nfi <- switch(
-    #   data_inputs$nfi,
-    #   'nfi_2' = 'NFI_2',
-    #   'nfi_3' = 'NFI_3',
-    #   'nfi_4' = 'NFI_4',
-    #   'nfi_2_nfi_3' = 'COMP_NFI2_NFI3',
-    #   'nfi_3_nfi_4' = 'COMP_NFI3_NFI4',
-    #   'nfi_2_shrub' = 'SHRUB_NFI_2_INFO',
-    #   'nfi_3_shrub' = 'SHRUB_NFI_3_INFO',
-    #   'nfi_4_shrub' = 'SHRUB_NFI_4_INFO',
-    #   'nfi_2_regen' = 'REGENERATION_NFI_2',
-    #   'nfi_3_regen' = 'REGENERATION_NFI_3',
-    #   'nfi_4_regen' = 'REGENERATION_NFI_4'
-    # )
-    #
-    # if (nfi %in% c(
-    #   'SHRUB_NFI_2_INFO', 'SHRUB_NFI_3_INFO', 'SHRUB_NFI_4_INFO',
-    #   'REGENERATION_NFI_2', 'REGENERATION_NFI_3', 'REGENERATION_NFI_4'
-    # )) {
-    #   nfi_strip <- stringr::str_extract(nfi, 'NFI_[2-4]')
-    #   table_names <- c(
-    #     nfi,
-    #     'PLOTS',
-    #     glue::glue("PLOTS_{nfi_strip}_DYNAMIC_INFO")
-    #   )
-    # } else {
-    #   functional_group <- data_inputs$functional_group %>% toupper()
-    #   diameter_classes <- data_inputs$diameter_classes
-    #
-    #   if (isTRUE(diameter_classes)) {
-    #     dc <- 'DIAMCLASS_'
-    #   } else {
-    #     dc <- ''
-    #   }
-    #
-    #   table_names <- c(
-    #     glue::glue("{functional_group}_{nfi}_{dc}RESULTS"),
-    #     'PLOTS',
-    #     glue::glue("PLOTS_{nfi}_DYNAMIC_INFO")
-    #   )
-    # }
-    #
-    # return(table_names)
   })
 
   # we need the vars in the data to be able to show the names in the color and size inputs
@@ -211,7 +155,7 @@ mod_viz <- function(
       dplyr::filter(var_id %in% all_variables, var_table %in% table_names) %>%
       dplyr::pull(var_id)
 
-    if (data_inputs$viz_shape == 'plot') {
+    if (data_inputs$viz_shape == 'plot' & data_inputs$dominant_group == 'none') {
       return(all_variables)
     } else {
       return(numeric_variables)
@@ -276,10 +220,11 @@ mod_viz <- function(
   shiny::observe({
 
     shiny::validate(
-      shiny::need(data_inputs$viz_shape, 'No visualization shape selected')
+      shiny::need(data_inputs$viz_shape, 'No visualization shape selected'),
+      shiny::need(data_inputs$dominant_group, 'No dominant group selected')
     )
 
-    if (data_inputs$viz_shape != 'plot') {
+    if (data_inputs$viz_shape != 'plot' | data_inputs$dominant_group != 'none') {
       shinyjs::show('viz_statistic')
     } else {
       shinyjs::hide('viz_statistic')
@@ -291,7 +236,8 @@ mod_viz <- function(
 
     shiny::validate(
       shiny::need(data_inputs$functional_group, 'No breakdown selected'),
-      shiny::need(data_inputs$nfi, 'No nfi selected')
+      shiny::need(data_inputs$nfi, 'No nfi selected'),
+      shiny::need(data_inputs$dominant_group, 'No dominant group selected')
     )
 
     if (data_inputs$functional_group != 'plot') {
@@ -306,18 +252,13 @@ mod_viz <- function(
         dplyr::arrange(var_values) %>%
         dplyr::pull(var_values)
 
+      # we need to remove not only if there is a filter (as above), also when other filters
+      # reduce the final available functional groups
       if (!is.null(fg_filter_vals)) {
         viz_functional_group_value_choices <- viz_functional_group_value_choices[
           viz_functional_group_value_choices %in% fg_filter_vals
           ]
       }
-
-      # # we need to remove not only if there is a filter (as above), also when other filters
-      # # reduce the final available functional groups
-      #
-      # viz_functional_group_value_choices <- viz_functional_group_value_choices[
-      #   viz_functional_group_value_choices %in% fg_filter_vals
-      #   ]
 
       shinyWidgets::updatePickerInput(
         session, 'viz_functional_group_value',
@@ -326,38 +267,41 @@ mod_viz <- function(
       )
       shinyjs::show('viz_functional_group_value')
     } else {
-      shinyjs::hide('viz_functional_group_value')
-    }
 
-    # if (data_inputs$nfi %in% c(
-    #   'nfi_2_shrub', 'nfi_3_shrub', 'nfi_4_shrub',
-    #   'nfi_2_regen', 'nfi_3_regen', 'nfi_4_regen'
-    # )) {
-    #   functional_group <- 'species'
-    #   funct_group_var <- glue::glue('{functional_group}_id')
-    #   table_names <- tables_to_look_at()
-    #   fg_filter_vals <- data_inputs$otf_filter_inputs[[funct_group_var]]
-    #
-    #   viz_functional_group_value_choices <- dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL') %>%
-    #     dplyr::filter(var_id == funct_group_var, var_table %in% table_names) %>%
-    #     dplyr::arrange(var_values) %>%
-    #     dplyr::pull(var_values)
-    #
-    #   if (!is.null(fg_filter_vals)) {
-    #     viz_functional_group_value_choices <- viz_functional_group_value_choices[
-    #       viz_functional_group_value_choices %in% fg_filter_vals
-    #       ]
-    #   }
-    #
-    #   shinyWidgets::updatePickerInput(
-    #     session, 'viz_functional_group_value',
-    #     choices = viz_functional_group_value_choices,
-    #     label = glue::glue(text_translate('viz_functional_group_value_input', lang(), texts_thes))
-    #   )
-    #   shinyjs::show('viz_functional_group_value')
-    # } else {
-    #
-    # }
+      # what happens when fg is not plots, but dominant group is selected. We need
+      # to do the same, but with the new funct_group_var.
+      # Don't do it when diameter classes are selected
+      if (data_inputs$dominant_group != 'none' & !isTRUE(data_inputs$diameter_classes)) {
+        functional_group <- data_inputs$dominant_group
+        functional_criteria <- data_inputs$dominant_criteria
+        funct_group_var <- glue::glue('{functional_criteria}_{functional_group}_dominant')
+        table_names <- tables_to_look_at()
+        fg_filter_vals <- data_inputs$otf_filter_inputs[[funct_group_var]]
+
+        viz_functional_group_value_choices <- dplyr::tbl(nfidb, 'VARIABLES_CATEGORICAL') %>%
+          dplyr::filter(var_id == funct_group_var, var_table %in% table_names) %>%
+          dplyr::arrange(var_values) %>%
+          dplyr::pull(var_values)
+
+        # we need to remove not only if there is a filter (as above), also when other filters
+        # reduce the final available functional groups
+        if (!is.null(fg_filter_vals)) {
+          viz_functional_group_value_choices <- viz_functional_group_value_choices[
+            viz_functional_group_value_choices %in% fg_filter_vals
+            ]
+        }
+
+        shinyWidgets::updatePickerInput(
+          session, 'viz_functional_group_value',
+          choices = viz_functional_group_value_choices,
+          # TODO update the text_thesaurus for this case, to add dominant to the label
+          label = glue::glue(text_translate('viz_functional_group_value_input', lang(), texts_thes))
+        )
+        shinyjs::show('viz_functional_group_value')
+      } else {
+        shinyjs::hide('viz_functional_group_value')
+      }
+    }
   })
 
   # diameter_classes

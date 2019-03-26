@@ -280,7 +280,6 @@ mod_data <- function(
   # functional group
   shiny::observe({
 
-    browser()
     # validation
     shiny::validate(
       shiny::need(input$functional_group, 'no inputs yet'),
@@ -293,6 +292,7 @@ mod_data <- function(
 
     # remove if plot
     if (fg != 'plot' | isTRUE(dc)) {
+      shinyjs::reset('dominant_group')
       shinyjs::hide('dominant_group')
       shinyjs::hide('dominant_criteria')
       shinyjs::showElement('dominant_warn')
