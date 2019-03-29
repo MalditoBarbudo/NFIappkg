@@ -30,11 +30,15 @@ mod_saveMapInput <- function(id, lang, texts_thes) {
       shiny::br(),
       shiny::downloadButton(
         ns('save_wkt'), label = text_translate('save_wkt_button', lang, texts_thes)
-      )
+      ),
       # shinyWidgets::downloadBttn(
       #   ns('save_wkt'), label = text_translate('save_wkt_button', lang, texts_thes),
       #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
       # )
+      shiny::br(),
+      shiny::downloadButton(
+        ns('save_gpkg'), label = 'save geo package'
+      )
     )
   )
 }
@@ -88,6 +92,18 @@ mod_saveMap <- function(
       sf::write_sf(
         map_inputs$map_data, file, delete_layer = TRUE,
         layer_options = "GEOMETRY=AS_WKT"
+      )
+    }
+  )
+
+  # geo package
+  output$save_gpkg <- shiny::downloadHandler(
+    filename = function() {
+      glue::glue("nfi_map_{Sys.Date()}.gpkg")
+    },
+    content = function(file) {
+      sf::st_write(
+        map_inputs$map_data, file, delete_dsn = TRUE
       )
     }
   )
