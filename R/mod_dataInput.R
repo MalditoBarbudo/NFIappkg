@@ -304,7 +304,9 @@ mod_data <- function(
 
 
     # remove if plot
-    if (fg != 'plot' | isTRUE(dc) | !(nfi %in% c('nfi_2', 'nfi_3', 'nfi_4'))) {
+    if (fg != 'plot' |
+        isTRUE(dc) |
+        !(nfi %in% c('nfi_2', 'nfi_3', 'nfi_4', 'nfi_2_nfi_3', 'nfi_3_nfi_4'))) {
       shinyjs::reset('dominant_group')
       shinyjs::hide('dominant_group')
       shinyjs::hide('dominant_criteria')
