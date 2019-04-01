@@ -592,7 +592,8 @@ is_chached <- function(
   filter_expressions, filterexpressionscached,
   custom_polygon, custompolygoncached,
   dominant_group, dominantgroupcached,
-  dominant_criteria, dominantcriteriacached
+  dominant_criteria, dominantcriteriacached,
+  dominant_nfi, dominantnficached
 ) {
 
   all(
@@ -604,7 +605,8 @@ is_chached <- function(
     identical(filter_expressions, filterexpressionscached),
     identical(custom_polygon, custompolygoncached),
     identical(dominant_group, dominantgroupcached),
-    identical(dominant_criteria, dominantcriteriacached)
+    identical(dominant_criteria, dominantcriteriacached),
+    identical(dominant_nfi, dominantnficached)
   )
 
 }
@@ -618,6 +620,7 @@ returned_data <- function(
   diameter_classes,
   dominant_group,
   dominant_criteria,
+  dominant_nfi,
   filter_vars,
   filter_expressions,
   custom_polygon,
@@ -717,6 +720,9 @@ returned_data <- function(
     selected_data <- NULL
     summarised_data <- NULL
   } else {
+
+    browser()
+
     summarised_data <- selected_data %>%
       nfi_results_summarise(
         polygon_group = admin_div,
@@ -724,6 +730,7 @@ returned_data <- function(
         diameter_classes = diameter_classes,
         dominant_group = dominant_group,
         dominant_criteria = dominant_criteria,
+        dominant_nfi = dominant_nfi,
         conn = nfidb,
         .collect = TRUE
       )

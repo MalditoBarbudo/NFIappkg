@@ -207,12 +207,21 @@ mod_map <- function(
         )
       )
 
+      dominant_nfi <- switch(
+        data_inputs$dominant_nfi,
+        none = '',
+        nfi2 = '_nfi2',
+        nfi3 = '_nfi3',
+        nfi4 = '_nfi4'
+      )
+
       # filter by functional group value
       if (data_inputs$functional_group != 'plot' | data_inputs$dominant_group != 'none') {
 
         if (data_inputs$dominant_group != 'none') {
+
           fil_var <- glue::glue(
-            "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+            "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant{dominant_nfi}"
           )
         } else {
           fil_var <- glue::glue("{data_inputs$functional_group}_id")
@@ -277,7 +286,7 @@ mod_map <- function(
           ) %>%
           dplyr::select(dplyr::one_of(
             join_var, viz_color, glue::glue("{data_inputs$functional_group}_id"),
-            glue::glue("{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"),
+            glue::glue("{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant{dominant_nfi}"),
             'diamclass_id'
           ))
 

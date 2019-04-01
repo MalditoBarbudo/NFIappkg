@@ -65,13 +65,20 @@ mod_info <- function(
     if (click$group == 'plots') {
       viz_sel <- data_inputs$viz_color
       fg_id <- glue::glue("{data_inputs$functional_group}_id")
+      dom_nfi <- switch(
+        data_inputs$dominant_nfi,
+        none = '',
+        nfi2 = '_nfi2',
+        nfi3 = '_nfi3',
+        nfi4 = '_nfi4'
+      )
       if (fg_id == 'plot_id') {
         # check if dominant group is present
         if (data_inputs$dominant_group == 'none') {
           fg_id <- ''
         } else {
           fg_id <- glue::glue(
-            "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+            "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant{dom_nfi}"
           )
         }
       }
@@ -94,8 +101,15 @@ mod_info <- function(
         if (data_inputs$dominant_group == 'none') {
           fg_id <- ''
         } else {
+          dom_nfi <- switch(
+            data_inputs$dominant_nfi,
+            none = '',
+            nfi2 = '_nfi2',
+            nfi3 = '_nfi3',
+            nfi4 = '_nfi4'
+          )
           fg_id <- glue::glue(
-            "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+            "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant{dom_nfi}"
           )
         }
       }
@@ -140,8 +154,15 @@ mod_info <- function(
           if (data_inputs$dominant_group == 'none') {
             fg_id <- ''
           } else {
+            dom_nfi <- switch(
+              data_inputs$dominant_nfi,
+              none = '',
+              nfi2 = '_nfi2',
+              nfi3 = '_nfi3',
+              nfi4 = '_nfi4'
+            )
             fg_id <- glue::glue(
-              "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+              "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant{dom_nfi}"
             )
           }
         }
@@ -176,8 +197,15 @@ mod_info <- function(
           if (data_inputs$dominant_group == 'none') {
             fg_id <- ''
           } else {
+            dom_nfi <- switch(
+              data_inputs$dominant_nfi,
+              none = '',
+              nfi2 = '_nfi2',
+              nfi3 = '_nfi3',
+              nfi4 = '_nfi4'
+            )
             fg_id <- glue::glue(
-              "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant"
+              "{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant{dom_nfi}"
             )
           }
         }

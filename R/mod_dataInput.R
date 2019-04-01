@@ -223,6 +223,13 @@ mod_data <- function(
                         choices = c('density', 'basal_area'),
                         selected = 'density',
                         status = 'info', checkbox = FALSE
+                      ),
+                      shinyWidgets::awesomeRadio(
+                        ns('dominant_nfi'),
+                        label = 'Dominant NFI version',
+                        choices = c('none', 'nfi2', 'nfi3', 'nfi4'),
+                        selected = 'none',
+                        status = 'info', checkbox = FALSE
                       )
                     )
                   )
@@ -310,11 +317,42 @@ mod_data <- function(
       shinyjs::reset('dominant_group')
       shinyjs::hide('dominant_group')
       shinyjs::hide('dominant_criteria')
+      shinyjs::hide('dominant_nfi')
       shinyjs::showElement('dominant_warn')
     } else {
       shinyjs::show('dominant_group')
       shinyjs::show('dominant_criteria')
+      shinyjs::show('dominant_nfi')
       shinyjs::hideElement('dominant_warn')
+
+      if (nfi %in% c('nfi_2', 'nfi_3', 'nfi_4')) {
+        shinyWidgets::updateAwesomeRadio(
+          session = session,
+          'dominant_nfi', label = 'Dominant NFI version',
+          choices = 'none',
+          selected = 'none',
+          status = 'info', checkbox = FALSE
+        )
+        shinyjs::hide('dominant_nfi')
+      } else {
+        shinyjs::enable('dominant_nfi')
+        shinyjs::show('dominant_nfi')
+
+        if (nfi == 'nfi_2_nfi_3') {
+          dominant_nfi_choices <- c('nfi2', 'nfi3')
+        } else {
+          dominant_nfi_choices <- c('nfi3', 'nfi4')
+        }
+
+        shinyWidgets::updateAwesomeRadio(
+          session = session,
+          'dominant_nfi', label = 'Dominant NFI version',
+          choices = dominant_nfi_choices,
+          selected = dominant_nfi_choices[1],
+          status = 'info', checkbox = FALSE
+        )
+
+      }
     }
   })
 
@@ -367,6 +405,7 @@ mod_data <- function(
   shiny::observe({
     data_inputs$dominant_group <- input$dominant_group
     data_inputs$dominant_criteria <- input$dominant_criteria
+    data_inputs$dominant_nfi <- input$dominant_nfi
   })
 
   # calling the modules used
