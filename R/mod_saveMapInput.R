@@ -37,7 +37,7 @@ mod_saveMapInput <- function(id, lang, texts_thes) {
       # )
       shiny::br(),
       shiny::downloadButton(
-        ns('save_gpkg'), label = 'save geo package'
+        ns('save_gpkg'), label = text_translate('save_gpkg_button', lang, texts_thes)
       )
     )
   )
