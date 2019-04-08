@@ -51,17 +51,22 @@ mod_tableOutput <- function(id) {
         ),
         shiny::column(
           2, offset = 3,
-          # shiny::br(),
-          shiny::downloadButton(
-            ns('dwl_csv_button'),
-            'csv',
-            class = 'success'
-          ),
-          shiny::downloadButton(
-            ns('dwl_xlsx_button'),
-            'xlsx',
-            class = 'success'
-          )#,
+          shiny::br(),
+          shiny::actionButton(
+            ns('save_data_table'), icon = shiny::icon('download'), label = ''
+          )
+
+
+          # shiny::downloadButton(
+          #   ns('dwl_csv_button'),
+          #   'csv',
+          #   class = 'success'
+          # ),
+          # shiny::downloadButton(
+          #   ns('dwl_xlsx_button'),
+          #   'xlsx',
+          #   class = 'success'
+          # )#,
           # shiny::downloadButton(
           #   ns('dwl_sql_query'),
           #   'SQL query',
@@ -261,50 +266,123 @@ mod_table <- function(
     build_table()
   })
 
+  # modal for saving the data
+  shiny::observeEvent(
+    eventExpr = input$save_data_table,
+    handlerExpr = {
+
+      ns <- session$ns
+
+      shiny::showModal(
+        ui = shiny::modalDialog(
+          shiny::tagList(
+
+            shiny::fluidRow(
+              shiny::column(
+                12,
+                # format options
+                shiny::radioButtons(
+                  ns('data_format'), #'Data format',
+                  text_translate('data_format', lang(), texts_thes),
+                  choices = c('csv', 'xlsx'),
+                  selected = 'csv'
+                ),
+                # length options
+                shiny::radioButtons(
+                  ns('data_length'), #'All data?',
+                  text_translate('data_length', lang(), texts_thes),
+                  choices = c('visible', 'all_columns') %>%
+                    magrittr::set_names(c(
+                      text_translate('visible', lang(), texts_thes),
+                      text_translate('all_columns', lang(), texts_thes)
+                    )),
+                  selected = 'visible', width = '100%'
+                )
+              )
+            )
+          ),
+          easyClose = TRUE,
+          footer = shiny::tagList(
+            shiny::modalButton(text_translate('dismiss', lang(), texts_thes)),
+            shiny::downloadButton(
+              ns('download_data_with_options'),
+              label = text_translate('download', lang(), texts_thes),
+              class = 'btn-success'
+            )
+          )
+        )
+      )
+    }
+  )
+
+
   # download handlers
-  output$dwl_csv_button <- shiny::downloadHandler(
+  output$download_data_with_options <- shiny::downloadHandler(
     filename = function() {
-      'NFI_data.csv'
+      glue::glue("NFI_data.{input$data_format}")
     },
     content = function(file) {
-      if (isTRUE(data_inputs$diameter_classes)) {
-        shinyWidgets::sendSweetAlert(
-          session, 'Note:',
-          text = 'Saving the data broken down by diameter classes can take some time'
-        )
-      }
-      readr::write_csv(table_data(), file)
-    }
-  )
 
-  output$dwl_xlsx_button <- shiny::downloadHandler(
-    filename = function() {
-      'NFI_data.xlsx'
-    },
-    content = function(file) {
-      if (isTRUE(data_inputs$diameter_classes)) {
-        shinyWidgets::sendSweetAlert(
-          session, 'Note:',
-          text = 'Saving the data broken down by diameter classes can take some time'
-        )
-      }
-      writexl::write_xlsx(table_data(), file)
-    }
-  )
-
-  output$dwl_sql_query <- shiny::downloadHandler(
-    filename = function() {
-      'NFI_data_query.sql'
-    },
-    content = function(file) {
-      if (data_inputs$viz_shape == 'plot') {
-        query <- dbplyr::sql_render(map_inputs$main_data$selected)
+      # data length
+      if (input$data_length == 'visible') {
+        data_res <- table_data() %>%
+          dplyr::select(dplyr::one_of(input$col_vis_selector))
       } else {
-        query <- dbplyr::sql_render(map_inputs$main_data$summarised)
+        data_res <- table_data()
       }
-      writeLines(query, con = file)
+
+      # data format
+      if (input$data_format == 'csv') {
+        readr::write_csv(data_res, file)
+      } else {
+        writexl::write_xlsx(data_res, file)
+      }
     }
   )
+
+  # output$dwl_csv_button <- shiny::downloadHandler(
+  #   filename = function() {
+  #     'NFI_data.csv'
+  #   },
+  #   content = function(file) {
+  #     if (isTRUE(data_inputs$diameter_classes)) {
+  #       shinyWidgets::sendSweetAlert(
+  #         session, 'Note:',
+  #         text = 'Saving the data broken down by diameter classes can take some time'
+  #       )
+  #     }
+  #     readr::write_csv(table_data(), file)
+  #   }
+  # )
+  #
+  # output$dwl_xlsx_button <- shiny::downloadHandler(
+  #   filename = function() {
+  #     'NFI_data.xlsx'
+  #   },
+  #   content = function(file) {
+  #     if (isTRUE(data_inputs$diameter_classes)) {
+  #       shinyWidgets::sendSweetAlert(
+  #         session, 'Note:',
+  #         text = 'Saving the data broken down by diameter classes can take some time'
+  #       )
+  #     }
+  #     writexl::write_xlsx(table_data(), file)
+  #   }
+  # )
+  #
+  # output$dwl_sql_query <- shiny::downloadHandler(
+  #   filename = function() {
+  #     'NFI_data_query.sql'
+  #   },
+  #   content = function(file) {
+  #     if (data_inputs$viz_shape == 'plot') {
+  #       query <- dbplyr::sql_render(map_inputs$main_data$selected)
+  #     } else {
+  #       query <- dbplyr::sql_render(map_inputs$main_data$summarised)
+  #     }
+  #     writeLines(query, con = file)
+  #   }
+  # )
 
   shiny::observeEvent(
     eventExpr = input$show_hri,
