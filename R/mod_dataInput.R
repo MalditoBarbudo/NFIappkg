@@ -98,6 +98,30 @@ mod_data <- function(
         text_translate('fg_bc', lang(), texts_thes)
       ))
 
+    dominant_group_choices <- c('none', 'species', 'simpspecies', 'genus', 'dec', 'bc') %>%
+      magrittr::set_names(c(
+        text_translate('none', lang(), texts_thes),
+        text_translate('species', lang(), texts_thes),
+        text_translate('simpspecies', lang(), texts_thes),
+        text_translate('genus', lang(), texts_thes),
+        text_translate('dec', lang(), texts_thes),
+        text_translate('bc', lang(), texts_thes)
+      ))
+
+    dominant_criteria_choices <- c('density', 'basal_area') %>%
+      magrittr::set_names(c(
+        text_translate('dominant_criteria_density', lang(), texts_thes),
+        text_translate('dominant_criteria_basal_area', lang(), texts_thes)
+      ))
+
+    dominant_nfi_choices <- c('none', 'nfi2', 'nfi3', 'nfi4') %>%
+      magrittr::set_names(c(
+        text_translate('none', lang(), texts_thes),
+        text_translate('nfi2', lang(), texts_thes),
+        text_translate('nfi3', lang(), texts_thes),
+        text_translate('nfi4', lang(), texts_thes)
+      ))
+
     # absolute panel for all, later on we will be able to hide/show the different
     # parts of the panel
     shiny::absolutePanel(
@@ -147,7 +171,7 @@ mod_data <- function(
         ),
         shiny::hr(),
         shiny::fluidRow(
-          shiny::h4('Additional controls'),
+          shiny::h4(text_translate('h4_additional_controls', lang(), texts_thes)),
           shiny::tabsetPanel(
             type = 'pills',
             # 2. data aggregation level (div and id is for shinyjs later
@@ -165,7 +189,8 @@ mod_data <- function(
                     selected = 'plot', width = '100%'
                   ),
                   shiny::actionButton(
-                    ns('advanced_fg_options'), 'Show/Hide advanced options',
+                    ns('advanced_fg_options'),# 'Show/Hide advanced options',
+                    text_translate('advanced_fg_options', lang(), texts_thes),
                     class = 'btn-info'
                   )
                 )
@@ -188,8 +213,9 @@ mod_data <- function(
                         shiny::div(
                           id = ns('shrub_regen_warn'),
                           shiny::br(),
-                          'When shrub or regeneration tables are selected,
-              breakdown is fixed to species and diameter classes are inactive'
+                          text_translate('shrub_regen_warn', lang(), texts_thes)
+              #             'When shrub or regeneration tables are selected,
+              # breakdown is fixed to species and diameter classes are inactive'
                         )
                       ),
                       # hidden message
@@ -197,9 +223,10 @@ mod_data <- function(
                         shiny::div(
                           id = ns('dominant_warn'),
                           shiny::br(),
-                          'When other than total by plot break down is selected,
-                          or diameter classes breakown is active,
-                          dominant functional group grouping is not available'
+                          text_translate('dominant_warn', lang(), texts_thes)
+                          # 'When other than total by plot break down is selected,
+                          # or diameter classes breakown is active,
+                          # dominant functional group grouping is not available'
                         )
                       )
                     )
@@ -210,7 +237,7 @@ mod_data <- function(
                       # inputs
                       shinyWidgets::awesomeRadio(
                         ns('dominant_group'), label = 'Dominant group to group by',
-                        choices = c('none', 'species', 'simpspecies', 'genus', 'dec', 'bc'),
+                        choices = dominant_group_choices,
                         selected = 'none',
                         status = 'info', checkbox = FALSE
                       )
@@ -220,14 +247,14 @@ mod_data <- function(
                       shinyWidgets::awesomeRadio(
                         ns('dominant_criteria'),
                         label = 'Dominant criteria to group by',
-                        choices = c('density', 'basal_area'),
+                        choices = dominant_criteria_choices,
                         selected = 'density',
                         status = 'info', checkbox = FALSE
                       ),
                       shinyWidgets::awesomeRadio(
                         ns('dominant_nfi'),
                         label = 'Dominant NFI version',
-                        choices = c('none', 'nfi2', 'nfi3', 'nfi4'),
+                        choices = dominant_nfi_choices,
                         selected = 'none',
                         status = 'info', checkbox = FALSE
                       )
@@ -339,9 +366,17 @@ mod_data <- function(
         shinyjs::show('dominant_nfi')
 
         if (nfi == 'nfi_2_nfi_3') {
-          dominant_nfi_choices <- c('nfi2', 'nfi3')
+          dominant_nfi_choices <- c('nfi2', 'nfi3') %>%
+            magrittr::set_names(c(
+              text_translate('nfi2', lang(), texts_thes),
+              text_translate('nfi3', lang(), texts_thes)
+            ))
         } else {
-          dominant_nfi_choices <- c('nfi3', 'nfi4')
+          dominant_nfi_choices <- c('nfi3', 'nfi4') %>%
+            magrittr::set_names(c(
+              text_translate('nfi3', lang(), texts_thes),
+              text_translate('nfi4', lang(), texts_thes)
+            ))
         }
 
         shinyWidgets::updateAwesomeRadio(

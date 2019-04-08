@@ -314,7 +314,6 @@ mod_viz <- function(
         shinyWidgets::updatePickerInput(
           session, 'viz_functional_group_value',
           choices = viz_functional_group_value_choices,
-          # TODO update the text_thesaurus for this case, to add dominant to the label
           label = glue::glue(text_translate('viz_functional_group_value_input', lang(), texts_thes))
         )
         shinyjs::show('viz_functional_group_value')
