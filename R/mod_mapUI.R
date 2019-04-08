@@ -16,7 +16,9 @@ mod_mapUI <- function(id, nfidb) {
     leaflet::leafletOutput(ns('map'), height = '100%'),
 
     # mod returned data
-    mod_returnedDataOutput('mod_returnedDataOutput')
+    mod_returnedDataOutput('mod_returnedDataOutput'),
+
+    shiny::uiOutput(ns('cite_div_container'))
   )
 }
 
@@ -39,6 +41,19 @@ mod_map <- function(
   data_inputs, nfidb, var_thes, texts_thes, numerical_thes, lang,
   cache_list
 ) {
+
+  # cite div
+  output$cite_div_container <- shiny::renderUI({
+    ## cite div ####
+    shiny::tags$div(
+      id = 'cite',
+      # glue::glue(
+      #   'Data prepared by the CTFC and CREAF based on the raw NFI data served ',
+      #   'by the MAPA (Spanish government)'
+      # )
+      text_translate('cite_div', lang(), texts_thes)
+    )
+  })
 
   tables_to_look_at <- shiny::reactive({
 

@@ -98,15 +98,6 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
 
               mod_infoUI('mod_infoUI')
             )
-          ),
-
-          ## cite div ####
-          shiny::tags$div(
-            id = 'cite',
-            glue::glue(
-              'Data prepared by the CTFC and CREAF based on the raw NFI data served ',
-              'by the MAPA (Spanish government)'
-            )
           )
         )
       ),

@@ -721,8 +721,6 @@ returned_data <- function(
     summarised_data <- NULL
   } else {
 
-    browser()
-
     summarised_data <- selected_data %>%
       nfi_results_summarise(
         polygon_group = admin_div,
