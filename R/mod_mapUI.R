@@ -68,9 +68,14 @@ mod_map <- function(
   output$map <- leaflet::renderLeaflet({
     leaflet::leaflet() %>%
       leaflet::setView(0.74, 41.70, zoom = 8) %>%
-      leaflet::addProviderTiles(leaflet::providers$Esri.WorldShadedRelief) %>%
+      leaflet::addProviderTiles(leaflet::providers$Esri.WorldShadedRelief, group = 'Relief') %>%
+      leaflet::addProviderTiles(leaflet::providers$Esri.WorldImagery, group = 'Imaginery') %>%
       leaflet::addMapPane('admin_divs', zIndex = 410) %>%
       leaflet::addMapPane('plots', zIndex = 420) %>%
+      leaflet::addLayersControl(
+        baseGroups = c('Relief', 'Imaginery'),
+        options = leaflet::layersControlOptions(collapsed = TRUE)
+      ) %>%
       # leaflet.extras plugins
       leaflet.extras::addDrawToolbar(
         targetGroup = 'custom_polygon',
