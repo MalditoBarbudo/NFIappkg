@@ -47,6 +47,13 @@ mod_tableOutput <- function(id) {
             style = 'material-circle',
             icon = shiny::icon('info-circle'),
             color = 'primary', size = 'sm'
+          ),
+          shinyWidgets::actionBttn(
+            ns('show_glossary'),
+            'Glossary',
+            style = 'material-circle',
+            icon = shiny::icon('question-circle'),
+            color = 'primary', size = 'sm'
           )
         ),
         shiny::column(
@@ -392,6 +399,18 @@ mod_table <- function(
         title = 'Data info',
         text = shiny::tags$div(hri_builder(data_inputs)),
         html = TRUE
+      )
+    }
+  )
+
+  shiny::observeEvent(
+    eventExpr = input$show_glossary,
+    handlerExpr = {
+
+      # ns <- session$ns
+      shiny::showModal(
+        # ui = mod_glossaryUI(ns('mod_glossaryUI'))
+        ui = mod_glossaryUI('mod_glossaryUI')
       )
     }
   )

@@ -102,7 +102,7 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
         )
       ),
 
-      # data tab
+      ## data tab ####
       shiny::tabPanel(
         'Data',
 
@@ -172,6 +172,12 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
     shiny::callModule(
       mod_table, 'mod_tableOutput',
       data_reactives, map_reactives, nfidb, var_thes, texts_thes, numerical_thes, lang
+    )
+
+    # glossary
+    shiny::callModule(
+      mod_glossary, 'mod_glossaryUI',
+      nfidb, var_thes, numerical_thes, texts_thes, lang, data_reactives
     )
 
     shiny::observeEvent(
