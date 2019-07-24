@@ -28,7 +28,8 @@ uniformize the apps style
   color: #c8cac8;
 }
 
-.navbar-default .navbar-nav>li>a {
+.navbar-default .navbar-nav>li>a,
+.navbar-default .navbar-nav>li>a:hover {
   background-color: #647a8d;
   border: 0px;
   color: #c8cac8;
@@ -57,21 +58,31 @@ uniformize the apps style
   border: 0px;
 }
 
-/* lang input */
-.dropdown-menu {
-  background-color: #c8cac8;
-}
-
-.dropdown-menu>.selected>a {
-  background-color: #c8cac8;
-}
-
+/* lang input and inputs as buttons*/
+.dropdown-menu,
+.dropdown-menu>.selected>a,
 .dropdown-menu>li>a {
   background-color: #c8cac8;
 }
 
+.dropdown-menu>.active>a {
+  background-color: #c8cac8;
+  color: #333;
+}
+
+.dropdown-menu>.active>a:hover {
+  background-color: #448714;
+  color: #333;
+}
+
 .dropdown-menu>li>a:hover {
   background-color: #448714;
+}
+
+button.btn.dropdown-toggle.btn-default {
+  background-color: #c8cac8;
+  border-color: #c8cac8;
+  color: #333;
 }
 
 /* inputs */
@@ -90,13 +101,14 @@ uniformize the apps style
   border: 0px;
 }
 
+
 /* body background */
 body {
   background-color: #c8cac8;
 }
 
 /* buttons */
-.btn-default {
+.btn-default, .btn-default:focus {
   background-color: #15351e;
   border-color: #15351e;
   color: #c8cac8;
@@ -117,7 +129,7 @@ body {
 
 /* panels */
 
-.panel-body {
+.panel, .panel-body {
   background-color: #001629;
   border-color: #001629;
   color: #c8cac8;
@@ -227,7 +239,7 @@ div.table_container {
 /* Controls */
 #dataControls {
   /* Appearance */
-  background-color: #bdc3c7;
+  /* background-color: #bdc3c7; */
   padding: 0 20px 20px 20px;
   cursor: move;
   border-radius: 8px;
