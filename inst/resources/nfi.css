@@ -1,3 +1,139 @@
+/* TESTS FOR CORPORATIVE IMAGE */
+/*
+
+Esto es una tentativa de establecer una paleta de colores basada en los colores del
+CREAF y del CTFC e uniformizar el estilo de las apps
+
+This is a try to establish a color palette based on the main colors of CREAF and CTFC, and
+uniformize the apps style
+
+@import "ic_tests.css";
+
+*/
+
+/* navbar */
+.navbar-static-top {
+  background-color: #001629;
+  border: 0px;
+}
+
+.navbar-default .navbar-brand {
+  color: #c8cac8;
+}
+
+.navbar-default .navbar-nav>.active>a,
+.navbar-default .navbar-nav>.active>a:focus,
+.navbar-default .navbar-nav>.active>a:hover {
+  background-color: #448714;
+  color: #c8cac8;
+}
+
+.navbar-default .navbar-nav>li>a {
+  background-color: #647a8d;
+  border: 0px;
+  color: #c8cac8;
+}
+
+/* main panel tabs */
+
+.tabbable .nav-tabs>li>a {
+  background-color: #647a8d;
+  border: 0px;
+  color: #c8cac8;
+}
+
+.tabbable .nav-tabs>.active>a,
+.tabbable .nav-tabs>.active>a:focus,
+.tabbable .nav-tabs>.active>a:hover {
+  background-color: #448714;
+  color: #c8cac8;
+  border: 0px;
+}
+
+/* well panels and sidebars */
+.well {
+  background-color: #001629;
+  color: #c8cac8;
+  border: 0px;
+}
+
+/* lang input */
+.dropdown-menu {
+  background-color: #c8cac8;
+}
+
+.dropdown-menu>.selected>a {
+  background-color: #c8cac8;
+}
+
+.dropdown-menu>li>a {
+  background-color: #c8cac8;
+}
+
+.dropdown-menu>li>a:hover {
+  background-color: #448714;
+}
+
+/* inputs */
+.form-control, .datepicker-dropdown, .datepicker {
+  background-color: #c8cac8;
+  border: 0px;
+}
+
+.selectize-dropdown, .selectize-input.full, .optgroup-header, .option, .selectize-input {
+  background-color: #c8cac8 !important;
+  border: 0px;
+}
+
+.option:hover, .option:focus {
+  background-color: #448714 !important;
+  border: 0px;
+}
+
+/* body background */
+body {
+  background-color: #c8cac8;
+}
+
+/* buttons */
+.btn-default {
+  background-color: #15351e;
+  border-color: #15351e;
+  color: #c8cac8;
+}
+
+.btn-default:hover, .btn-default:active {
+  background-color: #76f7a7;
+  border-color: #76f7a7;
+  color: #647a8d;
+}
+
+/* modals */
+.modal-content {
+  background-color: #001629;
+  border-color: #001629;
+  color: #c8cac8;
+}
+
+/* panels */
+
+.panel-body {
+  background-color: #001629;
+  border-color: #001629;
+  color: #c8cac8;
+}
+
+.panel-default>.panel-heading {
+  background-color: #448714;
+  border-color: #448714;
+  color: #c8cac8;
+}
+
+input.form-control {
+  background-color: #c8cac8 !important;
+}
+
+
 /*
 Custom css for NFI app.
 Citations:
