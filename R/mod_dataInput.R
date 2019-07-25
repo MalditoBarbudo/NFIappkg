@@ -143,7 +143,8 @@ mod_data <- function(
             shinyWidgets::radioGroupButtons(
               ns('viz_shape'),
               choices = viz_shape_choices, selected = 'polygon',
-              status = 'info', size = 'sm', justified = TRUE,
+              status = 'lfc_radiogroupbuttons',
+              size = 'sm', justified = TRUE,
               checkIcon = list(
                 yes = shiny::icon("check"),
                 no = shiny::icon("times")
@@ -285,7 +286,7 @@ mod_data <- function(
             shiny::tabPanel(
               text_translate('data_tab_4', lang(), texts_thes),
               shiny::column(
-                8, offset = 2,
+                12,
                 shiny::br(),
                 mod_saveMapInput('mod_saveMapInput', lang(), texts_thes)
               )

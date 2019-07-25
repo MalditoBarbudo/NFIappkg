@@ -15,26 +15,24 @@ mod_saveMapInput <- function(id, lang, texts_thes) {
   # Buttons
   shiny::fluidRow(
     shiny::column(
-      12,
+      4,
       # title
       shiny::tags$strong(text_translate('save_the_map', lang, texts_thes)),
       shiny::br(),
       # buttons
       shiny::downloadButton(
         ns('save_shp'), label = text_translate('save_shp_button', lang, texts_thes)
-      ),
-      # shinyWidgets::downloadBttn(
-      #   ns('save_shp'), label = text_translate('save_shp_button', lang, texts_thes),
-      #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
-      # ),
+      )
+    ),
+    shiny::column(
+      4,
       shiny::br(),
       shiny::downloadButton(
         ns('save_wkt'), label = text_translate('save_wkt_button', lang, texts_thes)
-      ),
-      # shinyWidgets::downloadBttn(
-      #   ns('save_wkt'), label = text_translate('save_wkt_button', lang, texts_thes),
-      #   style = 'material-flat', color = 'success', size = 'sm', block = TRUE
-      # )
+      )
+    ),
+    shiny::column(
+      4,
       shiny::br(),
       shiny::downloadButton(
         ns('save_gpkg'), label = text_translate('save_gpkg_button', lang, texts_thes)

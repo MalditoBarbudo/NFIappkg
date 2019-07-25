@@ -100,7 +100,7 @@ mod_vizInput <- function(id, nfidb, lang, texts_thes) {
               text_translate('pal_normal', lang, texts_thes),
               text_translate('pal_high', lang, texts_thes)
             )),
-          selected = 'normal', direction = 'vertical', status = 'warning'
+          selected = 'normal', direction = 'vertical', status = 'lfc_radiogroupbuttons'
         ),
         # reverse palette
         shinyWidgets::awesomeCheckbox(

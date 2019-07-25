@@ -10,7 +10,7 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
 
   ### Variables names inter ####################################################
   var_thes <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>% dplyr::collect()
-  texts_thes <- dplyr::tbl(nfidb, 'TEXTS_THESAURUS') %>% dplyr::collect()
+  texts_thes <- dplyr::tbl(nfidb, tolower('TEXTS_THESAURUS')) %>% dplyr::collect()
   numerical_thes <- dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL') %>% dplyr::collect()
 
   ### Language input ###########################################################

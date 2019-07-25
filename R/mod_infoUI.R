@@ -274,7 +274,7 @@ mod_info <- function(
         #   field.border.top.width = 0,
         #   field.border.bottom.width = 0,
           heading.border.bottom.width = 2,
-          heading.border.bottom.color = 'black'
+          heading.border.bottom.color = '#c8cac8'
         ) %>%
         gt::tab_style(
           style = gt::cells_styles(
@@ -285,7 +285,7 @@ mod_info <- function(
         gt::tab_style(
           style = gt::cells_styles(
             text_font = 'Montserrat',
-            text_color = 'black',
+            text_color = '#c8cac8',
             text_weight = 'bold',
             text_align = 'right'
           ),
@@ -294,7 +294,7 @@ mod_info <- function(
         gt::tab_style(
           style = gt::cells_styles(
             text_font = 'Montserrat',
-            text_color = 'black',
+            text_color = '#c8cac8',
             text_align = 'right'
           ),
           locations = gt::cells_stub(rows = TRUE)
@@ -302,7 +302,7 @@ mod_info <- function(
         gt::tab_style(
           style = gt::cells_styles(
             text_font = 'Montserrat',
-            text_color = 'black',
+            text_color = '#c8cac8',
             text_weight = 'bold',
             text_align = 'left'
           ),
