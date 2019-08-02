@@ -121,7 +121,8 @@ body {
 }
 
 /* buttons */
-.btn-default, .btn-default:focus {
+.btn-default, .btn-default:focus,
+.swal-button, .swal-button:focus {
   background-color: var(--main-button-color);
   border-color: var(--main-button-color);
   color: var(--main-bg-color);
@@ -133,7 +134,8 @@ body {
   color: var(--main-bg-color) !important;
 }
 
-.btn-default:hover, .btn-default:active {
+.btn-default:hover, .btn-default:active,
+.swal-button:hover, .swal-button:active {
   background-color: var(--main-button-hover-color);
   border-color: var(--main-button-hover-color);
   color: var(--main-not-focused-color);
@@ -149,6 +151,10 @@ body {
 .modal-content, .swal-modal {
   background-color: var(--main-dark-color);
   border-color: var(--main-dark-color);
+  color: var(--main-bg-color);
+}
+
+.swal-title, .swal-text {
   color: var(--main-bg-color);
 }
 

@@ -86,19 +86,10 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
 
           ## mod_map ####
           # mod_map, it includes the map
-          mod_mapUI('mod_mapUI'),
+          mod_mapUI('mod_mapUI')
 
           ## mod_info ####
-          # mod_infoPanel, it includes the map events info panel
-          shinyjs::hidden(
-            shiny::absolutePanel(
-              id = 'infoPanel', class = 'panel panel-default', fixed = TRUE,
-              draggable = TRUE, width = 'auto', height = 'auto',
-              top = 60, left = '5%', right = '5%', bottom = '2%',
-
-              mod_infoUI('mod_infoUI')
-            )
-          )
+          # mod info now is a modal, and is launched in the server section
         )
       ),
 
@@ -183,13 +174,15 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
     shiny::observeEvent(
       eventExpr = map_reactives$map_shape_click,
       handlerExpr = {
-        shinyjs::showElement('infoPanel')
-      }
-    )
-    shiny::observeEvent(
-      eventExpr = info_reactives$close,
-      handlerExpr = {
-        shinyjs::hideElement('infoPanel')
+        shiny::showModal(
+          shiny::modalDialog(
+            mod_infoUI('mod_infoUI'),
+            footer = shiny::modalButton(
+              text_translate('dismiss', lang(), texts_thes)
+            ),
+            size = 'l', easyClose = TRUE
+          )
+        )
       }
     )
 

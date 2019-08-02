@@ -16,24 +16,12 @@ mod_infoUI <- function(id) {
         6,
         # plot column
         shiny::br(),
-        shiny::plotOutput(ns("info_plot"), height = "700px")
+        shiny::plotOutput(ns("info_plot"))
       ),
       shiny::column(
         6,
         shiny::br(),
         gt::gt_output(ns('info_table'))
-      )
-    ),
-    shiny::fluidRow(
-      shiny::column(
-        2, offset = 10,
-        shiny::hr(),
-        shinyWidgets::actionBttn(
-          ns('close'),
-          'Close',
-          icon = shiny::icon('check-circle'), style = 'stretch',
-          block = FALSE, size = 'sm'
-        )
       )
     )
   )

@@ -315,8 +315,8 @@ infoplot_builder <- function(
         # warning the user about the trimming
         shinyWidgets::sendSweetAlert(
           session,
-          title = 'Too much functional group levels to safely plot them all',
-          text = glue::glue("Showing only the 5 levels more abundant")
+          title = text_translate('swal_too_much_title', lang(), texts_thes),
+          text = text_translate('swal_too_much_text', lang(), texts_thes)
         )
       # }
 
@@ -346,7 +346,7 @@ infoplot_builder <- function(
           "{plot_expression} +
             ggplot2::geom_jitter(
               data = plot_data_sel, ggplot2::aes(size = {viz_size}), width = 0.1,
-              height = 0, alpha = 1, color = 'red', show.legend = FALSE
+              height = 0, alpha = 1, color = '#448714', show.legend = FALSE
             )"
         )
       } else {
@@ -354,7 +354,7 @@ infoplot_builder <- function(
           "{plot_expression} +
             ggplot2::geom_jitter(
               data = plot_data_sel, width = 0.1, size = 4,
-              height = 0, alpha = 1, color = 'red', show.legend = FALSE
+              height = 0, alpha = 1, color = '#448714', show.legend = FALSE
             )"
         )
       }
@@ -366,11 +366,11 @@ infoplot_builder <- function(
             ggplot2::geom_jitter(
               data = plot_data_unsel,
               ggplot2::aes(size = {viz_size}), width = 0.1, height = 0,
-              alpha = 0.3, color = 'grey88', show.legend = FALSE
+              alpha = 0.3, color = '#647a8d', show.legend = FALSE
             ) +
             ggplot2::geom_jitter(
               data = plot_data_sel, ggplot2::aes(size = {viz_size}), width = 0.1,
-              height = 0, alpha = 1, color = 'red', show.legend = FALSE
+              height = 0, alpha = 1, color = '#448714', show.legend = FALSE
             )"
         )
       } else {
@@ -379,11 +379,11 @@ infoplot_builder <- function(
             ggplot2::geom_jitter(
               data = plot_data_unsel,
               width = 0.1, height = 0, alpha = 0.3, size = 4,
-              color = 'grey88', show.legend = FALSE
+              color = '#647a8d', show.legend = FALSE
             ) +
             ggplot2::geom_jitter(
               data = plot_data_sel, width = 0.1, size = 4,
-              height = 0, alpha = 1, color = 'red', show.legend = FALSE
+              height = 0, alpha = 1, color = '#448714', show.legend = FALSE
             )"
         )
       }
@@ -418,7 +418,7 @@ infoplot_builder <- function(
         "{plot_expression} +
         ggplot2::geom_violin(
           adjust = 0.5,
-          fill = 'transparent', colour = 'grey88'
+          fill = 'transparent', colour = '#647a8d'
         )"
       )
     }
@@ -499,7 +499,7 @@ infoplot_builder <- function(
         "plot_data_all %>%
           ggplot2::ggplot(ggplot2::aes(x = {viz_sel})) +
           ggplot2::geom_bar(ggplot2::aes(fill = fill), show.legend = FALSE) +
-          ggplot2::scale_fill_manual(values = c('red', 'grey88'))"
+          ggplot2::scale_fill_manual(values = c('#448714', '#647a8d'))"
       )
 
       # dont forget to change the title_viz_sel object, as it is not summ and
@@ -519,8 +519,8 @@ infoplot_builder <- function(
         dplyr::filter(plot_id == click$id) %>%
         dplyr::pull(!!rlang::sym(viz_sel))
 
-      pal_vals <- rep('grey88', length(pal_ref))
-      pal_vals[which(pal_ref == click_value)] <- 'red'
+      pal_vals <- rep('#647a8d', length(pal_ref))
+      pal_vals[which(pal_ref == click_value)] <- '#448714'
 
 
 
@@ -564,15 +564,15 @@ infoplot_builder <- function(
     "{plot_expression} +
       ggplot2::theme_minimal() +
       ggplot2::theme(
-        text = ggplot2::element_text(size = 14, color = 'gray88'),
-        axis.text = ggplot2::element_text(color = 'gray88'),
-        strip.text = ggplot2::element_text(color = 'gray88'),
-        panel.background = ggplot2::element_rect(fill = 'gray12', colour = NA),
-        plot.background = ggplot2::element_rect(fill = 'gray12', colour = NA),
-        strip.background = ggplot2::element_rect(fill = 'gray12', colour = NA),
-        panel.grid = ggplot2::element_line(colour = 'gray58'),
+        text = ggplot2::element_text(size = 14, color = '#647a8d'),
+        axis.text = ggplot2::element_text(color = '#647a8d'),
+        strip.text = ggplot2::element_text(color = '#647a8d'),
+        panel.background = ggplot2::element_rect(fill = '#c8cac8', colour = NA),
+        plot.background = ggplot2::element_rect(fill = '#c8cac8', colour = NA),
+        strip.background = ggplot2::element_rect(fill = '#c8cac8', colour = NA),
+        panel.grid = ggplot2::element_line(colour = '#647a8d'),
         panel.grid.minor.y = ggplot2::element_blank(),
-        panel.grid.major.y = ggplot2::element_line(size = ggplot2::rel(0.5), colour = 'gray25')
+        panel.grid.major.y = ggplot2::element_line(size = ggplot2::rel(0.5), colour = '#647a8d')
       )"
   )
 
