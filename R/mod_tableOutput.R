@@ -39,21 +39,20 @@ mod_tableOutput <- function(id) {
         ),
         shiny::column(
           2, offset = 2, align = 'center',
-          shiny::br(),
+          # shiny::br(),
           # shiny::p('Data info'),
-          shinyWidgets::actionBttn(
+          shiny::actionButton(
             ns('show_hri'),
-            'Info',
-            style = 'material-circle',
-            icon = shiny::icon('info-circle'),
-            color = 'primary', size = 'sm'
+            'Query info',
+            icon = shiny::icon('info-circle')
           ),
-          shinyWidgets::actionBttn(
+          shiny::br(),
+          shiny::br(),
+          # shiny::br(),
+          shiny::actionButton(
             ns('show_glossary'),
-            'Glossary',
-            style = 'material-circle',
-            icon = shiny::icon('question-circle'),
-            color = 'primary', size = 'sm'
+            'Variables glossary',
+            icon = shiny::icon('question-circle')
           )
         ),
         shiny::column(
@@ -391,6 +390,20 @@ mod_table <- function(
   #   }
   # )
 
+  # hri and glossary
+  shiny::observe({
+    lang_sel <- lang()
+    shiny::updateActionButton(
+      session, 'show_hri', label = text_translate('hri', lang_sel, texts_thes)
+    )
+    shiny::updateActionButton(
+      session, 'show_glossary', label = text_translate('glossary', lang_sel, texts_thes)
+    )
+    shiny::updateActionButton(
+      session, 'save_data_table', label = text_translate('download', lang_sel, texts_thes)
+    )
+  })
+
   shiny::observeEvent(
     eventExpr = input$show_hri,
     handlerExpr = {
@@ -410,7 +423,7 @@ mod_table <- function(
       # ns <- session$ns
       shiny::showModal(
         # ui = mod_glossaryUI(ns('mod_glossaryUI'))
-        ui = mod_glossaryUI('mod_glossaryUI')
+        ui = mod_glossaryUI('mod_glossaryUI', lang(), texts_thes)
       )
     }
   )

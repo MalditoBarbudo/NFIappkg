@@ -4,10 +4,12 @@
 \alias{mod_glossaryUI}
 \title{mod_glossaryUI and mod_glossary}
 \usage{
-mod_glossaryUI(id)
+mod_glossaryUI(id, lang, texts_thes)
 }
 \arguments{
 \item{id}{shiny id}
+
+\item{lang}{character indicating the lang selected}
 }
 \description{
 Shiny module to generate the glossary

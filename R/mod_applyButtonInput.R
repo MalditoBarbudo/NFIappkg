@@ -12,11 +12,16 @@ mod_applyButtonInput <- function(id, lang, texts_thes) {
 
   # button
   shiny::fluidRow(
-    shinyWidgets::actionBttn(
+    shiny::actionButton(
       ns('apply'),
       text_translate('apply', lang, texts_thes),
-      icon = shiny::icon('check-circle'), style = 'stretch', block = FALSE, size = 'sm'
+      icon = shiny::icon('check-circle')
     )
+    # shinyWidgets::actionBttn(
+    #   ns('apply'),
+    #   text_translate('apply', lang, texts_thes),
+    #   icon = shiny::icon('check-circle'), style = 'stretch', block = FALSE, size = 'sm'
+    # )
   )
 
 }

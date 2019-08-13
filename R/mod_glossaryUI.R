@@ -3,9 +3,10 @@
 #' @description Shiny module to generate the glossary
 #'
 #' @param id shiny id
+#' @param lang character indicating the lang selected
 #'
 #' @export
-mod_glossaryUI <- function(id) {
+mod_glossaryUI <- function(id, lang, texts_thes) {
 
   # ns
   ns <- shiny::NS(id)
@@ -14,7 +15,7 @@ mod_glossaryUI <- function(id) {
   shiny::tagList(
     shiny::modalDialog(
       shiny::uiOutput(ns('mod_glossary_container')),
-      title = 'Variable glossary',
+      title = text_translate('glossary', lang, texts_thes),
       easyClose = TRUE
     )
 
@@ -67,7 +68,7 @@ mod_glossary <- function(
       shinyWidgets::pickerInput(
         ns('variable_glossary'),
         # label_getter(nfidb, 'esp', 'col_vis_selector_label'),
-        label = text_translate('col_vis_selector_input', lang_declared, texts_thes),
+        label = text_translate('glossary_selector_input', lang_declared, texts_thes),
         choices = var_choices, multiple = FALSE,
         width = '90%',
         options = list(
@@ -78,10 +79,10 @@ mod_glossary <- function(
       ),
 
       # output
-      shiny::h4('Variable description'),
+      shiny::h4(text_translate('glossary_var_desc', lang_declared, texts_thes)),
       shiny::textOutput(ns('glossary_description')),
       shiny::br(),
-      shiny::h4('Variable units (if numeric)'),
+      shiny::h4(text_translate('glossary_var_units', lang_declared, texts_thes)),
       shiny::textOutput(ns('glossary_units'))
     )
   })
