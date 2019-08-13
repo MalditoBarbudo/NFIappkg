@@ -9,20 +9,32 @@ mod_infoUI <- function(id) {
   # ns
   ns <- shiny::NS(id)
 
-  # ui skeleton
+  # # ui skeleton (columns)
+  # shiny::tagList(
+  #   shiny::fluidRow(
+  #     shiny::column(
+  #       6,
+  #       # plot column
+  #       shiny::br(),
+  #       shiny::plotOutput(ns("info_plot"))
+  #     ),
+  #     shiny::column(
+  #       6,
+  #       shiny::br(),
+  #       gt::gt_output(ns('info_table'))
+  #     )
+  #   )
+  # )
+
+  # ui skeleton (rows)
   shiny::tagList(
     shiny::fluidRow(
-      shiny::column(
-        6,
-        # plot column
-        shiny::br(),
-        shiny::plotOutput(ns("info_plot"))
-      ),
-      shiny::column(
-        6,
-        shiny::br(),
-        gt::gt_output(ns('info_table'))
-      )
+      shiny::br(),
+      shiny::plotOutput(ns("info_plot"))
+    ),
+    shiny::fluidRow(
+      shiny::br(),
+      gt::gt_output(ns('info_table'))
     )
   )
 }

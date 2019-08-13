@@ -333,3 +333,12 @@ div.table_container {
 .flag-image {
   border-radius: 50%;
 }
+
+/* modal lg size refactoring */
+.modal-body {
+  min-height: 800px;
+}
+
+.modal-lg {
+  width: 1200px;
+}
