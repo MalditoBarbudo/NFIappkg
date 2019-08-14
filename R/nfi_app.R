@@ -63,6 +63,10 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
             # custom css
             shiny::includeCSS(
               system.file('resources', 'nfi.css', package = 'NFIappkg')
+            ),
+            # corporative image css
+            shiny::includeCSS(
+              system.file('resources', 'corp_image.css', package = 'NFIappkg')
             )
           ),
 
