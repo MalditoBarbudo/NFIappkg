@@ -393,6 +393,7 @@ mod_table <- function(
   # hri and glossary
   shiny::observe({
     lang_sel <- lang()
+
     shiny::updateActionButton(
       session, 'show_hri', label = text_translate('hri', lang_sel, texts_thes)
     )

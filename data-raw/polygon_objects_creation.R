@@ -41,10 +41,20 @@ natura_network_2000_polygons <- sf::read_sf('data-raw/shapefiles/xn2000_2017.shp
   sf::st_transform('+proj=longlat +datum=WGS84')%>%
   dplyr::select(admin_natura_network_2000 = nom_n2, geometry)
 
-devtools::use_data(
+### internal data from database
+nfidb <- tidyNFI::nfi_connect(
+  user = 'guest', password = 'guest', host = '158.109.46.23', port = 5433, dbname = 'tururu'
+)
+var_thes <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>% dplyr::collect()
+texts_thes <- dplyr::tbl(nfidb, tolower('TEXTS_THESAURUS')) %>% dplyr::collect()
+numerical_thes <- dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL') %>% dplyr::collect()
+tidyNFI::nfi_close(nfidb)
+
+usethis::use_data(
   municipalities_polygons, regions_polygons, veguerias_polygons, provinces_polygons,
   catalonia_polygons, natural_interest_area_polygons,
   special_protection_natural_area_polygons, natura_network_2000_polygons,
+  var_thes, texts_thes, numerical_thes,
 
 
   internal = TRUE, overwrite = TRUE

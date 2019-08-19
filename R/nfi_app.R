@@ -9,9 +9,9 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
   nfidb <- tidyNFI::nfi_connect(user = user, password = password, host = host, port = port, dbname = dbname)
 
   ### Variables names inter ####################################################
-  var_thes <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>% dplyr::collect()
-  texts_thes <- dplyr::tbl(nfidb, tolower('TEXTS_THESAURUS')) %>% dplyr::collect()
-  numerical_thes <- dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL') %>% dplyr::collect()
+  # var_thes <- dplyr::tbl(nfidb, 'VARIABLES_THESAURUS') %>% dplyr::collect()
+  # texts_thes <- dplyr::tbl(nfidb, tolower('TEXTS_THESAURUS')) %>% dplyr::collect()
+  # numerical_thes <- dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL') %>% dplyr::collect()
 
   ### Language input ###########################################################
   shiny::addResourcePath(
