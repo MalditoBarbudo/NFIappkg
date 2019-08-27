@@ -280,43 +280,50 @@ mod_table <- function(
       ns <- session$ns
 
       shiny::showModal(
-        ui = shiny::modalDialog(
-          shiny::tagList(
-
-            shiny::fluidRow(
-              shiny::column(
-                12,
-                # format options
-                shiny::radioButtons(
-                  ns('data_format'), #'Data format',
-                  text_translate('data_format', lang(), texts_thes),
-                  choices = c('csv', 'xlsx'),
-                  selected = 'csv'
-                ),
-                # length options
-                shiny::radioButtons(
-                  ns('data_length'), #'All data?',
-                  text_translate('data_length', lang(), texts_thes),
-                  choices = c('visible', 'all_columns') %>%
-                    magrittr::set_names(c(
-                      text_translate('visible', lang(), texts_thes),
-                      text_translate('all_columns', lang(), texts_thes)
-                    )),
-                  selected = 'visible', width = '100%'
+        ui = shiny::tagList(
+          shiny::div(
+            id = 'download_table_modal',
+            shiny::modalDialog(
+              shiny::tagList(
+                shiny::fluidRow(
+                  shiny::column(
+                    12,
+                    # format options
+                    shiny::radioButtons(
+                      ns('data_format'), #'Data format',
+                      text_translate('data_format', lang(), texts_thes),
+                      choices = c('csv', 'xlsx'),
+                      selected = 'csv'
+                    ),
+                    # length options
+                    shiny::radioButtons(
+                      ns('data_length'), #'All data?',
+                      text_translate('data_length', lang(), texts_thes),
+                      choices = c('visible', 'all_columns') %>%
+                        magrittr::set_names(c(
+                          text_translate('visible', lang(), texts_thes),
+                          text_translate('all_columns', lang(), texts_thes)
+                        )),
+                      selected = 'visible', width = '100%'
+                    )
+                  )
+                )
+              ),
+              easyClose = TRUE,
+              footer = shiny::tagList(
+                shiny::modalButton(text_translate('dismiss', lang(), texts_thes)),
+                shiny::downloadButton(
+                  ns('download_data_with_options'),
+                  label = text_translate('download', lang(), texts_thes),
+                  class = 'btn-success'
                 )
               )
             )
-          ),
-          easyClose = TRUE,
-          footer = shiny::tagList(
-            shiny::modalButton(text_translate('dismiss', lang(), texts_thes)),
-            shiny::downloadButton(
-              ns('download_data_with_options'),
-              label = text_translate('download', lang(), texts_thes),
-              class = 'btn-success'
-            )
           )
         )
+
+
+
       )
     }
   )

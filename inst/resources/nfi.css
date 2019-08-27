@@ -125,12 +125,12 @@ div.table_container {
 
 /* language selector */
 .navbar-form {
-  margin-top: 5px;
+  margin-top: 8px;
   margin-bottom: 0px;
 }
 
 .navbar-form > .form-group {
-  position: fixed;
+  position: absolute;
   right: 25px;
 }
 
@@ -147,6 +147,10 @@ div.table_container {
 /* modal lg size refactoring */
 .modal-body {
   min-height: 800px;
+}
+
+#download_table_modal > #shiny-modal > .modal-dialog > .modal-content > .modal-body {
+  min-height: 210px;
 }
 
 .modal-lg {
