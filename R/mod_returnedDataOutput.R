@@ -55,6 +55,7 @@ mod_returnedData <- function(
       dominant_group <- data_inputs$dominant_group
       dominant_criteria <- data_inputs$dominant_criteria
       dominant_nfi <- data_inputs$dominant_nfi
+      user_file_sel <- data_inputs$user_file_sel
 
       # let's check if we can use the cache data:
 
@@ -68,7 +69,8 @@ mod_returnedData <- function(
         custom_polygon, cache_list$get("custompolygoncached"),
         dominant_group, cache_list$get("dominantgroupcached"),
         dominant_criteria, cache_list$get("dominantcriteriacached"),
-        dominant_nfi, cache_list$get("dominantnficached")
+        dominant_nfi, cache_list$get("dominantnficached"),
+        user_file_sel, cache_list$get("userfileselcached")
       )) {
         if (!is.null(cache_list$get("datacached"))) {
           res <- cache_list$get("datacached")
@@ -85,7 +87,9 @@ mod_returnedData <- function(
           dominant_nfi,
           filter_vars,
           filter_expressions,
-          custom_polygon, lang, texts_thes
+          custom_polygon,
+          user_file_sel,
+          lang, texts_thes
         )
 
         cache_list$set('datacached', res)
@@ -99,6 +103,7 @@ mod_returnedData <- function(
         cache_list$set("dominantgroupcached", data_inputs$dominant_group)
         cache_list$set("dominantcriteriacached", data_inputs$dominant_criteria)
         cache_list$set("dominantnficached", data_inputs$dominant_nfi)
+        cache_list$set("userfileselcached", data_inputs$user_file_sel)
 
       }
 
