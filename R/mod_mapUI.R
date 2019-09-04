@@ -104,6 +104,13 @@ mod_map <- function(
     handlerExpr = {
 
       # browser()
+
+      if (is.null(data_inputs$user_file_sel)) {
+        file_poly <- catalonia_polygons
+      } else {
+        file_poly <- sf::st_read(data_inputs$user_file_sel$datapath)
+      }
+
       polygon_object <- switch(
         data_inputs$admin_div,
         'aut_community' = 'catalonia_polygons',
@@ -113,7 +120,8 @@ mod_map <- function(
         'municipality' = 'municipalities_polygons',
         'natural_interest_area' = 'natural_interest_area_polygons',
         'special_protection_natural_area' = 'special_protection_natural_area_polygons',
-        'natura_network_2000' = 'natura_network_2000_polygons'
+        'natura_network_2000' = 'natura_network_2000_polygons',
+        'file' = 'file_poly'
       )
 
       polygon_group <- switch(
@@ -125,7 +133,8 @@ mod_map <- function(
         'municipality' = 'municipalities',
         'natural_interest_area' = 'natural_interest_areas',
         'special_protection_natural_area' = 'special_protection_natural_areas',
-        'natura_network_2000' = 'natura_network_2000s'
+        'natura_network_2000' = 'natura_network_2000s',
+        'file' = 'custom'
       )
 
       polygon_labels <- switch(
@@ -137,7 +146,8 @@ mod_map <- function(
         'municipality' = '~admin_municipality',
         'natural_interest_area' = '~admin_natural_interest_area',
         'special_protection_natural_area' = '~admin_special_protection_natural_area',
-        'natura_network_2000' = '~admin_natura_network_2000'
+        'natura_network_2000' = '~admin_natura_network_2000',
+        'file' = NULL
       )
 
       leaflet::leafletProxy('map') %>%

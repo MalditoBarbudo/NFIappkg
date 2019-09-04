@@ -75,7 +75,8 @@ mod_data <- function(
 
     admin_div_choices <- c(
       'aut_community', 'province', 'vegueria', 'region', 'municipality',
-      'natural_interest_area', 'special_protection_natural_area', 'natura_network_2000'
+      'natural_interest_area', 'special_protection_natural_area', 'natura_network_2000',
+      'file'
     ) %>%
       magrittr::set_names(c(
         text_translate('aut_community', lang(), texts_thes),
@@ -85,7 +86,8 @@ mod_data <- function(
         text_translate('municipality', lang(), texts_thes),
         text_translate('natural_interest_area', lang(), texts_thes),
         text_translate('special_protection_natural_area', lang(), texts_thes),
-        text_translate('natura_network_2000', lang(), texts_thes)
+        text_translate('natura_network_2000', lang(), texts_thes),
+        "file"
       ))
 
     functional_group_choices <- c('plot', 'species', 'simpspecies', 'genus', 'dec', 'bc') %>%
@@ -392,6 +394,33 @@ mod_data <- function(
     }
   })
 
+  # observer to show the modal to load the file when file is selected
+  shiny::observe({
+
+    # check for input
+    shiny::validate(
+      shiny::need(input$admin_div, "no admin selected")
+    )
+
+    # lets show the modal if we need it
+    admin_sel <- input$admin_div
+    if (admin_sel == 'file') {
+      shiny::showModal(
+        shiny::modalDialog(
+          shiny::fileInput(
+            'user_file_sel',
+            text_translate('user_file_sel_label', lang(), texts_thes),
+            accept = c('zip', 'gpkg'),
+            buttonLabel = text_translate('user_file_sel_buttonLabel', lang(), texts_thes),
+            placeholder = text_translate('user_file_sel_placeholder', lang(), texts_thes)
+          ),
+          size = "m", easyClose = FALSE, fade = TRUE,
+          footer = shiny::modalButton(text_translate('dismiss', lang(), texts_thes))
+        )
+      )
+    }
+  })
+
   # observer to disable the breakdown and diamclass inputs when shrub or regeneration
   # tables are selected
   shiny::observe({
@@ -439,6 +468,7 @@ mod_data <- function(
 
   # updating the data inputs
   shiny::observe({
+    data_inputs$user_file_sel <- input$user_file_sel
     data_inputs$dominant_group <- input$dominant_group
     data_inputs$dominant_criteria <- input$dominant_criteria
     data_inputs$dominant_nfi <- input$dominant_nfi

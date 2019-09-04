@@ -87,7 +87,8 @@ text_translate <- function(text, lang, texts_thes) {
     as.data.frame()
 
   if (nrow(text_df) < 1) {
-    stop(glue::glue("{text} not found in thesaurus"))
+    message(glue::glue("{text} not found in thesaurus"))
+    return(text)
   }
 
   text %>%
@@ -593,7 +594,8 @@ is_chached <- function(
   custom_polygon, custompolygoncached,
   dominant_group, dominantgroupcached,
   dominant_criteria, dominantcriteriacached,
-  dominant_nfi, dominantnficached
+  dominant_nfi, dominantnficached,
+  user_file_sel, userfileselcached
 ) {
 
   all(
@@ -606,7 +608,8 @@ is_chached <- function(
     identical(custom_polygon, custompolygoncached),
     identical(dominant_group, dominantgroupcached),
     identical(dominant_criteria, dominantcriteriacached),
-    identical(dominant_nfi, dominantnficached)
+    identical(dominant_nfi, dominantnficached),
+    identical(user_file_sel, userfileselcached)
   )
 
 }
@@ -624,6 +627,7 @@ returned_data <- function(
   filter_vars,
   filter_expressions,
   custom_polygon,
+  user_file_sel,
   lang,
   texts_thes
 ) {
@@ -634,9 +638,39 @@ returned_data <- function(
     value = 35, display_pct = TRUE, striped = TRUE
   )
 
-  # custom_polygon_fil_expr needs some extra checking:
+  # custom_polygon_fil_expr needs some extra checking, especially if there is
+  # also a file poly. Drawed poly has always the priority!!!
   if (is.null(custom_polygon)) {
-    custom_polygon_fil_expr <- rlang::quos()
+    # check for file poly
+    if (is.null(user_file_sel)) {
+      custom_polygon_fil_expr <- rlang::quos()
+    } else {
+      # check if plot_id is already in the filter_vars
+      if ('plot_id' %in% filter_vars) {
+        # then we need to replace the filter expression adding the one created
+        # by the custom_polygon_filter_expr function
+        orig_expr <- rlang::quo_text(
+          filter_expressions[[which(filter_vars == 'plot_id')]]
+        )
+        expr_to_add <- rlang::quo_text(
+          tidyNFI:::custom_polygon_filter_expr(
+            sf::st_read(input$user_file_sel$datapath), nfidb
+          )
+        )
+        filter_expressions[[which(filter_vars == 'plot_id')]] <- rlang::quo_set_expr(
+          filter_expressions[[which(filter_vars == 'plot_id')]],
+          rlang::expr(!!rlang::parse_expr(glue::glue(
+            "{orig_expr} || {expr_to_add}"
+          )))
+        )
+        custom_polygon_fil_expr <- rlang::quos()
+      } else {
+        filter_vars <- c('plot_id', filter_vars)
+        custom_polygon_fil_expr <- tidyNFI:::custom_polygon_filter_expr(
+          sf::st_read(input$user_file_sel$datapath), nfidb
+        )
+      }
+    }
   } else {
     # check if plot_id is already in the filter_vars
     if ('plot_id' %in% filter_vars) {

@@ -129,6 +129,7 @@ nfi_app <- function(user = 'guest', password = 'guest', host = NULL, port = NULL
     cache_list$set("dominantgroupcached", NULL)
     cache_list$set("dominantcriteriacached", NULL)
     cache_list$set("dominantnficached", NULL)
+    cache_list$set("userfileselcached", NULL)
 
     # lang reactive
     lang <- shiny::reactive({
