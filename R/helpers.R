@@ -594,7 +594,8 @@ is_chached <- function(
   custom_polygon, custompolygoncached,
   dominant_group, dominantgroupcached,
   dominant_criteria, dominantcriteriacached,
-  dominant_nfi, dominantnficached
+  dominant_nfi, dominantnficached,
+  user_file_sel, userfileselcached
 ) {
 
   all(
@@ -607,7 +608,8 @@ is_chached <- function(
     identical(custom_polygon, custompolygoncached),
     identical(dominant_group, dominantgroupcached),
     identical(dominant_criteria, dominantcriteriacached),
-    identical(dominant_nfi, dominantnficached)
+    identical(dominant_nfi, dominantnficached),
+    identical(user_file_sel, userfileselcached)
   )
 
 }

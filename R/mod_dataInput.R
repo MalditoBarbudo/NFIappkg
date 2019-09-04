@@ -396,6 +396,13 @@ mod_data <- function(
 
   # observer to show the modal to load the file when file is selected
   shiny::observe({
+
+    # check for input
+    shiny::validate(
+      shiny::need(input$admin_div, "no admin selected")
+    )
+
+    # lets show the modal if we need it
     admin_sel <- input$admin_div
     if (admin_sel == 'file') {
       shiny::showModal(
