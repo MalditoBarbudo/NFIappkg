@@ -87,7 +87,8 @@ text_translate <- function(text, lang, texts_thes) {
     as.data.frame()
 
   if (nrow(text_df) < 1) {
-    stop(glue::glue("{text} not found in thesaurus"))
+    message(glue::glue("{text} not found in thesaurus"))
+    return(text)
   }
 
   text %>%
