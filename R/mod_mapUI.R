@@ -338,6 +338,8 @@ mod_map <- function(
           )
         )
 
+        browser()
+
         map_data <- map_data_pre %>%
           dplyr::full_join(
             rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
