@@ -87,7 +87,8 @@ text_translate <- function(text, lang, texts_thes) {
     as.data.frame()
 
   if (nrow(text_df) < 1) {
-    stop(glue::glue("{text} not found in thesaurus"))
+    message(glue::glue("{text} not found in thesaurus"))
+    return(text)
   }
 
   text %>%
@@ -624,6 +625,7 @@ returned_data <- function(
   filter_vars,
   filter_expressions,
   custom_polygon,
+  polygon_object,
   lang,
   texts_thes
 ) {
@@ -721,6 +723,7 @@ returned_data <- function(
     summarised_data <- NULL
   } else {
 
+    # browser()
     summarised_data <- selected_data %>%
       nfi_results_summarise(
         polygon_group = admin_div,
@@ -729,6 +732,7 @@ returned_data <- function(
         dominant_group = dominant_group,
         dominant_criteria = dominant_criteria,
         dominant_nfi = dominant_nfi,
+        polygon_object = polygon_object,
         conn = nfidb,
         .collect = TRUE
       )

@@ -75,7 +75,8 @@ mod_data <- function(
 
     admin_div_choices <- c(
       'aut_community', 'province', 'vegueria', 'region', 'municipality',
-      'natural_interest_area', 'special_protection_natural_area', 'natura_network_2000'
+      'natural_interest_area', 'special_protection_natural_area', 'natura_network_2000',
+      'file'
     ) %>%
       magrittr::set_names(c(
         text_translate('aut_community', lang(), texts_thes),
@@ -85,7 +86,8 @@ mod_data <- function(
         text_translate('municipality', lang(), texts_thes),
         text_translate('natural_interest_area', lang(), texts_thes),
         text_translate('special_protection_natural_area', lang(), texts_thes),
-        text_translate('natura_network_2000', lang(), texts_thes)
+        text_translate('natura_network_2000', lang(), texts_thes),
+        text_translate('file', lang(), texts_thes)
       ))
 
     functional_group_choices <- c('plot', 'species', 'simpspecies', 'genus', 'dec', 'bc') %>%
@@ -167,6 +169,27 @@ mod_data <- function(
             shinyWidgets::pickerInput(
               ns('admin_div'), text_translate('divisions', lang(), texts_thes),
               admin_div_choices, selected = 'region'
+            )
+          )
+        ),
+        shinyjs::hidden(
+          shiny::div(
+            id = ns('file_upload_panel'),
+            shiny::fluidRow(
+              shiny::column(
+                7, offset = 5, align = 'center',
+                shiny::fileInput(
+                  ns('user_file_sel'),
+                  text_translate('user_file_sel_label', lang(), texts_thes),
+                  accept = c('zip', 'gpkg'),
+                  buttonLabel = text_translate(
+                    'user_file_sel_buttonLabel', lang(), texts_thes
+                  ),
+                  placeholder = text_translate(
+                    'user_file_sel_placeholder', lang(), texts_thes
+                  )
+                )
+              )
             )
           )
         ),
@@ -312,6 +335,21 @@ mod_data <- function(
     data_inputs$diameter_classes <- input$diameter_classes
   })
 
+  # observer to show the file upload panel if needed
+  shiny::observe({
+
+    shiny::validate(
+      shiny::need(input$admin_div, 'no div')
+    )
+    admin_div <- input$admin_div
+
+    if (admin_div == 'file') {
+      shinyjs::show('file_upload_panel')
+    } else {
+      shinyjs::hide('file_upload_panel')
+    }
+  })
+
   # observer to show the advanced options in the aggregation tab
   shiny::observeEvent(
     ignoreInit = TRUE,
@@ -320,6 +358,11 @@ mod_data <- function(
       shinyjs::toggle('advanced_fg_options_container')
     }
   )
+
+  # observer to get the file uploaded
+  shiny::observe({
+    data_inputs$user_file_sel <- input$user_file_sel
+  })
 
   # observer to disable the dominant grouping when other than plot is the
   # functional group, or diameter classes are selected, or other than nfi static

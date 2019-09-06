@@ -55,6 +55,7 @@ mod_returnedData <- function(
       dominant_group <- data_inputs$dominant_group
       dominant_criteria <- data_inputs$dominant_criteria
       dominant_nfi <- data_inputs$dominant_nfi
+      polygon_object <- map_inputs$polygon_info$object
 
       # let's check if we can use the cache data:
 
@@ -85,7 +86,9 @@ mod_returnedData <- function(
           dominant_nfi,
           filter_vars,
           filter_expressions,
-          custom_polygon, lang, texts_thes
+          custom_polygon,
+          polygon_object,
+          lang, texts_thes
         )
 
         cache_list$set('datacached', res)

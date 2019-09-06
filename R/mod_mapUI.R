@@ -92,6 +92,91 @@ mod_map <- function(
       )
   })
 
+  # reactive to get the default and file polygons
+  polygon_info <- shiny::reactive({
+
+    # browser()
+
+    # inputs
+    # apply_button_pressed <- data_inputs$apply_data
+    admin_div <- data_inputs$admin_div
+    path_to_file <- data_inputs$user_file_sel$datapath
+
+    # check if there is user file
+    if (is.null(path_to_file)) {
+      user_file_polygons <- NULL
+    } else {
+      user_file_polygons <- sf::st_read(path_to_file)
+    }
+
+    # check if file is uploaded
+    if (admin_div == 'file') {
+      shiny::validate(
+        shiny::need(user_file_polygons, 'no file provided')
+      )
+    }
+
+    # polygon info elements
+    polygon_object <- switch(
+      admin_div,
+      'aut_community' = catalonia_polygons,
+      'province' = provinces_polygons,
+      'vegueria' = veguerias_polygons,
+      'region' = regions_polygons,
+      'municipality' = municipalities_polygons,
+      'natural_interest_area' = natural_interest_area_polygons,
+      'special_protection_natural_area' = special_protection_natural_area_polygons,
+      'natura_network_2000' = natura_network_2000_polygons,
+      'file' = user_file_polygons
+    )
+    polygon_group <- switch(
+      admin_div,
+      'aut_community' = 'aut_communities',
+      'province' = 'provinces',
+      'vegueria' = 'veguerias',
+      'region' = 'regions',
+      'municipality' = 'municipalities',
+      'natural_interest_area' = 'natural_interest_areas',
+      'special_protection_natural_area' = 'special_protection_natural_areas',
+      'natura_network_2000' = 'natura_network_2000s',
+      'file' = 'user_file'
+    )
+    polygon_labels <- switch(
+      admin_div,
+      'aut_community' = as.formula('~admin_aut_community'),
+      'province' = as.formula('~admin_province'),
+      'vegueria' = as.formula('~admin_vegueria'),
+      'region' = as.formula('~admin_region'),
+      'municipality' = as.formula('~admin_municipality'),
+      'natural_interest_area' = as.formula('~admin_natural_interest_area'),
+      'special_protection_natural_area' = as.formula('~admin_special_protection_natural_area'),
+      'natura_network_2000' = as.formula('~admin_natura_network_2000'),
+      'file' = as.formula(glue::glue("~{names(user_file_polygons)[1]}"))
+    )
+    join_var <- switch(
+      admin_div,
+      'aut_community' = 'admin_aut_community',
+      'province' = 'admin_province',
+      'vegueria' = 'admin_vegueria',
+      'region' = 'admin_region',
+      'municipality' = 'admin_municipality',
+      'natural_interest_area' = 'admin_natural_interest_area',
+      'special_protection_natural_area' = 'admin_special_protection_natural_area',
+      'natura_network_2000' = 'admin_natura_network_2000',
+      'file' = 'poly_id'
+    )
+
+    # result to return
+    res <- list(
+      object = polygon_object,
+      group = polygon_group,
+      labels = polygon_labels,
+      join_var = join_var
+    )
+
+    return(res)
+  })
+
   # observer for admin divs polygons. We use this instead of add polygons
   # directly in the map and control them with the default addLayersControl
   # because some ids are identical between polygons layers (i.e. Barcelona in
@@ -104,41 +189,42 @@ mod_map <- function(
     handlerExpr = {
 
       # browser()
-      polygon_object <- switch(
-        data_inputs$admin_div,
-        'aut_community' = 'catalonia_polygons',
-        'province' = 'provinces_polygons',
-        'vegueria' = 'veguerias_polygons',
-        'region' = 'regions_polygons',
-        'municipality' = 'municipalities_polygons',
-        'natural_interest_area' = 'natural_interest_area_polygons',
-        'special_protection_natural_area' = 'special_protection_natural_area_polygons',
-        'natura_network_2000' = 'natura_network_2000_polygons'
-      )
-
-      polygon_group <- switch(
-        data_inputs$admin_div,
-        'aut_community' = 'aut_communities',
-        'province' = 'provinces',
-        'vegueria' = 'veguerias',
-        'region' = 'regions',
-        'municipality' = 'municipalities',
-        'natural_interest_area' = 'natural_interest_areas',
-        'special_protection_natural_area' = 'special_protection_natural_areas',
-        'natura_network_2000' = 'natura_network_2000s'
-      )
-
-      polygon_labels <- switch(
-        data_inputs$admin_div,
-        'aut_community' = '~admin_aut_community',
-        'province' = '~admin_province',
-        'vegueria' = '~admin_vegueria',
-        'region' = '~admin_region',
-        'municipality' = '~admin_municipality',
-        'natural_interest_area' = '~admin_natural_interest_area',
-        'special_protection_natural_area' = '~admin_special_protection_natural_area',
-        'natura_network_2000' = '~admin_natura_network_2000'
-      )
+      # polygon_object <- switch(
+      #   data_inputs$admin_div,
+      #   'aut_community' = 'catalonia_polygons',
+      #   'province' = 'provinces_polygons',
+      #   'vegueria' = 'veguerias_polygons',
+      #   'region' = 'regions_polygons',
+      #   'municipality' = 'municipalities_polygons',
+      #   'natural_interest_area' = 'natural_interest_area_polygons',
+      #   'special_protection_natural_area' = 'special_protection_natural_area_polygons',
+      #   'natura_network_2000' = 'natura_network_2000_polygons'
+      # )
+      #
+      # polygon_group <- switch(
+      #   data_inputs$admin_div,
+      #   'aut_community' = 'aut_communities',
+      #   'province' = 'provinces',
+      #   'vegueria' = 'veguerias',
+      #   'region' = 'regions',
+      #   'municipality' = 'municipalities',
+      #   'natural_interest_area' = 'natural_interest_areas',
+      #   'special_protection_natural_area' = 'special_protection_natural_areas',
+      #   'natura_network_2000' = 'natura_network_2000s'
+      # )
+      #
+      # polygon_labels <- switch(
+      #   data_inputs$admin_div,
+      #   'aut_community' = '~admin_aut_community',
+      #   'province' = '~admin_province',
+      #   'vegueria' = '~admin_vegueria',
+      #   'region' = '~admin_region',
+      #   'municipality' = '~admin_municipality',
+      #   'natural_interest_area' = '~admin_natural_interest_area',
+      #   'special_protection_natural_area' = '~admin_special_protection_natural_area',
+      #   'natura_network_2000' = '~admin_natura_network_2000'
+      # )
+      polygon_info_col <- polygon_info()
 
       leaflet::leafletProxy('map') %>%
         leaflet::clearGroup('veguerias') %>%
@@ -149,11 +235,12 @@ mod_map <- function(
         leaflet::clearGroup('natural_interest_areas') %>%
         leaflet::clearGroup('special_protection_natural_areas') %>%
         leaflet::clearGroup('natura_network_2000s') %>%
+        leaflet::clearGroup('user_file') %>%
         leaflet::addPolygons(
-          data = rlang::eval_tidy(rlang::sym(polygon_object)),
-          group = polygon_group,
-          label = as.formula(polygon_labels),
-          layerId = as.formula(polygon_labels),
+          data = polygon_info_col$object,
+          group = polygon_info_col$group,
+          label = polygon_info_col$labels,
+          layerId = polygon_info_col$labels,
           weight = 1, smoothFactor = 1,
           opacity = 1.0, fill = TRUE,
           color = '#6C7A89FF', fillColor = "#CF000F00",
@@ -272,29 +359,30 @@ mod_map <- function(
         magrittr::extract(!vapply(., rlang::quo_is_missing, logical(1)))
 
       # switches (polygons objects, labels and groups)
-      join_var <- switch(
-        data_inputs$admin_div,
-        'aut_community' = 'admin_aut_community',
-        'province' = 'admin_province',
-        'vegueria' = 'admin_vegueria',
-        'region' = 'admin_region',
-        'municipality' = 'admin_municipality',
-        'natural_interest_area' = 'admin_natural_interest_area',
-        'special_protection_natural_area' = 'admin_special_protection_natural_area',
-        'natura_network_2000' = 'admin_natura_network_2000'
-      )
-
-      polygon_object <- switch(
-        data_inputs$admin_div,
-        'aut_community' = 'catalonia_polygons',
-        'province' = 'provinces_polygons',
-        'vegueria' = 'veguerias_polygons',
-        'region' = 'regions_polygons',
-        'municipality' = 'municipalities_polygons',
-        'natural_interest_area' = 'natural_interest_area_polygons',
-        'special_protection_natural_area' = 'special_protection_natural_area_polygons',
-        'natura_network_2000' = 'natura_network_2000_polygons'
-      )
+      # join_var <- switch(
+      #   data_inputs$admin_div,
+      #   'aut_community' = 'admin_aut_community',
+      #   'province' = 'admin_province',
+      #   'vegueria' = 'admin_vegueria',
+      #   'region' = 'admin_region',
+      #   'municipality' = 'admin_municipality',
+      #   'natural_interest_area' = 'admin_natural_interest_area',
+      #   'special_protection_natural_area' = 'admin_special_protection_natural_area',
+      #   'natura_network_2000' = 'admin_natura_network_2000'
+      # )
+      #
+      # polygon_object <- switch(
+      #   data_inputs$admin_div,
+      #   'aut_community' = 'catalonia_polygons',
+      #   'province' = 'provinces_polygons',
+      #   'vegueria' = 'veguerias_polygons',
+      #   'region' = 'regions_polygons',
+      #   'municipality' = 'municipalities_polygons',
+      #   'natural_interest_area' = 'natural_interest_area_polygons',
+      #   'special_protection_natural_area' = 'special_protection_natural_area_polygons',
+      #   'natura_network_2000' = 'natura_network_2000_polygons'
+      # )
+      polygon_info_col <- polygon_info()
 
       # polygons shape
       if (data_inputs$viz_shape == 'polygon') {
@@ -305,7 +393,8 @@ mod_map <- function(
             !!! filter_exprs
           ) %>%
           dplyr::select(dplyr::one_of(
-            join_var, viz_color, glue::glue("{data_inputs$functional_group}_id"),
+            polygon_info_col$join_var, viz_color,
+            glue::glue("{data_inputs$functional_group}_id"),
             glue::glue("{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant{dominant_nfi}"),
             'diamclass_id'
           ))
@@ -319,7 +408,7 @@ mod_map <- function(
 
         map_data <- map_data_pre %>%
           dplyr::full_join(
-            rlang::eval_tidy(rlang::sym(polygon_object)), by = join_var
+            polygon_info_col$object, by = polygon_info_col$join_var
           ) %>%
           sf::st_as_sf()
 
@@ -383,41 +472,42 @@ mod_map <- function(
       )
 
       # switches (polygons objects, labels and groups)
-      polygon_group <- switch(
-        data_inputs$admin_div,
-        'aut_community' = 'aut_communities',
-        'province' = 'provinces',
-        'vegueria' = 'veguerias',
-        'region' = 'regions',
-        'municipality' = 'municipalities',
-        'natural_interest_area' = 'natural_interest_areas',
-        'special_protection_natural_area' = 'special_protection_natural_areas',
-        'natura_network_2000' = 'natura_network_2000s'
-      )
-
-      polygon_labels <- switch(
-        data_inputs$admin_div,
-        'aut_community' = '~admin_aut_community',
-        'province' = '~admin_province',
-        'vegueria' = '~admin_vegueria',
-        'region' = '~admin_region',
-        'municipality' = '~admin_municipality',
-        'natural_interest_area' = '~admin_natural_interest_area',
-        'special_protection_natural_area' = '~admin_special_protection_natural_area',
-        'natura_network_2000' = '~admin_natura_network_2000'
-      )
-
-      polygon_object <- switch(
-        data_inputs$admin_div,
-        'aut_community' = 'catalonia_polygons',
-        'province' = 'provinces_polygons',
-        'vegueria' = 'veguerias_polygons',
-        'region' = 'regions_polygons',
-        'municipality' = 'municipalities_polygons',
-        'natural_interest_area' = 'natural_interest_area_polygons',
-        'special_protection_natural_area' = 'special_protection_natural_area_polygons',
-        'natura_network_2000' = 'natura_network_2000_polygons'
-      )
+      # polygon_group <- switch(
+      #   data_inputs$admin_div,
+      #   'aut_community' = 'aut_communities',
+      #   'province' = 'provinces',
+      #   'vegueria' = 'veguerias',
+      #   'region' = 'regions',
+      #   'municipality' = 'municipalities',
+      #   'natural_interest_area' = 'natural_interest_areas',
+      #   'special_protection_natural_area' = 'special_protection_natural_areas',
+      #   'natura_network_2000' = 'natura_network_2000s'
+      # )
+      #
+      # polygon_labels <- switch(
+      #   data_inputs$admin_div,
+      #   'aut_community' = '~admin_aut_community',
+      #   'province' = '~admin_province',
+      #   'vegueria' = '~admin_vegueria',
+      #   'region' = '~admin_region',
+      #   'municipality' = '~admin_municipality',
+      #   'natural_interest_area' = '~admin_natural_interest_area',
+      #   'special_protection_natural_area' = '~admin_special_protection_natural_area',
+      #   'natura_network_2000' = '~admin_natura_network_2000'
+      # )
+      #
+      # polygon_object <- switch(
+      #   data_inputs$admin_div,
+      #   'aut_community' = 'catalonia_polygons',
+      #   'province' = 'provinces_polygons',
+      #   'vegueria' = 'veguerias_polygons',
+      #   'region' = 'regions_polygons',
+      #   'municipality' = 'municipalities_polygons',
+      #   'natural_interest_area' = 'natural_interest_area_polygons',
+      #   'special_protection_natural_area' = 'special_protection_natural_area_polygons',
+      #   'natura_network_2000' = 'natura_network_2000_polygons'
+      # )
+      polygon_info_col <- polygon_info()
 
       # polygons
       if (data_inputs$viz_shape == 'polygon') {
@@ -478,12 +568,13 @@ mod_map <- function(
           leaflet::clearGroup('natural_interest_areas') %>%
           leaflet::clearGroup('special_protection_natural_areas') %>%
           leaflet::clearGroup('natura_network_2000s') %>%
+          leaflet::clearGroup('user_file') %>%
           leaflet::clearGroup('plots') %>%
           leaflet::addPolygons(
             data = map_data,
-            group = polygon_group,
-            label = as.formula(polygon_labels),
-            layerId = as.formula(polygon_labels),
+            group = polygon_info_col$group,
+            label = polygon_info_col$labels,
+            layerId = polygon_info_col$labels,
             weight = 1, smoothFactor = 1,
             opacity = 1.0, fill = TRUE,
             color = '#6C7A89FF', fillColor = pal(color_vector),
@@ -581,12 +672,13 @@ mod_map <- function(
           leaflet::clearGroup('natural_interest_areas') %>%
           leaflet::clearGroup('special_protection_natural_areas') %>%
           leaflet::clearGroup('natura_network_2000s') %>%
+          leaflet::clearGroup('user_file') %>%
           leaflet::clearGroup('plots') %>%
           leaflet::addPolygons(
-            data = rlang::eval_tidy(rlang::sym(polygon_object)),
-            group = polygon_group,
-            label = as.formula(polygon_labels),
-            layerId = as.formula(polygon_labels),
+            data = polygon_info_col$object,
+            group = polygon_info_col$group,
+            label = polygon_info_col$labels,
+            layerId = polygon_info_col$labels,
             weight = 1, smoothFactor = 1,
             opacity = 1.0, fill = TRUE,
             color = '#6C7A89FF', fillColor = "#CF000F00",
@@ -628,6 +720,7 @@ mod_map <- function(
     map_inputs$map_draw_new_feature <- input$map_draw_new_feature
     map_inputs$map_draw_start <- input$map_draw_start
     map_inputs$map_draw_stop <- input$map_draw_stop
+    map_inputs$polygon_info <- polygon_info()
   })
 
   return(map_inputs)
