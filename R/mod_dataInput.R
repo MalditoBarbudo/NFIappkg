@@ -177,7 +177,7 @@ mod_data <- function(
             id = ns('file_upload_panel'),
             shiny::fluidRow(
               shiny::column(
-                7, offset = 5, align = 'center',
+                7, align = 'center',
                 shiny::fileInput(
                   ns('user_file_sel'),
                   text_translate('user_file_sel_label', lang(), texts_thes),
@@ -189,6 +189,10 @@ mod_data <- function(
                     'user_file_sel_placeholder', lang(), texts_thes
                   )
                 )
+              ),
+              shiny::column(
+                5, align = 'center',
+                shiny::p(text_translate('file_text', lang(), texts_thes))
               )
             )
           )

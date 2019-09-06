@@ -114,7 +114,11 @@ mod_info <- function(
         }
       }
       viz_size <- ''
-      admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
+      if (data_inputs$admin_div == 'file') {
+        admin_sel <- 'poly_id'
+      } else {
+        admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
+      }
 
       prep_data <- map_inputs$main_data[['summarised']] %>%
         dplyr::select(dplyr::one_of(
@@ -210,7 +214,11 @@ mod_info <- function(
           }
         }
         viz_size <- ''
-        admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
+        if (data_inputs$admin_div == 'file') {
+          admin_sel <- 'poly_id'
+        } else {
+          admin_sel <- glue::glue("admin_{data_inputs$admin_div}")
+        }
 
         plot_data_all <- prep_data()
 
