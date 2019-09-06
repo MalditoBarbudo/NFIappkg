@@ -171,7 +171,11 @@ mod_table <- function(
       }
 
       # selected_choices_sources
-      admin_div_sel <- glue::glue("admin_{data_inputs$admin_div}")
+      if (data_inputs$admin_div == 'file') {
+        admin_div_sel <- 'poly_id'
+      } else {
+        admin_div_sel <- glue::glue("admin_{data_inputs$admin_div}")
+      }
       fg_sel <- glue::glue("{data_inputs$functional_group}_id")
       dom_nfi_sel <- switch(data_inputs$dominant_nfi, none = '', nfi2 = '_nfi2', nfi3 = '_nfi3', nfi4 = '_nfi4')
       dominant_sel <- glue::glue("{data_inputs$dominant_criteria}_{data_inputs$dominant_group}_dominant{dom_nfi_sel}")
