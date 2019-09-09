@@ -418,7 +418,7 @@ infoplot_builder <- function(
       plot_expression <- glue::glue(
         "{plot_expression} +
         ggplot2::geom_violin(
-          adjust = 0.5,
+          adjust = 0.5, scale = 'count',
           fill = 'transparent', colour = '#647a8d'
         )"
       )
