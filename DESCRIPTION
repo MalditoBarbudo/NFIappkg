@@ -16,7 +16,6 @@ Imports:
     DT,
     ggplot2,
     glue,
-    gt (>= 0.1.0),
     htmlwidgets,
     leaflet,
     leaflet.extras,
