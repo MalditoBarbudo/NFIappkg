@@ -102,8 +102,6 @@ mod_map <- function(
     admin_div <- data_inputs$admin_div
     path_to_file <- data_inputs$user_file_sel$datapath
 
-    browser()
-
     # check if there is user file
     if (is.null(path_to_file)) {
       user_file_polygons <- NULL
