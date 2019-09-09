@@ -307,7 +307,7 @@ mod_info <- function(
             Characteristics = formattable::formatter(
               "span", style = formattable::style(
                 "font-family" = "Montserrat", color = "#c8cac8",
-                "font-size" = "16pt", "font-weight" = "normal"
+                "font-size" = "14pt", "font-weight" = "normal"
               )
             ),
             Value = formattable::formatter(
