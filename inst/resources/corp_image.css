@@ -207,3 +207,12 @@ input.form-control {
   color: var(--main-bg-color);
 }
 
+/* formattable thingys */
+.lfc_formattable th {
+  display: none;
+  border: none;
+}
+
+.lfc_formattable>tbody>tr>td {
+  border: none;
+}

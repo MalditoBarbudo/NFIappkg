@@ -30,7 +30,7 @@ Imports:
     stringr,
     tidyNFI (>= 0.0.0.9000),
     tidyr,
-    writexl
+    writexl,
+    formattable
 Remotes: 
-    rstudio/gt,
     MalditoBarbudo/tidyNFI

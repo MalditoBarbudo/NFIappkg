@@ -9,23 +9,6 @@ mod_infoUI <- function(id) {
   # ns
   ns <- shiny::NS(id)
 
-  # # ui skeleton (columns)
-  # shiny::tagList(
-  #   shiny::fluidRow(
-  #     shiny::column(
-  #       6,
-  #       # plot column
-  #       shiny::br(),
-  #       shiny::plotOutput(ns("info_plot"))
-  #     ),
-  #     shiny::column(
-  #       6,
-  #       shiny::br(),
-  #       gt::gt_output(ns('info_table'))
-  #     )
-  #   )
-  # )
-
   # ui skeleton (rows)
   shiny::tagList(
     shiny::fluidRow(
@@ -34,7 +17,7 @@ mod_infoUI <- function(id) {
     ),
     shiny::fluidRow(
       shiny::br(),
-      gt::gt_output(ns('info_table'))
+      formattable::formattableOutput(ns('info_table'), width = "75%")
     )
   )
 }
@@ -268,53 +251,74 @@ mod_info <- function(
             numerical_thes, ordered = FALSE
           ))
         ) %>%
-        gt::gt(rowname_col = 'Characteristics') %>%
-        gt::tab_header(
-          title = glue::glue(text_translate("info_tab_header", lang(), texts_thes))
-        ) %>%
-        gt::tab_options(
-          table.background.color = 'transparent',
-          heading.title.font.size = 22,
-          table.font.size = 16,
-          table.border.top.width = 0,
-        #   stub_group.border.top.width = 0,
-        #   stub_group.border.bottom.width = 0,
-        #   field.border.top.width = 0,
-        #   field.border.bottom.width = 0,
-          heading.border.bottom.width = 2,
-          heading.border.bottom.color = '#c8cac8'
-        ) %>%
-        gt::tab_style(
-          style = gt::cells_styles(
-            text_size = 0
+        ##################################################################################
+        ## gt is TOO FAR EXPERIMENTAL yet, so its better to use another html table engine
+        # gt::gt(rowname_col = 'Characteristics') %>%
+        # gt::tab_header(
+        #   title = glue::glue(text_translate("info_tab_header", lang(), texts_thes))
+        # ) %>%
+        # gt::tab_options(
+        #   table.background.color = 'transparent',
+        #   heading.title.font.size = 22,
+        #   table.font.size = 16,
+        #   table.border.top.width = 0,
+        # #   stub_group.border.top.width = 0,
+        # #   stub_group.border.bottom.width = 0,
+        # #   field.border.top.width = 0,
+        # #   field.border.bottom.width = 0,
+        #   heading.border.bottom.width = 2,
+        #   heading.border.bottom.color = '#c8cac8'
+        # ) %>%
+        # gt::tab_style(
+        #   style = gt::cells_styles(
+        #     text_size = 0
+        #   ),
+        #   location = gt::cells_column_labels(columns = TRUE)
+        # ) %>%
+        # gt::tab_style(
+        #   style = gt::cells_styles(
+        #     text_font = 'Montserrat',
+        #     text_color = '#c8cac8',
+        #     text_weight = 'bold',
+        #     text_align = 'right'
+        #   ),
+        #   locations = gt::cells_title(groups = 'title')
+        # ) %>%
+        # gt::tab_style(
+        #   style = gt::cells_styles(
+        #     text_font = 'Montserrat',
+        #     text_color = '#c8cac8',
+        #     text_align = 'right'
+        #   ),
+        #   locations = gt::cells_stub(rows = TRUE)
+        # ) %>%
+        # gt::tab_style(
+        #   style = gt::cells_styles(
+        #     text_font = 'Montserrat',
+        #     text_color = '#c8cac8',
+        #     text_weight = 'bold',
+        #     text_align = 'left'
+        #   ),
+        #   locations = gt::cells_data(columns = dplyr::vars(Value))
+        # )
+        ##################################################################################
+        formattable::formattable(
+          list(
+            Characteristics = formattable::formatter(
+              "span", style = formattable::style(
+                "font-family" = "Montserrat", color = "#c8cac8",
+                "font-size" = "16pt", "font-weight" = "normal"
+              )
+            ),
+            Value = formattable::formatter(
+              "span", style = formattable::style(
+                "font-family" = "Montserrat", color = "#c8cac8",
+                "font-size" = "16pt", "font-weight" = "bold"
+              )
+            )
           ),
-          location = gt::cells_column_labels(columns = TRUE)
-        ) %>%
-        gt::tab_style(
-          style = gt::cells_styles(
-            text_font = 'Montserrat',
-            text_color = '#c8cac8',
-            text_weight = 'bold',
-            text_align = 'right'
-          ),
-          locations = gt::cells_title(groups = 'title')
-        ) %>%
-        gt::tab_style(
-          style = gt::cells_styles(
-            text_font = 'Montserrat',
-            text_color = '#c8cac8',
-            text_align = 'right'
-          ),
-          locations = gt::cells_stub(rows = TRUE)
-        ) %>%
-        gt::tab_style(
-          style = gt::cells_styles(
-            text_font = 'Montserrat',
-            text_color = '#c8cac8',
-            text_weight = 'bold',
-            text_align = 'left'
-          ),
-          locations = gt::cells_data(columns = dplyr::vars(Value))
+          align = c('r', 'l'),
+          table.attr = "class=\"table table-condensed lfc_formattable\""
         )
 
       return(list(info_plot = info_plot, info_table = info_table))
@@ -326,7 +330,7 @@ mod_info <- function(
     plot_and_table()$info_plot
   })
 
-  output$info_table <- gt::render_gt({
+  output$info_table <- formattable::renderFormattable({
     plot_and_table()$info_table
   })
 
