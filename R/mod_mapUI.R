@@ -102,11 +102,25 @@ mod_map <- function(
     admin_div <- data_inputs$admin_div
     path_to_file <- data_inputs$user_file_sel$datapath
 
+    browser()
+
     # check if there is user file
     if (is.null(path_to_file)) {
       user_file_polygons <- NULL
     } else {
-      user_file_polygons <- sf::st_read(path_to_file)
+      # check if zip (shapefile) or gpkg to load the data
+      if (stringr::str_detect(path_to_file, 'zip')) {
+        tmp_folder <- tempdir()
+        utils::unzip(path_to_file, exdir = tmp_folder)
+
+        user_file_polygons <- sf::st_read(
+          list.files(tmp_folder, '.shp', recursive = TRUE, full.names = TRUE),
+          as_tibble = TRUE
+        )
+      } else {
+        # gpkg
+        user_file_polygons <- sf::st_read(path_to_file)
+      }
     }
 
     # check if file is uploaded
