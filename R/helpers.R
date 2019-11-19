@@ -636,6 +636,8 @@ returned_data <- function(
     value = 35, display_pct = TRUE, striped = TRUE
   )
 
+  # browser()
+
   # custom_polygon_fil_expr needs some extra checking:
   if (is.null(custom_polygon)) {
     custom_polygon_fil_expr <- rlang::quos()
@@ -684,33 +686,6 @@ returned_data <- function(
     dplyr::left_join(dplyr::tbl(nfidb, 'PLOTS'), by = 'plot_id') %>%
     dplyr::collect()
 
-  if (nfi %in% c('nfi_2', 'nfi_3', 'nfi_4')) {
-    selected_data <- selected_data %>%
-      dplyr::left_join(
-        dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi)}_DYNAMIC_INFO")) %>%
-          dplyr::collect(),
-        by = 'plot_id'
-      )
-  } else {
-    if (nfi %in% c(
-      'nfi_2_shrub', 'nfi_3_shrub', 'nfi_4_shrub',
-      'nfi_2_regen', 'nfi_3_regen', 'nfi_4_regen'
-    )) {
-      nfi_stripped <- stringr::str_extract(nfi, "nfi_[2-4]")
-      selected_data <- selected_data %>%
-        dplyr::left_join(
-          dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi_stripped)}_DYNAMIC_INFO")) %>%
-            dplyr::collect(),
-          by = 'plot_id'
-        )
-    }
-  }
-
-  shinyWidgets::updateProgressBar(
-    session = session, id = 'data_progress',
-    value = 55
-  )
-
   # we must to check if the filters wiped out the data
   if (length(names(selected_data)) < 1) {
     shinyWidgets::sendSweetAlert(
@@ -722,6 +697,32 @@ returned_data <- function(
     selected_data <- NULL
     summarised_data <- NULL
   } else {
+    if (nfi %in% c('nfi_2', 'nfi_3', 'nfi_4')) {
+      selected_data <- selected_data %>%
+        dplyr::left_join(
+          dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi)}_DYNAMIC_INFO")) %>%
+            dplyr::collect(),
+          by = 'plot_id'
+        )
+    } else {
+      if (nfi %in% c(
+        'nfi_2_shrub', 'nfi_3_shrub', 'nfi_4_shrub',
+        'nfi_2_regen', 'nfi_3_regen', 'nfi_4_regen'
+      )) {
+        nfi_stripped <- stringr::str_extract(nfi, "nfi_[2-4]")
+        selected_data <- selected_data %>%
+          dplyr::left_join(
+            dplyr::tbl(nfidb, glue::glue("PLOTS_{toupper(nfi_stripped)}_DYNAMIC_INFO")) %>%
+              dplyr::collect(),
+            by = 'plot_id'
+          )
+      }
+    }
+
+    shinyWidgets::updateProgressBar(
+      session = session, id = 'data_progress',
+      value = 55
+    )
 
     # browser()
     summarised_data <- selected_data %>%
