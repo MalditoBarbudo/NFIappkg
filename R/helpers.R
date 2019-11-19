@@ -690,8 +690,8 @@ returned_data <- function(
   if (length(names(selected_data)) < 1) {
     shinyWidgets::sendSweetAlert(
       session = session,
-      title = 'No data can be retrieved with the actual filters',
-      text = 'Please choose another filter values'
+      title = text_translate('sweet_alert_returned_data_title', lang(), texts_thes),
+      text = text_translate('sweet_alert_returned_data_text', lang(), texts_thes)
     )
 
     selected_data <- NULL
