@@ -43,11 +43,11 @@ natura_network_2000_polygons <- sf::read_sf('data-raw/shapefiles/xn2000_2017.shp
 
 ### internal data from database
 nfidb <- tidyNFI::nfi_connect(
-  user = 'guest', password = 'guest', host = '158.109.46.23', port = 5433, dbname = 'tururu'
+  user = 'guest', password = 'guest', host = '158.109.46.23', port = 5432, dbname = 'tururu'
 )
 var_thes <- dplyr::tbl(nfidb, tolower('VARIABLES_THESAURUS')) %>% dplyr::collect()
 texts_thes <- dplyr::tbl(nfidb, tolower('TEXTS_THESAURUS')) %>% dplyr::collect()
-numerical_thes <- dplyr::tbl(nfidb, 'VARIABLES_NUMERICAL') %>% dplyr::collect()
+numerical_thes <- dplyr::tbl(nfidb, tolower('VARIABLES_NUMERICAL')) %>% dplyr::collect()
 tidyNFI::nfi_close(nfidb)
 
 usethis::use_data(
